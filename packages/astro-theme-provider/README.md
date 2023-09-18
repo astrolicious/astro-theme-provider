@@ -64,7 +64,7 @@ export default ThemeProvider({
 })
 ```
 
-#### Use Virtual Modules to Build Pages, Layouts, and Components
+#### Use virtual modules to build pages, layouts, and components
 
 ```tsx
 // my-theme/pages/index.astro
@@ -108,7 +108,7 @@ const { title, description } = Astro.props
 
 ### Using the Theme
 
-#### Import and configure them in Astro config
+#### Import and configure theme in Astro config
 
 ```ts
 import { defineConfig } from 'astro/config';
@@ -137,7 +137,7 @@ export default defineConfig({
 });
 ```
 
-#### Override components to Customize Theme
+#### Customize theme by overriding components
 
 ```tsx
 /// /src/CustomHeading.astro
