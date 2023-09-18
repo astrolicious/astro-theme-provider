@@ -106,6 +106,33 @@ const { title, description } = Astro.props
 </header>
 ```
 
+#### Type virtual modules
+
+```ts
+// my-theme/virtual.d.ts
+declare module 'virtual:my-theme/context' {
+  const Config: import('astro').AstroConfig;
+	export default Config;
+}
+
+declare module 'virtual:my-theme/config' {
+	const Config: import('my-theme').MyThemeConfig;
+	export default Config;
+}
+
+declare module 'virtual:my-theme/css' {}
+
+declare module 'virtual:my-theme/components' {
+	export const Layout: typeof import('./layouts/Layout.astro').default;
+	export const Heading: typeof import('./components/Heading.astro').default;
+}
+
+declare module 'virtual:my-theme/assets' {
+	type ImageMetadata = import('astro').ImageMetadata;
+	export const avatar: ImageMetadata
+}
+```
+
 ### Using the Theme
 
 #### Import and configure theme in Astro config
