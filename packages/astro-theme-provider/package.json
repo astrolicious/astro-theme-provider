@@ -1,0 +1,29 @@
+{
+  "name": "astro-theme-provider",
+  "version": "0.0.1",
+  "description": "Helper for creating theme integrations in Astro",
+  "keywords": [
+    "astro",
+    "withastro",
+    "astro-integration"
+  ],
+  "author": "Bryce Russell",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brycerussell/astro-theme-provider",
+    "directory": "packages/astro-theme-provider"
+  },
+  "bugs": "https://github.com/brycerussell/astro-theme-provider/issues",
+  "homepage": "https://github.com/brycerussell/astro-theme-provider",
+  "scripts": {},
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./types": "./types.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.1",
+    "astro": "3.1.0"
+  }
+}

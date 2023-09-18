@@ -1,0 +1,23 @@
+{
+  "name": "my-theme",
+  "version": "0.0.1",
+  "description": "",
+  "license": "MIT",
+  "scripts": {},
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./pages/*": "./pages/*",
+    "./layouts/*": "./layouts/*",
+    "./components/*": "./components/*",
+    "./assets/*": "./assets/*",
+    "./styles/*": "./styles/*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.1",
+    "astro": "3.1.0"
+  },
+  "dependencies": {
+    "astro-theme-provider": "workspace:^"
+  }
+}
