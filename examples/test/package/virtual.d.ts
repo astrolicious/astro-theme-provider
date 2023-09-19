@@ -12,7 +12,7 @@ declare module 'virtual:my-theme/css' {}
 
 declare module 'virtual:my-theme/components' {
 	export const Layout: typeof import('./layouts/Layout.astro').default;
-	export const Heading: typeof import('./components/Heading.astro.tsx').default;
+	export const Heading: typeof import('./components/Heading.astro').default;
 }
 
 declare module 'virtual:my-theme/assets' {
