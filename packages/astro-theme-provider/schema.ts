@@ -17,7 +17,7 @@ export function ThemeProviderUserConfigSchema<AuthorConfig, AuthorExports extend
 			css: z.string().array().optional().default([]).transform((css) => Array.from(new Set([...authorOptions.exports?.css ?? [], ...css]))),
 			components: overrideSchema<AuthorExports['components']>(authorOptions.exports?.components),
 			assets: overrideSchema<AuthorExports['assets']>(authorOptions.exports?.assets)
-		})
+		}).optional().default({})
 	})
 }
 
