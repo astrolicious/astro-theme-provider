@@ -20,8 +20,6 @@ export default function ThemeProviderIntegration<AuthorConfig, AuthorExports ext
   
     const userConfig = parsedUserConfig.data;
 
-    console.log(userConfig)
-
     return {
       name: authorOptions.name,
       hooks: {
