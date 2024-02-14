@@ -4,10 +4,6 @@
   "description": "",
   "license": "MIT",
   "scripts": {},
-  "type": "module",
-  "files": [
-    "**/*"
-  ],
   "devDependencies": {
     "@types/node": "^20.11.17",
     "astro": "^4.3.5"
