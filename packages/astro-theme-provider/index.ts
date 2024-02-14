@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url'
 import { defineIntegration, defineOptions } from "astro-integration-kit";
 import { watchIntegrationPlugin, addVirtualImportPlugin, hasIntegrationPlugin } from "astro-integration-kit/plugins";
 import addPageDirPlugin from 'astro-pages/plugins/astro-integration-kit.ts';
+import validatePackageName from 'validate-npm-package-name';
 import addDtsBufferPlugin from './plugins/d-ts-buffer'
 import { errorMap } from './error-map';
 import { GLOB_ASTRO, GLOB_CSS, GLOB_IMAGES, LineBuffer, camelCase, globToModule, isAbsoluteFile, isCSSFile, isImageFile, validateDirectory, validateFile, wrapWithBrackets } from './utils'
@@ -62,6 +63,29 @@ export default function<
   const entrypoint = validateFile(_entrypoint)
 
   const cwd = validateDirectory(entrypoint)
+
+  const pkg = JSON.parse(readFileSync(resolve(cwd, "package.json"), "utf-8"))
+
+
+  // Theme name
+
+  // Assign name from package.json as theme name
+  authorOptions.name = pkg.name
+
+  // If no name exists throw an error
+  if (!authorOptions.name) {
+    throw new AstroError(`Could not find name for theme! Add a name in your 'package.json' or to your author config`)
+  }
+
+  // Validate that the theme name is a valid package name or else throw an error
+  const isValidName = validatePackageName(authorOptions.name)
+
+  if (!isValidName.validForNewPackages) {
+    throw new AstroError(
+      `Theme name is not a valid package name! Add a name in your 'package.json' or to your author config`, 
+      [...isValidName.errors, ...isValidName.warnings].join(', ')
+    )
+  }
 
   return defineIntegration({
     name: authorOptions.name,
@@ -310,7 +334,7 @@ export default function<
           }
 
           // Overwrite/force cwd for finding routes
-          Object.assign(authorOptions.pages, { cwd, log: "verbose" })
+          Object.assign(authorOptions.pages, { cwd, log: "minimal" })
 
           // Initialize route injection
           const { patterns, injectPages } = addPageDir(authorOptions.pages)
