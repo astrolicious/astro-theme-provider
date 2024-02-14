@@ -3,11 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "description": "",
-  "scripts": {
-
-  },
+  "scripts": {},
   "license": "MIT",
   "devDependencies": {
-    "astro": "3.1.0"
+    "astro": "^4.3.5"
   }
 }

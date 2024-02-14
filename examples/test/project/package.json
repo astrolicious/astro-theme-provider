@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "test",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -10,7 +10,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^3.1.0",
+    "astro": "^4.3.5",
     "my-theme": "workspace:*"
   }
 }

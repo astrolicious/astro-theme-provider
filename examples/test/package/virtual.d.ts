@@ -1,10 +1,11 @@
+
 declare module 'virtual:my-theme/context' {
   const Config: import('astro').AstroConfig;
 	export default Config;
 }
 
 declare module 'virtual:my-theme/config' {
-	const Config: import('my-theme').MyThemeConfig;
+	const Config: Parameters<typeof import('C:\Users\Bryce\Desktop\Projects\Astro\astro-theme-provider\examples\test\package\index.ts').default>[0]['config']
 	export default Config;
 }
 

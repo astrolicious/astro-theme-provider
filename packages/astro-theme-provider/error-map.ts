@@ -1,34 +1,4 @@
-import type { AuthorConfigTypes, ExportTypes } from './types';
-import { z } from 'astro/zod';
-
-// Hacky, find better way
-function overrideSchema<T extends ExportTypes[keyof ExportTypes]>(exports: T): z.ZodType<T> {
-	const schema = z.object(Object.fromEntries(
-		Object.entries(exports ?? {})
-		.map(([name, path]) => [name, z.string().optional().default(path)])
-	)).optional().default({}) as unknown
-	return schema as z.ZodType<T>
-}
-
-export function ThemeProviderUserConfigSchema<AuthorConfig, AuthorExports extends ExportTypes>(authorOptions: AuthorConfigTypes<AuthorConfig, AuthorExports>) {
-	return z.object({
-		config: authorOptions.configSchema,
-		exports: z.object({
-			css: z.string().array().optional().default([]).transform((css) => Array.from(new Set([...authorOptions.exports?.css ?? [], ...css]))),
-			components: overrideSchema<AuthorExports['components']>(authorOptions.exports?.components),
-			assets: overrideSchema<AuthorExports['assets']>(authorOptions.exports?.assets)
-		}).optional().default({})
-	})
-}
-
-export type ThemeProviderUserConfig<AuthorConfig, AuthorExports extends ExportTypes> = z.infer<ReturnType<typeof ThemeProviderUserConfigSchema<AuthorConfig, AuthorExports>>>
-
-/**
- * 
- * This is a modified version of Astro's error map.
- * source: https://github.com/withastro/astro/blob/main/packages/astro/src/content/error-map.ts
- * 
- */
+import type { ZodErrorMap } from 'zod';
 
 type TypeOrLiteralErrByPathEntry = {
 	code: 'invalid_type' | 'invalid_literal';
@@ -36,7 +6,7 @@ type TypeOrLiteralErrByPathEntry = {
 	expected: unknown[];
 };
 
-export const errorMap: z.ZodErrorMap = (baseError, ctx) => {
+export const errorMap: ZodErrorMap = (baseError, ctx) => {
 	const baseErrorPath = flattenErrorPath(baseError.path);
 	if (baseError.code === 'invalid_union') {
 		// Optimization: Combine type and literal errors for keys that are common across ALL union types
@@ -44,7 +14,7 @@ export const errorMap: z.ZodErrorMap = (baseError, ctx) => {
 		// raise a single error when `key` does not match:
 		// > Did not match union.
 		// > key: Expected `'tutorial' | 'blog'`, received 'foo'
-		let typeOrLiteralErrByPath: Map<string, TypeOrLiteralErrByPathEntry> = new Map();
+		let typeOrLiteralErrByPath = new Map<string, TypeOrLiteralErrByPathEntry>();
 		for (const unionError of baseError.unionErrors.map((e) => e.errors).flat()) {
 			if (unionError.code === 'invalid_type' || unionError.code === 'invalid_literal') {
 				const flattenedErrorPath = flattenErrorPath(unionError.path);
@@ -74,7 +44,8 @@ export const errorMap: z.ZodErrorMap = (baseError, ctx) => {
 						.filter(([, error]) => error.expected.length === baseError.unionErrors.length)
 						.map(([key, error]) =>
 							key === baseErrorPath
-								? `> ${getTypeOrLiteralMsg(error)}` // Avoid printing the key again if it's a base error
+								? // Avoid printing the key again if it's a base error
+									`> ${getTypeOrLiteralMsg(error)}`
 								: `> ${prefix(key, getTypeOrLiteralMsg(error))}`
 						)
 				)
