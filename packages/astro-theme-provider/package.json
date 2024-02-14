@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "astro-pages": "^0.1.4",
+    "callsites": "^4.1.0",
     "validate-npm-package-name": "^5.0.0"
   }
 }

@@ -12,6 +12,7 @@ import validatePackageName from 'validate-npm-package-name';
 import addDtsBufferPlugin from './plugins/d-ts-buffer'
 import { errorMap } from './error-map';
 import { GLOB_ASTRO, GLOB_CSS, GLOB_IMAGES, LineBuffer, camelCase, globToModule, isAbsoluteFile, isCSSFile, isImageFile, validateDirectory, validateFile, wrapWithBrackets } from './utils'
+import callsites from 'callsites';
 
 type Prettify<T> = { [K in keyof T]: T[K]; } & {};
 
@@ -45,14 +46,12 @@ export default function<
 >(
   authorOptions: AuthorOptions<Name, Config>
   ){
-    
   let _entrypoint = authorOptions?.entrypoint
-  
+
+  // Loop over reversed stack traces to the first path that is not a Vite `file://` path
   if (!_entrypoint) {
-    // Last line in Error stack trace is a `file://` URL path from Vite, the line before Vite's traces should be entrypoint
-    // Create Error instance, loop over stack traces (reversed), extract file paths from traces, assign first non Vite file to entrypoint
-    for (const line of (new Error()).stack!.split('\n').reverse()) {
-      const file = /[\(|\s]([A-Z|\/|\\].*):\d+:\d+/.exec(line)?.[1]
+    for (const callsite of callsites().reverse()) {
+      const file = (callsite as NodeJS.CallSite).getScriptNameOrSourceURL()
       if (file && isAbsoluteFile(file)) {
         _entrypoint = file
         break
