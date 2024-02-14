@@ -24,7 +24,7 @@ type AuthorOptions<
   Config extends ConfigDefault
 > = Prettify<{
   entrypoint?: string;
-  name: Name;
+  name?: Name;
   pages?: string | PageDirOption | undefined;
   schema: z.ZodSchema<Config>;
   modules?: ExportTypes | undefined
