@@ -9,12 +9,12 @@ export default defineConfig({
         description: 'This is a description',
       },
       pages: {
-        '/blog': '/base',
+        // '/cats': '/dogs',
       },
       overrides: {
-        css: ["test"],
+        css: [],
         components: {
-          Navbar: './src/CustomHeading.astro'
+          Heading: './src/CustomHeading.astro'
         }
       }
     })
