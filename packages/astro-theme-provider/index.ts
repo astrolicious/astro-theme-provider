@@ -22,30 +22,27 @@ type ConfigDefault = Record<string, unknown>
 type ExportTypes = Record<string, undefined | null | false | string | string[] | Record<string, string>>
 
 type AuthorOptions<
-  Name extends keyof AstroThemePagesAuthored,
   Config extends ConfigDefault
 > = Prettify<{
   entrypoint?: string;
-  name?: Name;
+  name?: ThemeName;
   pages?: string | PageDirOption | undefined;
   schema: z.ZodSchema<Config>;
   modules?: ExportTypes | undefined
 }>
 
 type UserOptions<
-  Name extends keyof AstroThemePagesAuthored,
   Config extends ConfigDefault, 
 > = Prettify<{
   config: Config;
-  pages?: AstroThemePageOptions<Name> | undefined
-  overrides?: AstroThemeModulesOverrideOptions<Name> | undefined;
+  pages?: AstroThemePagesOptions<ThemeName> | undefined
+  overrides?: AstroThemeModulesOptions<ThemeName> | undefined;
 }>
 
 export default function<
-  Name extends keyof AstroThemePagesAuthored,
   Config extends ConfigDefault, 
 >(
-  authorOptions: AuthorOptions<Name, Config>
+  authorOptions: AuthorOptions<Config>
   ){
   let _entrypoint = authorOptions?.entrypoint
 
@@ -89,7 +86,7 @@ export default function<
 
   return defineIntegration({
     name: authorOptions.name,
-    options: defineOptions<UserOptions<Name, Config>>({} as Required<UserOptions<Name, Config>>),
+    options: defineOptions<UserOptions<Config>>({} as Required<UserOptions<Config>>),
     plugins: [
       watchIntegrationPlugin,
       addVirtualImportPlugin,
@@ -169,13 +166,17 @@ export default function<
           addLinesToDts(`
             type Prettify<T> = { [K in keyof T]: T[K]; } & {};
 
+            type ThemeName = '${authorOptions.name}';
             type ThemeConfig = NonNullable<Parameters<typeof import("${entrypoint}").default>[0]>['config']
 
+            declare type AstroThemes = keyof AstroThemeConfigs;
             declare type AstroThemeConfigs = {
               '${authorOptions.name}': ThemeConfig
             }
+
             declare type AstroThemeModulesGet<Name extends keyof AstroThemeModulesAuthored> = AstroThemeModulesAuthored[Name]
-            declare type AstroThemeModulesOverrideOptions<Name extends keyof AstroThemeModulesAuthored> = {
+
+            declare type AstroThemeModulesOptions<Name extends keyof AstroThemeModulesAuthored> = {
               [Module in keyof AstroThemeModulesGet<Name>]?:
                 AstroThemeModulesGet<Name>[Module] extends Record<string, any>
                   ? AstroThemeModulesGet<Name>[Module] extends string[]
@@ -184,14 +185,14 @@ export default function<
                   : never
             } & {}
             
-            declare type AstroThemePageOptions<Name extends keyof AstroThemePagesAuthored> = Prettify<Partial<Record<keyof AstroThemePagesAuthored[Name], string | boolean>>>
-          `)
+            declare type AstroThemePagesOptions<Name extends keyof AstroThemePagesAuthored> = Prettify<Partial<Record<keyof AstroThemePagesAuthored[Name], string | boolean>>>`
+          )
 
 
           // Buffers for modules types defined in AstroThemeModules interfaces, added to main addDts buffer after all virtual modules have been created
-          const modulesAuthoredBuffer = new LineBuffer()
-          const modulesOverridesBuffer = new LineBuffer()
-          const modulesExportsBuffer = new LineBuffer()
+          const modulesAuthoredBuffer = new LineBuffer(undefined, -1)
+          const modulesOverridesBuffer = new LineBuffer(undefined, -1)
+          const modulesExportsBuffer = new LineBuffer(undefined, -1)
 
 
           function arrayToVirtualModule(exportName: string, array: string[]) {
@@ -199,7 +200,7 @@ export default function<
 
             modulesAuthoredBuffer.add([`${exportName}: string[]`])
 
-            const overrides = options?.overrides?.[exportName as keyof AstroThemeModulesOverrideOptions<Name>]
+            const overrides = options?.overrides?.[exportName as keyof AstroThemeModulesOptions<ThemeName>]
 
             // Append user's "overrides" to array module
             if (overrides && Array.isArray(overrides)) {
@@ -230,7 +231,7 @@ export default function<
 
             // Override exports with user's overrides
             const overrides = Object.entries(
-              options?.overrides?.[exportName as keyof AstroThemeModulesOverrideOptions<Name>] || {} as Record<string, string>
+              options?.overrides?.[exportName as keyof AstroThemeModulesOptions<ThemeName>] || {} as Record<string, string>
             )
 
             if (overrides.length > 0) {
@@ -258,7 +259,7 @@ export default function<
                 wrapWithBrackets(
                   overrides.map(exportEntriesToTypes), 
                   `${exportName}: `
-                )
+                ),
               )
             }
 
@@ -278,7 +279,7 @@ export default function<
               exportedTypes.map(line => `export const ` + line)
             )
 
-            // Add exportedTypes with overrides to buffer for AstroThemeModulesExports interface
+            // Add exportedTypes with overrides to buffer for AstroThemeModulesInjected interface
             modulesExportsBuffer.add(wrapWithBrackets(exportedTypes, `${exportName}: `))
           }
 
@@ -321,7 +322,7 @@ export default function<
           addLinesToDtsInterface(
             `AstroThemeModulesAuthored`,
             wrapWithBrackets(
-              [...modulesAuthoredBuffer.lines], 
+              modulesAuthoredBuffer.lines, 
               `'${authorOptions.name}': `
             ),
           )
@@ -329,15 +330,15 @@ export default function<
           addLinesToDtsInterface(
             `AstroThemeModulesOverrides`,
             wrapWithBrackets(
-              [...modulesOverridesBuffer.lines], 
+              modulesOverridesBuffer.lines, 
               `'${authorOptions.name}': `
             ),
           )
 
           addLinesToDtsInterface(
-            `AstroThemeModulesExports`,
+            `AstroThemeModulesInjected`,
             wrapWithBrackets(
-              [...modulesExportsBuffer.lines], 
+              modulesExportsBuffer.lines, 
               `'${authorOptions.name}': `
             ),
           )
@@ -365,7 +366,7 @@ export default function<
           addLinesToDtsInterface(
             'AstroThemePagesAuthored',
             wrapWithBrackets(
-              Object.entries(patterns).map(([pattern, entrypoint]) => `'${pattern}': '${entrypoint}';`),
+              Object.entries(patterns).map(([pattern, entrypoint]) => `'${pattern}': typeof import("${entrypoint}").default;`),
               `'${authorOptions.name}': `
             )
           )
@@ -397,19 +398,21 @@ export default function<
           }
 
           //  Generate types for author pages overriden by a user
-          addLinesToDtsInterface(
-            'AstroThemePagesOverrides',
-            wrapWithBrackets(
-              pageOverrideBuffer.lines,
-              `'${authorOptions.name}': `
+          if (pageOverrideBuffer.lines.length > 0) {
+            addLinesToDtsInterface(
+              'AstroThemePagesOverrides',
+              wrapWithBrackets(
+                pageOverrideBuffer.lines,
+                `'${authorOptions.name}': `
+              )
             )
-          )
+          }
 
           // Generate types for injected routes
           addLinesToDtsInterface(
             'AstroThemePagesInjected',
             wrapWithBrackets(
-              Object.entries(patterns).map(([pattern, entrypoint]) => `'${pattern}': '${entrypoint}';`),
+              Object.entries(patterns).map(([pattern, entrypoint]) => `'${pattern}': typeof import("${entrypoint}").default;`),
               `'${authorOptions.name}': `
             )
           )
