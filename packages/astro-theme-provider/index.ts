@@ -135,7 +135,7 @@ export default function<
 
           const exportEntriesToTypes = ([name, path]: [string, string]) => {
             if (isCSSFile(path)) return ``
-            if (isImageFile(path)) return `${camelCase(name)}: import('astro').ImageMetadata;`
+            if (isImageFile(path)) return `${camelCase(name)}: import("astro").ImageMetadata;`
             return `${camelCase(name)}: typeof import(${resolveAuthorImport(path)}).default;`
           }
 
@@ -168,12 +168,12 @@ export default function<
           addLinesToDts(`
             type Prettify<T> = { [K in keyof T]: T[K]; } & {};
 
-            type ThemeName = '${authorOptions.name}';
-            type ThemeConfig = NonNullable<Parameters<typeof import("${entrypoint}").default>[0]>['config']
+            type ThemeName = "${authorOptions.name}";
+            type ThemeConfig = NonNullable<Parameters<typeof import("${entrypoint}").default>[0]>["config"]
 
             declare type AstroThemes = keyof AstroThemeConfigs;
             declare type AstroThemeConfigs = {
-              '${authorOptions.name}': ThemeConfig
+              "${authorOptions.name}": ThemeConfig
             }
 
             declare type AstroThemeModulesGet<Name extends keyof AstroThemeModulesAuthored> = AstroThemeModulesAuthored[Name]
@@ -326,7 +326,7 @@ export default function<
             `AstroThemeModulesAuthored`,
             wrapWithBrackets(
               modulesAuthoredBuffer.lines, 
-              `'${authorOptions.name}': `
+              `"${authorOptions.name}": `
             ),
           )
 
@@ -334,7 +334,7 @@ export default function<
             `AstroThemeModulesOverrides`,
             wrapWithBrackets(
               modulesOverridesBuffer.lines, 
-              `'${authorOptions.name}': `
+              `"${authorOptions.name}": `
             ),
           )
 
@@ -342,7 +342,7 @@ export default function<
             `AstroThemeModulesInjected`,
             wrapWithBrackets(
               modulesExportsBuffer.lines, 
-              `'${authorOptions.name}': `
+              `"${authorOptions.name}": `
             ),
           )
 
@@ -369,8 +369,8 @@ export default function<
           addLinesToDtsInterface(
             'AstroThemePagesAuthored',
             wrapWithBrackets(
-              Object.entries(patterns).map(([pattern, entrypoint]) => `'${pattern}': typeof import("${entrypoint}").default;`),
-              `'${authorOptions.name}': `
+              Object.entries(patterns).map(([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`),
+              `"${authorOptions.name}": `
             )
           )
 
@@ -401,7 +401,7 @@ export default function<
               // Add new pattern
               patterns[newPattern] = patterns[oldPattern]!
               // Add page type to buffer
-              pageOverrideBuffer.add(`'${oldPattern}': '${newPattern}';`)
+              pageOverrideBuffer.add(`"${oldPattern}": "${newPattern}";`)
               // Remove old pattern
               delete patterns[oldPattern]
               continue
@@ -414,7 +414,7 @@ export default function<
               'AstroThemePagesOverrides',
               wrapWithBrackets(
                 pageOverrideBuffer.lines,
-                `'${authorOptions.name}': `
+                `"${authorOptions.name}": `
               )
             )
           }
@@ -423,8 +423,8 @@ export default function<
           addLinesToDtsInterface(
             'AstroThemePagesInjected',
             wrapWithBrackets(
-              Object.entries(patterns).map(([pattern, entrypoint]) => `'${pattern}': typeof import("${entrypoint}").default;`),
-              `'${authorOptions.name}': `
+              Object.entries(patterns).map(([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`),
+              `"${authorOptions.name}": `
             )
           )
 

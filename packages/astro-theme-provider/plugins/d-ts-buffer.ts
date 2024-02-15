@@ -70,7 +70,7 @@ function createDtsBuffer() {
         global.lines,
         [...interfaces.entries()].map(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare interface ${name} `)).flat(),
         [...namespaces.entries()].map(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare ${name} `)).flat(),
-        [...modules.entries()].map(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare module '${name}' `)).flat(),
+        [...modules.entries()].map(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare module "${name}" `)).flat(),
       ].flat(8).join('\n')
     )
   }
