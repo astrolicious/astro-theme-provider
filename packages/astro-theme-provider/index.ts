@@ -253,7 +253,7 @@ export default function<
               // Resolve relative paths from user relative to srcDir
               for (const [name, path] of overrides) {
                 console.log(path, '\n', resolveUserImport(path))
-                obj[name] = resolveUserImport(path)
+                obj[camelCase(name)] = resolveUserImport(path)
               }
 
               // Add overrides to buffer for AstroThemeModulesOverrides interface
