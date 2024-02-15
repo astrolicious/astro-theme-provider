@@ -39,6 +39,8 @@ type UserOptions<
   overrides?: AstroThemeModulesOptions<ThemeName> | undefined;
 }>
 
+const thisFile = validateFile(import.meta.url)
+
 export default function<
   Config extends ConfigDefault, 
 >(
@@ -50,7 +52,7 @@ export default function<
   if (!_entrypoint) {
     for (const callsite of callsites().reverse()) {
       const file = (callsite as NodeJS.CallSite).getScriptNameOrSourceURL()
-      if (file && isAbsoluteFile(file)) {
+      if (file && isAbsoluteFile(file) && file !== thisFile) {
         _entrypoint = file
         break
       } 
