@@ -6,8 +6,9 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url'
 import { defineIntegration, defineOptions } from "astro-integration-kit";
-import { watchIntegrationPlugin, addVirtualImportPlugin, hasIntegrationPlugin } from "astro-integration-kit/plugins";
+import { watchIntegrationPlugin, addVirtualImportPlugin } from "astro-integration-kit/plugins";
 import addPageDirPlugin from 'astro-pages/plugins/astro-integration-kit.ts';
+// @ts-ignore
 import validatePackageName from 'validate-npm-package-name';
 import addDtsBufferPlugin from './plugins/d-ts-buffer'
 import { errorMap } from './error-map';
@@ -90,7 +91,6 @@ export default function<
     name: authorOptions.name,
     options: defineOptions<UserOptions<Name, Config>>({} as Required<UserOptions<Name, Config>>),
     plugins: [
-      hasIntegrationPlugin,
       watchIntegrationPlugin,
       addVirtualImportPlugin,
       addDtsBufferPlugin,
@@ -112,7 +112,6 @@ export default function<
         'astro:config:setup': ({
           logger,
           config,
-          hasIntegration,
           watchIntegration,
           addPageDir,
           addVirtualImport,
@@ -133,7 +132,13 @@ export default function<
           
           const resolveUserImport = (id: string) => 
             JSON.stringify(id.startsWith('.') ? resolve(srcDir, id) : id)
-              .replace(/^\"|\"$/g, '')
+              .replace(/^\"|\"$/g, '') // Added back by resolveAuthorImport
+
+          const exportEntriesToTypes = ([name, path]: [string, string]) => {
+            if (isCSSFile(path)) return ``
+            if (isImageFile(path)) return `${camelCase(name)}: import('astro').ImageMetadata;`
+            return `${camelCase(name)}: typeof import(${resolveAuthorImport(path)}).default;`
+          }
 
           // HMR for `astro-theme-provider` package
           watchIntegration(dirname(fileURLToPath(import.meta.url)));
@@ -157,10 +162,10 @@ export default function<
           )
 
 
+
           // Generate Modules
 
-
-          // Utility types for modules 
+          // Utility types
           addLinesToDts(`
             type Prettify<T> = { [K in keyof T]: T[K]; } & {};
 
@@ -183,16 +188,11 @@ export default function<
           `)
 
 
-          // Buffer for module types defined in AstroThemeModules interface, added to main addDts buffer after all virtual modules have been created
+          // Buffers for modules types defined in AstroThemeModules interfaces, added to main addDts buffer after all virtual modules have been created
           const modulesAuthoredBuffer = new LineBuffer()
           const modulesOverridesBuffer = new LineBuffer()
           const modulesExportsBuffer = new LineBuffer()
 
-          const exportEntriesToTypes = ([name, path]: [string, string]) => {
-            if (isCSSFile(path)) return ``
-            if (isImageFile(path)) return `${camelCase(name)}: import('astro').ImageMetadata;`
-            return `${camelCase(name)}: typeof import(${resolveAuthorImport(path)}).default;`
-          }
 
           function arrayToVirtualModule(exportName: string, array: string[]) {
             if (array.length < 1) return // Skip empty arrays
@@ -218,6 +218,7 @@ export default function<
             addLinesToDtsModule(authorOptions.name + '/' + exportName, "")
           }
 
+          
           function objToVirtualModule(exportName: string, obj: Record<string, string>) {
             // Generate types for exports
             let exportedTypes = Object.entries(obj).map(exportEntriesToTypes)
@@ -246,13 +247,11 @@ export default function<
                 exportedTypes.map(line => `export const ` + line)
               )
 
-              console.log(obj)
               // Resolve relative paths from user relative to srcDir
               for (const [name, path] of overrides) {
                 console.log(path, '\n', resolveUserImport(path))
                 obj[name] = resolveUserImport(path)
               }
-              console.log(obj)
 
               // Add overrides to buffer for AstroThemeModulesOverrides interface
               modulesOverridesBuffer.add(
@@ -284,17 +283,17 @@ export default function<
           }
 
           // Default modules
-          const modules: ExportTypes = {
+          const defaultModules: ExportTypes = {
             css: GLOB_CSS,
             assets: GLOB_IMAGES,
             layouts: GLOB_ASTRO,
             components: GLOB_ASTRO
           }
           
-          Object.assign(modules, authorOptions.modules)
+          Object.assign(defaultModules, authorOptions.modules)
           
           // Dynamically create virtual modules using globs and/or export objects defined by theme author or user
-          for (let [exportName, option] of Object.entries(modules)) {
+          for (let [exportName, option] of Object.entries(defaultModules)) {
             if (!option) continue
 
             if (typeof option === "string") {
@@ -317,7 +316,7 @@ export default function<
             }
           }
 
-          // Add module interfaces to main buffer
+          // Add module interface buffers to main buffer
 
           addLinesToDtsInterface(
             `AstroThemeModulesAuthored`,
@@ -417,7 +416,9 @@ export default function<
 
           // Inject routes/pages
           injectPages()
-          
+
+
+
           // Write generated types to .d.ts file
           writeDtsBuffer()
         }
