@@ -194,7 +194,7 @@ export function normalizeLines(lines: string[]) {
   return lines.map(line => line.trim() && line.slice(extraWhitespace))
 }
 
-const NEWLINE = /\n/
+const NEWLINE = /\n/g
 
 export class LineBuffer {
   lines: string[] = []
