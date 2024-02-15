@@ -96,7 +96,7 @@ export function isAbsoluteFile(path: string) {
 }
 
 
-export function validateFile(path?: string, options?: { base?: string }) {
+export function validateFile(path: string | undefined, options?: { base?: string }) {
   const { base = "./" } = options || {}
 
   if (!path || typeof path !== "string") {
@@ -110,7 +110,11 @@ export function validateFile(path?: string, options?: { base?: string }) {
 
   // Check if path is a file URL
   if (path.startsWith('file:/')) {
-    path = fileURLToPath(path)
+    if (extname(path)) {
+      path = dirname(fileURLToPath(path))
+    } else {
+      throw new AstroError(`Expected file path but received directory path`, path)
+    }
   }
 
   // Check if path is relative
@@ -126,16 +130,20 @@ export function validateFile(path?: string, options?: { base?: string }) {
   return path
 }
 
-export function validateDirectory(path?: string, options?: { base?: string, resolveFile?: boolean }) {
-  const { base = "./", resolveFile = true } = options || {}
+export function validateDirectory(path?: string, options?: { base?: string }) {
+  const { base = "./" } = options || {}
 
   if (!path || typeof path !== "string") {
     throw new AstroError(`Path is undefined`, path)
   }
 
   // Check if path is a file URL
-  if (resolveFile && path.startsWith('file:/')) {
-    path = dirname(fileURLToPath(path))
+  if (path.startsWith('file:/')) {
+    if (extname(path)) {
+      path = dirname(fileURLToPath(path))
+    } else {
+      path = fileURLToPath(path)
+    }
   }
 
   // Check if path is relative
@@ -144,7 +152,7 @@ export function validateDirectory(path?: string, options?: { base?: string, reso
   }
 
   // Check if path is a file
-  if (resolveFile && extname(path)) {
+  if (extname(path)) {
     path = dirname(path)
   }
   
@@ -181,6 +189,8 @@ export function normalizeLines(lines: string[]) {
   return lines.map(line => line.trim() && line.slice(extraWhitespace))
 }
 
+const NEWLINE = /\n/
+
 export class LineBuffer {
   lines: string[] = []
   depth: number
@@ -190,22 +200,24 @@ export class LineBuffer {
     this.depth = depth
   }
 
-  add(type: string | NestedStringArray, depth: number = this.depth) {
+  add(type: string | NestedStringArray, depth: number = this.depth) {    
+    if (typeof type === 'string') {
+      if (type.trim()) {
+        if (NEWLINE.test(type)) {
+          for (const line of normalizeLines(type.split('\n'))) {
+            this.lines.push(line)
+          }
+          return
+        }
+        this.lines.push('\t'.repeat(Math.max(0, depth)) + type)
+      }
+      return
+    }
+
     if (Array.isArray(type)) {
       depth++
       for (const t of type) {
         this.add(t, depth)
-      }
-    }
-    
-    if (typeof type === 'string') {
-      if (type.trim()) {
-        const lines = type.split('\n')
-        if (lines.length > 1) {
-          this.add(normalizeLines(lines), depth)
-          return
-        }
-        this.lines.push('\t'.repeat(Math.max(0, depth)) + type)
       }
     }
   }
