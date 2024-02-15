@@ -391,6 +391,9 @@ export default function<
             
             // If user defines a string, override route pattern
             if (typeof newPattern === "string") {
+              if (!newPattern.startsWith('/')) {
+                throw new AstroError(`Invalid page override, pattern must start with a forward slash '/'`, `New: ${newPattern}\nOld: ${oldPattern}`)
+              }
               if (!validatePattern(newPattern, oldPattern)) {
                 throw new AstroError(`Invalid page override, pattern must contain the same params in the same location`, `New: ${newPattern}\nOld: ${oldPattern}`)
               }
