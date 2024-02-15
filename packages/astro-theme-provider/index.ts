@@ -111,6 +111,7 @@ export default function<
       return {
         'astro:config:setup': ({
           logger,
+          config,
           hasIntegration,
           watchIntegration,
           addPageDir,
@@ -118,15 +119,21 @@ export default function<
           createDtsBuffer
         }) => {
 
+          const srcDir = validateDirectory(config.srcDir.toString())
+
           const {
             addLinesToDts,
             addLinesToDtsInterface,
             addLinesToDtsModule,
             writeDtsBuffer
-          } = createDtsBuffer(authorOptions.name)
+          } = createDtsBuffer(authorOptions.name!)
 
-          const resolveImport = (id: string) =>
+          const resolveAuthorImport = (id: string) => 
             JSON.stringify(id.startsWith('.') ? resolve(cwd, id) : id);
+          
+          const resolveUserImport = (id: string) => 
+            JSON.stringify(id.startsWith('.') ? resolve(srcDir, id) : id)
+              .replace(/^\"|\"$/g, '')
 
           // HMR for `astro-theme-provider` package
           watchIntegration(dirname(fileURLToPath(import.meta.url)));
@@ -162,9 +169,7 @@ export default function<
             declare type AstroThemeConfigs = {
               '${authorOptions.name}': ThemeConfig
             }
-
             declare type AstroThemeModulesGet<Name extends keyof AstroThemeModulesAuthored> = AstroThemeModulesAuthored[Name]
-
             declare type AstroThemeModulesOverrideOptions<Name extends keyof AstroThemeModulesAuthored> = {
               [Module in keyof AstroThemeModulesGet<Name>]?:
                 AstroThemeModulesGet<Name>[Module] extends Record<string, any>
@@ -186,7 +191,7 @@ export default function<
           const exportEntriesToTypes = ([name, path]: [string, string]) => {
             if (isCSSFile(path)) return ``
             if (isImageFile(path)) return `${camelCase(name)}: import('astro').ImageMetadata;`
-            return `${camelCase(name)}: typeof import(${resolveImport(path)}).default;`
+            return `${camelCase(name)}: typeof import(${resolveAuthorImport(path)}).default;`
           }
 
           function arrayToVirtualModule(exportName: string, array: string[]) {
@@ -194,16 +199,18 @@ export default function<
 
             modulesAuthoredBuffer.add([`${exportName}: string[]`])
 
+            const overrides = options?.overrides?.[exportName as keyof AstroThemeModulesOverrideOptions<Name>]
+
             // Append user's "overrides" to array module
-            if (Array.isArray(options?.overrides?.[exportName as keyof AstroThemeModulesOverrideOptions<Name>])) {
+            if (overrides && Array.isArray(overrides)) {
               modulesOverridesBuffer.add([`${exportName}: string[]`])
-              array = [...array, ...options.overrides[exportName as keyof AstroThemeModulesOverrideOptions<Name>] as string[]]
+              array = [...array, ...overrides.map(path => resolveUserImport(path))]
             }
 
             // Add "import only" virtual module from array of entrypoints (mostly used for CSS)
             addVirtualImport({
               name: authorOptions.name + '/' + exportName,
-              content: array.map((path) => `import ${resolveImport(path)};`).join(''),
+              content: array.map((path) => `import ${resolveAuthorImport(path)};`).join(''),
             })
 
             modulesExportsBuffer.add([`${exportName}: string[]`])
@@ -212,53 +219,68 @@ export default function<
           }
 
           function objToVirtualModule(exportName: string, obj: Record<string, string>) {
-            if (Object.keys(obj).length < 1) return // Skip empty objects
-
             // Generate types for exports
             let exportedTypes = Object.entries(obj).map(exportEntriesToTypes)
+
+            if (exportedTypes.length < 1) return // Skip empty objects
 
             // Add exportedTypes to buffer for AstroThemeModulesAuthored interface
             modulesAuthoredBuffer.add(wrapWithBrackets(exportedTypes, `${exportName}: `))
 
             // Override exports with user's overrides
-            const overrides = options?.overrides?.[exportName as keyof AstroThemeModulesOverrideOptions<Name>]
-            if (
-              typeof overrides === "object" &&
-              !Array.isArray(overrides)
-            ) {
-              if (overrides) {
-                // Add exportedTypes to buffer for AstroThemeModulesOverrides interface
-                modulesOverridesBuffer.add(
-                  wrapWithBrackets(
-                    Object.entries(overrides).map(exportEntriesToTypes), 
-                    `${exportName}: `
-                  )
+            const overrides = Object.entries(
+              options?.overrides?.[exportName as keyof AstroThemeModulesOverrideOptions<Name>] || {} as Record<string, string>
+            )
+
+            if (overrides.length > 0) {
+              // Create User module for overrding component inside author module, does not include user overrides ex:"my-theme:components" to prevent circular imports
+              addVirtualImport({
+                name: authorOptions.name + ':' + exportName,
+                content: Object.entries(obj)
+                .map(([name, path]) => `export { default as ${camelCase(name)} } from ${resolveAuthorImport(path)};`)
+                .join(''),
+              })
+              // Add types for virtual module
+              addLinesToDtsModule(
+                authorOptions.name + ':' + exportName,
+                exportedTypes.map(line => `export const ` + line)
+              )
+
+              console.log(obj)
+              // Resolve relative paths from user relative to srcDir
+              for (const [name, path] of overrides) {
+                console.log(path, '\n', resolveUserImport(path))
+                obj[name] = resolveUserImport(path)
+              }
+              console.log(obj)
+
+              // Add overrides to buffer for AstroThemeModulesOverrides interface
+              modulesOverridesBuffer.add(
+                wrapWithBrackets(
+                  overrides.map(exportEntriesToTypes), 
+                  `${exportName}: `
                 )
-
-                // Override
-                Object.assign(obj, overrides)
-              } 
+              )
             }
-
-            // Dynamically create virtual modules with named exports using entrypoints with default exports
-            addVirtualImport({
-              name: authorOptions.name + '/' + exportName,
-              content: Object.entries(obj)
-              .map(([name, path]) => `export { default as ${camelCase(name)} } from ${resolveImport(path)};`)
-              .join(''),
-            })
 
             // Recalculate exportedTypes to include overrides
             exportedTypes = Object.entries(obj).map(exportEntriesToTypes)
 
-            // Add exportedTypes to buffer for AstroThemeModulesExports interface
-            modulesExportsBuffer.add(wrapWithBrackets(exportedTypes, `${exportName}: `))
-            
-            // Add export types to virtual module
+            // Create main author module with user's overrides
+            addVirtualImport({
+              name: authorOptions.name + '/' + exportName,
+              content: Object.entries(obj)
+              .map(([name, path]) => `export { default as ${camelCase(name)} } from ${resolveAuthorImport(path)};`)
+              .join(''),
+            })            
+            // Add export types for virtual module
             addLinesToDtsModule(
               authorOptions.name + '/' + exportName,
               exportedTypes.map(line => `export const ` + line)
             )
+
+            // Add exportedTypes with overrides to buffer for AstroThemeModulesExports interface
+            modulesExportsBuffer.add(wrapWithBrackets(exportedTypes, `${exportName}: `))
           }
 
           // Default modules
