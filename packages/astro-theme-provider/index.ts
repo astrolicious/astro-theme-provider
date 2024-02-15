@@ -200,6 +200,11 @@ export default function<
           function arrayToVirtualModule(exportName: string, array: string[]) {
             if (array.length < 1) return // Skip empty arrays
 
+            if (exportName === "config") {
+              logger.warn(`Export name 'config' is reserved for the config module '${authorOptions.name}/config'`)
+              return
+            }
+
             modulesAuthoredBuffer.add([`${exportName}: string[]`])
 
             const overrides = options?.overrides?.[exportName as keyof AstroThemeModulesOptions<ThemeName>]
@@ -228,6 +233,11 @@ export default function<
 
             if (exportedTypes.length < 1) return // Skip empty objects
 
+            if (exportName === "config") {
+              logger.warn(`Export name 'config' is reserved for the config module '${authorOptions.name}/config'`)
+              return
+            }
+
             // Add exportedTypes to buffer for AstroThemeModulesAuthored interface
             modulesAuthoredBuffer.add(wrapWithBrackets(exportedTypes, `${exportName}: `))
 
@@ -250,7 +260,7 @@ export default function<
                 exportedTypes.map(line => `export const ` + line)
               )
 
-              // Resolve relative paths from user relative to srcDir
+              // Resolve relative paths from user
               for (const [name, path] of overrides) {
                 obj[camelCase(name)] = resolveUserImport(path)
               }
@@ -297,12 +307,8 @@ export default function<
           // Dynamically create virtual modules using globs and/or export objects defined by theme author or user
           for (let [exportName, option] of Object.entries(defaultModules)) {
             if (!option) continue
-
+            
             if (typeof option === "string") {
-              if (exportName === "config") {
-                logger.warn(`Export name 'config' is reserved for the config module '${authorOptions.name}/config'`)
-                continue
-              }
               option = globToModule(option, exportName, cwd)
             }
 
