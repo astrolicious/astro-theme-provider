@@ -10,6 +10,7 @@ export default defineConfig({
       },
       pages: {
         // '/cats': '/dogs',
+        // '/cats/[...cat]': '/dogs/[...cat]',
       },
       overrides: {
         css: [

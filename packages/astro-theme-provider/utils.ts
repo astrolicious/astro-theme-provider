@@ -85,7 +85,12 @@ export function globToModule(
     : obj
 }
 
+const normalizePattern = (slug: string) => slug.startsWith('[') && slug || "/"
 
+export function validatePattern(newPattern: string, oldPattern: string) {
+  return  newPattern.split('/').map(normalizePattern).join('') ===
+          oldPattern.split('/').map(normalizePattern).join('')
+}
 
 // Files/Directories/Paths/URLs
 

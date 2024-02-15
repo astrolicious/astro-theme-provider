@@ -12,7 +12,7 @@ import addPageDirPlugin from 'astro-pages/plugins/astro-integration-kit.ts';
 import validatePackageName from 'validate-npm-package-name';
 import addDtsBufferPlugin from './plugins/d-ts-buffer'
 import { errorMap } from './error-map';
-import { GLOB_ASTRO, GLOB_CSS, GLOB_IMAGES, LineBuffer, camelCase, globToModule, isAbsoluteFile, isCSSFile, isImageFile, validateDirectory, validateFile, wrapWithBrackets } from './utils'
+import { GLOB_ASTRO, GLOB_CSS, GLOB_IMAGES, LineBuffer, camelCase, globToModule, isAbsoluteFile, isCSSFile, isImageFile, validateDirectory, validateFile, validatePattern, wrapWithBrackets } from './utils'
 import callsites from 'callsites';
 
 type Prettify<T> = { [K in keyof T]: T[K]; } & {};
@@ -377,24 +377,29 @@ export default function<
           const pageOverrideBuffer = new LineBuffer()
 
           // Filter out routes the theme user toggled off
-          for (let pattern of Object.keys(options.pages)) {
+          for (let oldPattern of Object.keys(options.pages)) {
             // Skip route patterns that are not defined by author
-            if (!patterns?.[pattern!]) continue
+            if (!patterns?.[oldPattern!]) continue
 
-            const newPattern = options.pages[pattern as keyof typeof options.pages]
+            const newPattern = options.pages[oldPattern as keyof typeof options.pages]
 
             // If user passes falsy value remove the route
             if (!newPattern) {
-              delete patterns[pattern]
+              delete patterns[oldPattern]
               continue
             }
             
             // If user defines a string, override route pattern
             if (typeof newPattern === "string") {
-              // TODO, validate that user's pattern contains the same params as author's pattern and starts with `/`
-              patterns[newPattern] = patterns[pattern]!
-              pageOverrideBuffer.add(`'${pattern}': '${newPattern}';`)
-              delete patterns[pattern]
+              if (!validatePattern(newPattern, oldPattern)) {
+                throw new AstroError(`Invalid page override, pattern must contain the same params in the same location`, `New: ${newPattern}\nOld: ${oldPattern}`)
+              }
+              // Add new pattern
+              patterns[newPattern] = patterns[oldPattern]!
+              // Add page type to buffer
+              pageOverrideBuffer.add(`'${oldPattern}': '${newPattern}';`)
+              // Remove old pattern
+              delete patterns[oldPattern]
               continue
             }
           }
