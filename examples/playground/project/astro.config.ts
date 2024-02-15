@@ -5,16 +5,18 @@ export default defineConfig({
   integrations: [
     MyTheme({
       config: {
-        title: 'My title from config',
-        description: 'This is a description',
+        title: 'Hey!',
+        description: 'This is a theme created using',
       },
       pages: {
         // '/cats': '/dogs',
       },
       overrides: {
-        css: [],
+        css: [
+          // "./custom.css"
+        ],
         components: {
-          Heading: './src/CustomHeading.astro'
+          // Heading: './CustomHeading.astro'
         }
       }
     })

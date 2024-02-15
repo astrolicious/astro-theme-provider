@@ -1,9 +1,17 @@
 ---
+import config from 'my-theme/config';
+
 interface Props {
-  text?: string
+  title?: string
 }
+
+const { title } = Astro.props
 ---
 
 <h1>
-  <slot />
+  { Astro.slots.has('default')
+    && <slot />
+    || title
+    || config.title
+  }
 </h1>

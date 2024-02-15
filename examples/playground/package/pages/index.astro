@@ -1,11 +1,12 @@
 ---
 import { Layout } from 'my-theme/layouts';
-import { Heading } from 'my-theme/components'
+import { Heading } from 'my-theme/components';
+import config from 'my-theme/config';
 ---
 
 <Layout>
-  <Heading>Hey!</Heading>
-  <h2>This is a Theme created using</h2>
+  <Heading></Heading>
+  <h2>{config.description}</h2>
   <p><code>astro-theme-provider</code></p>
   <h3>Explore</h3>
   <ul>
