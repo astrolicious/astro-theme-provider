@@ -307,7 +307,6 @@ export default function<
             
             if (typeof option === "string") {
               option = globToModule(option, moduleName, cwd)
-              continue
             }
 
             if (typeof option === "object") {
