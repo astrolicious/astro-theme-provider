@@ -57,7 +57,7 @@ export function isAstroFile(path: string): boolean {
 }
 
 export function camelCase(str: string) {
-  return str.replace(/(-|<|>|:|"|\/|\\|\||\?|\*)./g, x=>x[1]!.toUpperCase())
+  return str.replace(/(-|<|>|:|"|\/|\\|\||\?|\*|\s)./g, x=>x[1]!.toUpperCase())
 }
 
 export function globToModule(

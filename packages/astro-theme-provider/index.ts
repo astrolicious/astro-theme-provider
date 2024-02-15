@@ -197,66 +197,56 @@ export default function<
           const modulesExportsBuffer = new LineBuffer(undefined, -1)
 
 
-          function arrayToVirtualModule(exportName: string, array: string[]) {
+          function arrayToVirtualModule(moduleName: string, array: string[]) {
             if (array.length < 1) return // Skip empty arrays
 
-            if (exportName === "config") {
-              logger.warn(`Export name 'config' is reserved for the config module '${authorOptions.name}/config'`)
-              return
-            }
+            modulesAuthoredBuffer.add([`${moduleName}: string[]`])
 
-            modulesAuthoredBuffer.add([`${exportName}: string[]`])
-
-            const overrides = options?.overrides?.[exportName as keyof AstroThemeModulesOptions<ThemeName>]
+            const overrides = options?.overrides?.[moduleName as keyof AstroThemeModulesOptions<ThemeName>]
 
             // Append user's "overrides" to array module
             if (overrides && Array.isArray(overrides)) {
-              modulesOverridesBuffer.add([`${exportName}: string[]`])
+              modulesOverridesBuffer.add([`${moduleName}: string[]`])
               array = [...array, ...overrides.map(path => resolveUserImport(path))]
             }
 
             // Add "import only" virtual module from array of entrypoints (mostly used for CSS)
             addVirtualImport({
-              name: authorOptions.name + '/' + exportName,
+              name: authorOptions.name + '/' + moduleName,
               content: array.map((path) => `import ${resolveAuthorImport(path)};`).join(''),
             })
 
-            modulesExportsBuffer.add([`${exportName}: string[]`])
+            modulesExportsBuffer.add([`${moduleName}: string[]`])
 
-            addLinesToDtsModule(authorOptions.name + '/' + exportName, "")
+            addLinesToDtsModule(authorOptions.name + '/' + moduleName, "")
           }
 
           
-          function objToVirtualModule(exportName: string, obj: Record<string, string>) {
+          function objToVirtualModule(moduleName: string, obj: Record<string, string>) {
             // Generate types for exports
             let exportedTypes = Object.entries(obj).map(exportEntriesToTypes)
 
             if (exportedTypes.length < 1) return // Skip empty objects
 
-            if (exportName === "config") {
-              logger.warn(`Export name 'config' is reserved for the config module '${authorOptions.name}/config'`)
-              return
-            }
-
             // Add exportedTypes to buffer for AstroThemeModulesAuthored interface
-            modulesAuthoredBuffer.add(wrapWithBrackets(exportedTypes, `${exportName}: `))
+            modulesAuthoredBuffer.add(wrapWithBrackets(exportedTypes, `${moduleName}: `))
 
             // Override exports with user's overrides
             const overrides = Object.entries(
-              options?.overrides?.[exportName as keyof AstroThemeModulesOptions<ThemeName>] || {} as Record<string, string>
+              options?.overrides?.[moduleName as keyof AstroThemeModulesOptions<ThemeName>] || {} as Record<string, string>
             )
 
             if (overrides.length > 0) {
               // Create User module for overrding component inside author module, does not include user overrides ex:"my-theme:components" to prevent circular imports
               addVirtualImport({
-                name: authorOptions.name + ':' + exportName,
+                name: authorOptions.name + ':' + moduleName,
                 content: Object.entries(obj)
                 .map(([name, path]) => `export { default as ${camelCase(name)} } from ${resolveAuthorImport(path)};`)
                 .join(''),
               })
               // Add types for virtual module
               addLinesToDtsModule(
-                authorOptions.name + ':' + exportName,
+                authorOptions.name + ':' + moduleName,
                 exportedTypes.map(line => `export const ` + line)
               )
 
@@ -269,7 +259,7 @@ export default function<
               modulesOverridesBuffer.add(
                 wrapWithBrackets(
                   overrides.map(exportEntriesToTypes), 
-                  `${exportName}: `
+                  `${moduleName}: `
                 ),
               )
             }
@@ -279,19 +269,19 @@ export default function<
 
             // Create main author module with user's overrides
             addVirtualImport({
-              name: authorOptions.name + '/' + exportName,
+              name: authorOptions.name + '/' + moduleName,
               content: Object.entries(obj)
               .map(([name, path]) => `export { default as ${camelCase(name)} } from ${resolveAuthorImport(path)};`)
               .join(''),
             })            
             // Add export types for virtual module
             addLinesToDtsModule(
-              authorOptions.name + '/' + exportName,
+              authorOptions.name + '/' + moduleName,
               exportedTypes.map(line => `export const ` + line)
             )
 
             // Add exportedTypes with overrides to buffer for AstroThemeModulesInjected interface
-            modulesExportsBuffer.add(wrapWithBrackets(exportedTypes, `${exportName}: `))
+            modulesExportsBuffer.add(wrapWithBrackets(exportedTypes, `${moduleName}: `))
           }
 
           // Default modules
@@ -305,22 +295,29 @@ export default function<
           Object.assign(defaultModules, authorOptions.modules)
           
           // Dynamically create virtual modules using globs and/or export objects defined by theme author or user
-          for (let [exportName, option] of Object.entries(defaultModules)) {
+          for (let [moduleName, option] of Object.entries(defaultModules)) {
             if (!option) continue
+
+            if (moduleName === "config") {
+              logger.warn(`Export name 'config' is reserved for the config module '${authorOptions.name}/config'`)
+              continue
+            }
+
+            moduleName = camelCase(moduleName)
             
             if (typeof option === "string") {
-              option = globToModule(option, exportName, cwd)
+              option = globToModule(option, moduleName, cwd)
+              continue
             }
 
             if (typeof option === "object") {
               if (Array.isArray(option)) {
                 if (option.length > 0) {
-                  arrayToVirtualModule(exportName, option)
+                  arrayToVirtualModule(moduleName, option)
                 }
                 continue
               }
-
-              objToVirtualModule(exportName, option)
+              objToVirtualModule(moduleName, option)
             }
           }
 
