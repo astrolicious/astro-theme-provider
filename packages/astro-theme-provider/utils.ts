@@ -16,6 +16,18 @@ const IMAGE_FORMATS = [
 	'avif',
 ]
 
+// https://github.com/withastro/astro/blob/main/packages/astro/src/core/constants.ts#L5
+const MARKDOWN_FORMATS = [
+  'markdown',
+  'mdown',
+  'mdwn',
+  'mdoc',
+  'mkdn',
+  'mdx',
+  'mkd',
+  'md',
+]
+
 const CSS_FORMATS = [
 	'css',
 	'scss',
@@ -34,11 +46,23 @@ const API_FORMATS = [
 	'js',
 ]
 
-export const GLOB_ASTRO = `**.astro`
-export const GLOB_API = `**.{${API_FORMATS.join(',')}}`
+const UI_FRAMEWORK_FORMATS = [
+  'tsx',
+  'jsx',
+  'svelte',
+  'vue',
+  'lit'
+]
+
 export const GLOB_CSS = `**.{${CSS_FORMATS.join(',')}}`
+export const GLOB_API = `**.{${API_FORMATS.join(',')}}`
 export const GLOB_DATA = `**.{${DATA_FORMATS.join(',')}}`
+export const GLOB_ASTRO = `**.astro`
 export const GLOB_IMAGES = `**.{${IMAGE_FORMATS.join(',')}}`
+export const GLOB_MARKDOWN = `**.{${MARKDOWN_FORMATS.join(',')}}`
+export const GLOB_UI_FRAMEWORK = `**.{${UI_FRAMEWORK_FORMATS.join(',')}}`
+export const GLOB_COMPONENTS = `**.{astro,${UI_FRAMEWORK_FORMATS.join(',')}}`
+export const GLOB_PAGES = `**.{astro,${API_FORMATS.join(',')}}`
 
 export function isImageFile(path: string): boolean {
 	return IMAGE_FORMATS.includes(extname(path).slice(1).toLowerCase());

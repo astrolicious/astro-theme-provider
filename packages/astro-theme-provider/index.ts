@@ -12,7 +12,7 @@ import addPageDirPlugin from 'astro-pages/plugins/astro-integration-kit.ts';
 import validatePackageName from 'validate-npm-package-name';
 import addDtsBufferPlugin from './plugins/d-ts-buffer'
 import { errorMap } from './error-map';
-import { GLOB_ASTRO, GLOB_CSS, GLOB_IMAGES, LineBuffer, camelCase, globToModule, isAbsoluteFile, isCSSFile, isImageFile, validateDirectory, validateFile, validatePattern, wrapWithBrackets } from './utils'
+import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES, LineBuffer, camelCase, globToModule, isAbsoluteFile, isCSSFile, isImageFile, validateDirectory, validateFile, validatePattern, wrapWithBrackets } from './utils'
 import callsites from 'callsites';
 
 type Prettify<T> = { [K in keyof T]: T[K]; } & {};
@@ -289,7 +289,7 @@ export default function<
             css: GLOB_CSS,
             assets: GLOB_IMAGES,
             layouts: GLOB_ASTRO,
-            components: GLOB_ASTRO
+            components: GLOB_COMPONENTS
           }
           
           Object.assign(defaultModules, authorOptions.modules)
@@ -440,3 +440,15 @@ export default function<
     }
   })
 }
+
+export {
+  GLOB_CSS,
+  GLOB_API,
+  GLOB_DATA,
+  GLOB_ASTRO,
+  GLOB_IMAGES,
+  GLOB_MARKDOWN,
+  GLOB_UI_FRAMEWORK,
+  GLOB_COMPONENTS,
+  GLOB_PAGES,
+} from './utils'
