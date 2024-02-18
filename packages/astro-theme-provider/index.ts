@@ -126,11 +126,11 @@ export default function<
             writeDtsBuffer
           } = createDtsBuffer(authorOptions.name!)
 
-          const resolveAuthorImport = (id: string) => 
-            JSON.stringify(id.startsWith('.') ? resolve(cwd, id) : id);
+          const resolveAuthorImport = (id: string, base: string = "./") => 
+            JSON.stringify(id.startsWith('.') ? resolve(cwd, base, id) : id);
           
-          const resolveUserImport = (id: string) => 
-            JSON.stringify(id.startsWith('.') ? resolve(srcDir, id) : id)
+          const resolveUserImport = (id: string, base: string = "./") => 
+            JSON.stringify(id.startsWith('.') ? resolve(srcDir, base, id) : id)
               .replace(/^\"|\"$/g, '') // Added back by resolveAuthorImport
 
           const exportEntriesToTypes = ([name, path]: [string, string]) => {
@@ -241,7 +241,7 @@ export default function<
               addVirtualImport({
                 name: authorOptions.name + ':' + moduleName,
                 content: Object.entries(obj)
-                .map(([name, path]) => `export { default as ${camelCase(name)} } from ${resolveAuthorImport(path)};`)
+                .map(([name, path]) => `export { default as ${camelCase(name)} } from ${resolveAuthorImport(path, moduleName)};`)
                 .join(''),
               })
               // Add types for virtual module
@@ -271,8 +271,8 @@ export default function<
             addVirtualImport({
               name: authorOptions.name + '/' + moduleName,
               content: Object.entries(obj)
-              .map(([name, path]) => `export { default as ${camelCase(name)} } from ${resolveAuthorImport(path)};`)
-              .join(''),
+                .map(([name, path]) => `export { default as ${camelCase(name)} } from ${resolveAuthorImport(path, moduleName)};`)
+                .join(''),
             })            
             // Add export types for virtual module
             addLinesToDtsModule(
