@@ -1,0 +1,208 @@
+---
+title: Getting Started
+description: A reference page in my new Starlight docs site.
+---
+import FileTree from "../../../components/file-tree.astro"
+
+## Modules
+
+### Layouts
+
+By default, any Layouts inside the `layouts` folder at the root of your package will be included in the `/layouts` module
+
+```ts
+---
+import { Layout } from 'my-theme/layout';
+---
+```
+
+### Components
+
+By default, any Components inside the `components` folder at the root of your package will be included in the `/components` module
+
+```ts
+---
+import { Heading } from 'my-theme/components';
+---
+```
+
+### Styles
+
+By default, any Styles inside the `css` folder at the root of your package will be included in the `/css` module
+
+```ts
+---
+import 'my-theme/css'
+---
+```
+
+### Images
+
+By default, any Images inside the `assets` folder at the root of your package will be included in the `/assets` module
+
+```ts
+---
+import { logo } from 'my-theme/layout';
+---
+```
+
+### Examples
+
+#### Toggle default modules off
+
+```ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  modules: {
+    css: false,
+    assets: false,
+    layouts: false,
+    components: false,
+  }
+})
+```
+
+## Custom Modules
+
+<FileTree>
+- package/
+  - custom/
+    - logo.png
+    - styles.css
+    - Heading.astro
+  - ...
+  - index.ts
+  - package.json
+</FileTree>
+
+### Examples
+
+#### Create module from a glob pattern
+
+```ts
+// package/index.ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  modules: {
+    custom: '**.{astro,css,png}'
+  }
+})
+```
+
+#### Create module from an array
+
+```ts
+// package/index.ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  modules: {
+    custom: [ './styles.css' ]
+  }
+})
+```
+
+#### Create module from an object
+
+```ts
+// package/index.ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  modules: {
+    custom: {
+      css: './styles.css',
+      logo: './logo.png',
+      Heading: './heading.astro'
+    }
+  }
+})
+```
+
+#### Using a custom module
+
+```astro
+---
+// Includes styles from css files
+import { Heading, logo } from 'my-theme/custom';
+---
+```
+
+## Pages
+
+By default, any pages located inside the `pages` folder at the root of your package will be injected into your theme
+
+<FileTree>
+- package/
+  - pages/
+    - blog/
+      - index.astro
+      - [...slug].astro
+  - index.ts
+  - package.json
+</FileTree>
+
+### Examples
+
+#### Change the default page directory
+
+```ts "'routes'"
+// package/index.ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  pages: 'routes'
+})
+```
+
+#### Using glob patterns to match pages inside the page directory
+
+Astro Theme Provider uses [`fast-glob`](https://www.npmjs.com/package/fast-glob) to glob page files inside your pages directory. You can override the default glob pattern using the `glob` property
+
+```ts "'**.{astro}'"
+// package/index.ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  pages: {
+    dir: 'pages',
+    glob: '**.{astro}'
+  }
+})
+```
+
+#### Using glob patterns to ignore pages in the page directory
+
+[`fast-glob`](https://www.npmjs.com/package/fast-glob) also supports negative globs patterns for ignoring files
+
+```ts "'!**.{ts,js}'"
+// package/index.ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  pages: {
+    dir: 'pages',
+    glob: [
+      '**.astro', 
+      '!**.{ts,js}'
+    ]
+  }
+})
+```
+
+#### Debuging injected pages
+
+Use the  `log` property to print your injected pages to the console
+
+```ts "'verbose'"
+// package/index.ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  pages: {
+    log: 'verbose'
+  }
+})
+```

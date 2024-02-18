@@ -1,0 +1,36 @@
+---
+title: Welcome to Astro Theme Provider
+description: Easily create theme integration packages!
+template: splash
+hero:
+  tagline: Lets author a theme integration!
+  image:
+    file: ../../assets/houston.webp
+  actions:
+    - text: Introduction
+      link: /introduction
+      icon: right-arrow
+      variant: primary
+    - text: Author a Theme
+      link: /author/getting-started
+      icon: pencil
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Features
+
+<CardGrid>
+	<Card title="Author Theme Integrations" icon="pen">
+		Easily author themes as integrations you can configure from the Astro config
+	</Card>
+	<Card title="Configurable" icon="setting">
+		Users can configure your theme to their liking by overriding pages and components
+	</Card>
+	<Card title="Type safe" icon="approve-check-circle">
+		Everything inside your theme is type safe
+	</Card>
+	<Card title="Learn More" icon="open-book">
+		Learn more about [how Astro Theme Provider works](/introduction)
+	</Card>
+</CardGrid>

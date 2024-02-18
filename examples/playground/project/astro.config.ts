@@ -17,7 +17,7 @@ export default defineConfig({
           // "./custom.css"
         ],
         components: {
-          // Heading: './CustomHeading.astro'
+          Heading: './CustomHeading.astro'
         }
       }
     })
