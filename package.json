@@ -6,6 +6,6 @@
   "scripts": {},
   "license": "MIT",
   "devDependencies": {
-    "astro": "^4.3.5"
+    "astro": "^4.4.0"
   }
 }

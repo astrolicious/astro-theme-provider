@@ -23,9 +23,9 @@
     "./types": "./types.ts"
   },
   "devDependencies": {
-    "@types/node": "^20.11.17",
-    "astro": "^4.3.5",
-    "astro-integration-kit": "^0.1.1",
+    "@types/node": "^20.11.19",
+    "astro": "^4.4.0",
+    "astro-integration-kit": "^0.1.2",
     "fast-glob": "^3.3.2"
   },
   "dependencies": {

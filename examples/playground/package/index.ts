@@ -5,5 +5,10 @@ export default ThemeProvider({
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
-  })
+  }),
+  modules: {
+    components: {
+      Heading: './Heading.astro'
+    }
+  }
 })

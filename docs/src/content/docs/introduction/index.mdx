@@ -1,0 +1,111 @@
+---
+title: Introduction
+description: A reference page in my new Starlight docs site.
+---
+import FileTree from "../../../components/file-tree.astro"
+
+## Why?
+
+Most Astro themes are repos that you have to clone and edit yourself. They often times feel bloated, complicated, and have files that you dont necessarily need to see or touch. `astro-theme-provider` allows you to export your theme as an integration from a npm package that can be configured from inside the Astro config.
+
+```ts
+import { defineConfig } from 'astro/config';
+import MyTheme from 'my-theme';
+
+export default defineConfig({
+  integrations: [
+    MyTheme({
+      config: {
+        title: 'Hey!',
+        description: 'This is my theme!',
+      }
+    })
+  ]
+});
+```
+
+## How it Works 
+
+### Package Structure
+
+<FileTree>
+- package/
+  - assets/
+    - logo.png
+  - css/
+    - styles.css
+  - components/
+    - Heading.astro
+  - layouts/
+    - Layout.astro
+  - pages/
+    - blog/
+      - index.astro
+      - [...slug].astro
+  - index.ts
+  - package.json
+</FileTree>
+
+```json
+// package/package.json
+{
+  "name": "my-theme",
+  "version": "0.0.1",
+  // ...
+}
+```
+
+```ts
+// package/index.ts
+import defineTheme from 'astro-theme-provider';
+import { z } from 'astro/zod'
+
+export default defineTheme({
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+  })
+})
+```
+
+### Authoring Pages/Layouts/Components
+
+```tsx
+---
+import { Layout } from 'my-theme/layouts';
+import { Card } from 'my-theme/components';
+import 'my-theme/css';
+---
+```
+
+### Using a theme
+
+```ts
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import MyTheme from 'my-theme';
+
+export default defineConfig({
+  integrations: [
+    MyTheme({
+      config: {
+        title: 'Hey!',
+        description: 'This is my theme',
+      },
+      pages: {
+        '/blog': false, // Toggle route off
+        '/blog/[...slug]': '/projects/[...slug]', // Override path
+      },
+      overrides: {
+        css: [
+          "./custom.css" // Add custom css to theme
+        ],
+        components: {
+          // Overwrite default Heading component with a custom one
+          Heading: './CustomHeading.astro'
+        }
+      }
+    })
+  ]
+});
+```
