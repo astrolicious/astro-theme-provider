@@ -6,7 +6,7 @@ import FileTree from "../../../components/file-tree.astro"
 
 ## Why?
 
-Most Astro themes are repos that you have to clone and edit yourself. They often times feel bloated, complicated, and have files that you dont necessarily need to see or touch. `astro-theme-provider` allows you to export your theme as an integration from a npm package that can be configured from inside the Astro config.
+Astro Theme Provider allows you to export your theme as an integration from a npm package that can be configured from inside the Astro config. 
 
 ```ts
 import { defineConfig } from 'astro/config';
@@ -50,6 +50,7 @@ export default defineConfig({
 // package/package.json
 {
   "name": "my-theme",
+  "description": "My Astro Theme!",
   "version": "0.0.1",
   // ...
 }
