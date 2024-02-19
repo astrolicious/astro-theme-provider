@@ -2,10 +2,33 @@
 
 Easily create theme integrations for Astro
 
-### [Documentation](https://github.com/BryceRussell/astro-theme-provider/tree/master/packages/astro-theme-provider#readme)
+```ts
+import defineTheme from 'astro-theme-provider';
+import { z } from 'astro/zod'
 
-### Work In Progress
+export default defineTheme({
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+  })
+})
+```
 
-Currently this package works and can be used to create themes, but the shape of the API may change in the future!
+```ts
+import { defineConfig } from 'astro/config';
+import MyTheme from 'my-theme';
 
-I am still doing a lot thinking about how to support everything a theme author may need with an easy-to-use API. If you have any ideas or use cases that you want included you can open a discussion in the [discussions tab](https://github.com/BryceRussell/astro-theme-provider/discussions)
+export default defineConfig({
+  integrations: [
+    MyTheme({
+      config: {
+        title: 'Hey!',
+        description: 'This is my theme!',
+      }
+    })
+  ]
+});
+```
+
+### [Documentation](https://astro-theme-provider.netlify.app)
+### [Package](packages/astro-theme-provider)
