@@ -31,4 +31,5 @@ export default defineConfig({
 ```
 
 ### [Documentation](https://astro-theme-provider.netlify.app)
+
 ### [Package](packages/astro-theme-provider)
