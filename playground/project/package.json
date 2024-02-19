@@ -11,6 +11,6 @@
   },
   "dependencies": {
     "astro": "^4.0.0",
-    "my-theme": "workspace:*"
+    "my-theme": "workspace:^"
   }
 }
