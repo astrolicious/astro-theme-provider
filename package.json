@@ -1,7 +1,6 @@
 {
   "name": "theme-provider-root",
   "private": true,
-  "version": "1.0.0",
   "packageManager": "pnpm@8.15.2",
 	"engines": {
 		"node": ">=18.19.0"
