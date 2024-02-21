@@ -46,42 +46,52 @@ export default function<
 >(
   authorOptions: AuthorOptions<Config>
   ){
-  let _entrypoint = authorOptions?.entrypoint
 
-  // Loop over reversed stack traces to the first path that is not a Vite `file://` path
-  if (!_entrypoint) {
+  if (!authorOptions.entrypoint) {
+    // Loop over reversed stack traces
+    // Get file path of trace
+    // Assign first non Vite `file://` path as entrypoint (assume it is a theme's `index.ts`)
     for (const callsite of callsites().reverse()) {
       const file = (callsite as NodeJS.CallSite).getScriptNameOrSourceURL()
       if (file && isAbsoluteFile(file) && file !== thisFile) {
-        _entrypoint = file
+        authorOptions.entrypoint = file
         break
       } 
     }
   }
 
-  const entrypoint = validateFile(_entrypoint)
+  // Theme's `index.ts`
+  const entrypoint = validateFile(authorOptions.entrypoint)
 
+  // Theme's root directory
   const cwd = validateDirectory(entrypoint)
 
-  const pkg = JSON.parse(readFileSync(resolve(cwd, "package.json"), "utf-8"))
+  // Theme's `package.json`
+  const pkg = {
+    name: ''
+  }
 
+  try {
+    // Safely read theme's `package.json` file, parse into Object, assign keys/values to `pkg`
+    Object.assign(pkg, JSON.parse(readFileSync(resolve(cwd, "package.json"), "utf-8")))
+  } catch(error) {
 
-  // Theme name
+  }
 
-  // Assign name from package.json as theme name
-  authorOptions.name = pkg.name
+  // Assign name from `package.json` as theme name
+  authorOptions.name = pkg.name as ThemeName
 
   // If no name exists throw an error
   if (!authorOptions.name) {
     throw new AstroError(`Could not find name for theme! Add a name in your 'package.json' or to your author config`)
   }
 
-  // Validate that the theme name is a valid package name or else throw an error
+  // Validate that the theme name is a valid package name
   const isValidName = validatePackageName(authorOptions.name)
 
   if (!isValidName.validForNewPackages) {
     throw new AstroError(
-      `Theme name is not a valid package name! Add a name in your 'package.json' or to your author config`, 
+      `Theme name is not a valid package name!`, 
       [...isValidName.errors, ...isValidName.warnings].join(', ')
     )
   }
