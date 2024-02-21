@@ -3,7 +3,7 @@ import { type Option as PageDirOption } from 'astro-pages/types';
 import { AstroError } from "astro/errors";
 import { z } from 'astro/zod';
 import { readFileSync } from "node:fs";
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url'
 import { defineIntegration, defineOptions } from "astro-integration-kit";
 import { watchIntegrationPlugin, addVirtualImportPlugin } from "astro-integration-kit/plugins";
@@ -127,16 +127,15 @@ export default function<
           } = createDtsBuffer(authorOptions.name!)
 
           const resolveAuthorImport = (id: string, base: string = "./") => 
-            JSON.stringify(id.startsWith('.') ? resolve(cwd, base, id) : id);
+            JSON.stringify(id.startsWith('.') ? validateFile(join(base, id), { base: cwd }) : id);
           
-          const resolveUserImport = (id: string, base: string = "./") => 
-            JSON.stringify(id.startsWith('.') ? resolve(srcDir, base, id) : id)
-              .replace(/^\"|\"$/g, '') // Added back by resolveAuthorImport
+          const resolveUserImport = (id: string) => 
+            id.startsWith('.') ? validateFile(id, { base: srcDir }) : id
 
-          const moduleEntriesToTypes = ([name, path]: [string, string]) => {
+          const moduleEntriesToTypes = (moduleName: string) =>  ([name, path]: [string, string]) => {
             if (isCSSFile(path)) return ``
             if (isImageFile(path)) return `${camelCase(name)}: import("astro").ImageMetadata;`
-            return `${camelCase(name)}: typeof import(${resolveAuthorImport(path)}).default;`
+            return `${camelCase(name)}: typeof import(${resolveAuthorImport(path, moduleName)}).default;`
           }
 
           // HMR for `astro-theme-provider` package
@@ -224,7 +223,7 @@ export default function<
           
           function objToVirtualModule(moduleName: string, mod: Record<string, string>) {
             // Generate types for exports
-            let exportedTypes = Object.entries(mod).map(moduleEntriesToTypes)
+            let exportedTypes = Object.entries(mod).map(moduleEntriesToTypes(moduleName))
 
             if (exportedTypes.length < 1) return // Skip empty objects
 
@@ -232,11 +231,9 @@ export default function<
             modulesAuthoredBuffer.add(wrapWithBrackets(exportedTypes, `${moduleName}: `))
 
             // Override exports with user's overrides
-            const overrides = Object.entries(
-              options?.overrides?.[moduleName as keyof AstroThemeModulesOptions<ThemeName>] || {}
-            ) as [string, string][]
+            const overrides = options?.overrides?.[moduleName as keyof AstroThemeModulesOptions<ThemeName>] as Record<string, string> || {}
 
-            if (overrides.length > 0) {
+            if (Object.keys(overrides).length > 0) {
               // Create User module for overrding component inside author module, does not include user overrides ex:"my-theme:components" to prevent circular imports
               addVirtualImport({
                 name: authorOptions.name + ':' + moduleName,
@@ -251,21 +248,24 @@ export default function<
               )
 
               // Resolve relative paths from user
-              for (const [name, path] of overrides) {
-                mod[camelCase(name)] = resolveUserImport(path)
+              for (const name in overrides) {
+                overrides[name] = resolveUserImport(overrides[name]!)
               }
+
+              // Override
+              Object.assign(mod, overrides)
 
               // Add overrides to buffer for AstroThemeModulesOverrides interface
               modulesOverridesBuffer.add(
                 wrapWithBrackets(
-                  overrides.map(moduleEntriesToTypes), 
+                  Object.entries(overrides).map(moduleEntriesToTypes(moduleName)), 
                   `${moduleName}: `
                 ),
               )
             }
 
             // Recalculate exportedTypes to include overrides
-            exportedTypes = Object.entries(mod).map(moduleEntriesToTypes)
+            exportedTypes = Object.entries(mod).map(moduleEntriesToTypes(moduleName))
 
             // Create main author module with user's overrides
             addVirtualImport({
