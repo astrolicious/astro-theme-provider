@@ -1,4 +1,4 @@
-import type { ZodErrorMap } from 'zod';
+import type { ZodErrorMap } from 'astro/zod';
 
 type TypeOrLiteralErrByPathEntry = {
 	code: 'invalid_type' | 'invalid_literal';
