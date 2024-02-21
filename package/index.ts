@@ -150,6 +150,7 @@ export default function<
             type ThemeConfig = NonNullable<Parameters<typeof import("${entrypoint}").default>[0]>["config"]
   
             declare type AstroThemes = keyof AstroThemeConfigs;
+
             declare type AstroThemeConfigs = {
               "${themeName}": ThemeConfig
             }
