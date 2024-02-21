@@ -7,7 +7,6 @@
     "playground:dev": "pnpm --filter playground dev",
 		"docs:dev": "pnpm --filter docs dev",
 		"changeset": "changeset",
-    "release": "changeset publish",
     "lint": "biome check .",
     "lint:fix": "biome check --apply ."
   },
