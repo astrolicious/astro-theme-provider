@@ -153,10 +153,10 @@ export function validateFile(path: string | undefined, options?: { base?: string
 
   // Check if path exists
   if (!existsSync(path)) {
-    throw new AstroError(`Directory does not exist`, path)
+    throw new AstroError(`File does not exist`, path)
   }
 
-  return path
+  return path.replace(/\\/g, '/')
 }
 
 export function validateDirectory(path?: string, options?: { base?: string }) {
@@ -168,11 +168,7 @@ export function validateDirectory(path?: string, options?: { base?: string }) {
 
   // Check if path is a file URL
   if (path.startsWith('file:/')) {
-    if (extname(path)) {
-      path = dirname(fileURLToPath(path))
-    } else {
-      path = fileURLToPath(path)
-    }
+    path = fileURLToPath(path)
   }
 
   // Check if path is relative
@@ -190,7 +186,7 @@ export function validateDirectory(path?: string, options?: { base?: string }) {
     throw new AstroError(`Directory does not exist`, path)
   }
 
-  return path
+  return path.replace(/\\/g, '/')
 }
 
 
