@@ -1,45 +1,61 @@
-import { definePlugin } from "astro-integration-kit";
-import { addDts } from "astro-integration-kit/utilities";
-import { LineBuffer, wrapWithBrackets } from '../utils';
 import type { NestedStringArray } from "../types";
 
-export default definePlugin({
-  name: "createDtsBuffer",
-  hook: "astro:config:setup",
-  implementation:
-    ({ config, logger }) => {
-      return (name: string) => {
-        const {
-          addLinesToDts,
-          addLinesToDtsInterface,
-          addLinesToDtsNamespace,
-          addLinesToDtsModule,
-          compileDtsBuffer
-        } = createDtsBuffer()
+export function wrapWithBrackets(lines: NestedStringArray, prefix: string = "") {
+  return [
+    `${prefix}{`,
+      lines,
+    `}`
+  ]
+}
 
-        function writeDtsBuffer() {
-          addDts({
-            name: name,
-            content: compileDtsBuffer(),
-            root: config.root,
-            srcDir: config.srcDir,
-            logger,
-          })
-        }
+// Removes extra whitespace from start of lines, keep nested whitespace
+export function normalizeLines(lines: string[]) {
+  let extraWhitespace = 0;
+  for (let line of lines) {
+    if (line.trim()) {
+      const whitespace = line.length - line.trimStart().length
+      if (!whitespace && whitespace >= extraWhitespace) continue
+      extraWhitespace = whitespace
+    }
+  }
+  return lines.map(line => line.trim() && line.slice(extraWhitespace))
+}
 
-        return {
-          addLinesToDts,
-          addLinesToDtsInterface,
-          addLinesToDtsNamespace,
-          addLinesToDtsModule,
-          compileDtsBuffer,
-          writeDtsBuffer
+const NEWLINE = /\n/g
+
+export class LineBuffer {
+  lines: string[] = []
+  depth: number
+
+  constructor(type?: string | NestedStringArray, depth: number = 0) {
+    if (type) this.add(type, depth)
+    this.depth = depth
+  }
+
+  add(type: string | NestedStringArray, depth: number = this.depth) {    
+    if (typeof type === 'string') {
+      if (type.trim()) {
+        if (NEWLINE.test(type)) {
+          for (const line of normalizeLines(type.split('\n'))) {
+            this.lines.push(line)
+          }
+          return
         }
+        this.lines.push('\t'.repeat(Math.max(0, depth)) + type)
+      }
+      return
+    }
+
+    if (Array.isArray(type)) {
+      depth++
+      for (const t of type) {
+        this.add(t, depth)
       }
     }
-});
+  }
+}
 
-function createDtsBuffer() {
+export function createDtsBuffer() {
   const global = new LineBuffer()
   const interfaces = new Map<string, LineBuffer>()
   const namespaces = new Map<string, LineBuffer>()

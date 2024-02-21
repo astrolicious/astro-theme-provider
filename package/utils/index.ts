@@ -1,4 +1,3 @@
-import type { NestedStringArray } from './types';
 import { dirname, basename, extname, resolve, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
@@ -191,61 +190,13 @@ export function validateDirectory(path?: string, options?: { base?: string }) {
   return path.replace(/\\/g, '/')
 }
 
+export {
+  LineBuffer,
+  wrapWithBrackets,
+  normalizeLines,
+  createDtsBuffer
+} from './type-gen'
 
-
-// Utilities for compiling .d.ts
-
-export function wrapWithBrackets(lines: NestedStringArray, prefix: string = "") {
-  return [
-    `${prefix}{`,
-      lines,
-    `}`
-  ]
-}
-
-// Removes extra whitespace from start of lines, keep nested whitespace
-export function normalizeLines(lines: string[]) {
-  let extraWhitespace = 0;
-  for (let line of lines) {
-    if (line.trim()) {
-      const whitespace = line.length - line.trimStart().length
-      if (!whitespace && whitespace >= extraWhitespace) continue
-      extraWhitespace = whitespace
-    }
-  }
-  return lines.map(line => line.trim() && line.slice(extraWhitespace))
-}
-
-const NEWLINE = /\n/g
-
-export class LineBuffer {
-  lines: string[] = []
-  depth: number
-
-  constructor(type?: string | NestedStringArray, depth: number = 0) {
-    if (type) this.add(type, depth)
-    this.depth = depth
-  }
-
-  add(type: string | NestedStringArray, depth: number = this.depth) {    
-    if (typeof type === 'string') {
-      if (type.trim()) {
-        if (NEWLINE.test(type)) {
-          for (const line of normalizeLines(type.split('\n'))) {
-            this.lines.push(line)
-          }
-          return
-        }
-        this.lines.push('\t'.repeat(Math.max(0, depth)) + type)
-      }
-      return
-    }
-
-    if (Array.isArray(type)) {
-      depth++
-      for (const t of type) {
-        this.add(t, depth)
-      }
-    }
-  }
-}
+export {
+  errorMap
+} from './error-map'
