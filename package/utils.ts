@@ -1,8 +1,9 @@
+import type { NestedStringArray } from './types';
 import { dirname, basename, extname, resolve, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import fg from 'fast-glob';
 import { existsSync } from 'node:fs';
 import { AstroError } from 'astro/errors';
+import fg from 'fast-glob';
 
 // https://github.com/withastro/astro/blob/main/packages/astro/src/assets/consts.ts#L17
 const IMAGE_FORMATS = [

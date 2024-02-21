@@ -1,43 +1,17 @@
-
-import { type Option as PageDirOption } from 'astro-pages/types';
-import { AstroError } from "astro/errors";
-import { z } from 'astro/zod';
+import type { AuthorOptions, ConfigDefault, ExportTypes, UserOptions } from './types';
 import { readFileSync } from "node:fs";
 import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url'
+import { AstroError } from "astro/errors";
 import { defineIntegration, defineOptions } from "astro-integration-kit";
 import { watchIntegrationPlugin, addVirtualImportPlugin } from "astro-integration-kit/plugins";
 import addPageDirPlugin from 'astro-pages/plugins/astro-integration-kit.ts';
 // @ts-ignore
 import validatePackageName from 'validate-npm-package-name';
+import callsites from 'callsites';
 import addDtsBufferPlugin from './plugins/d-ts-buffer'
 import { errorMap } from './error-map';
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES, LineBuffer, camelCase, globToModule, isAbsoluteFile, isCSSFile, isImageFile, validateDirectory, validateFile, validatePattern, wrapWithBrackets } from './utils'
-import callsites from 'callsites';
-
-type Prettify<T> = { [K in keyof T]: T[K]; } & {};
-
-type ConfigDefault = Record<string, unknown>
-
-type ExportTypes = Record<string, undefined | null | false | string | string[] | Record<string, string>>
-
-type AuthorOptions<
-  Config extends ConfigDefault
-> = Prettify<{
-  entrypoint?: string;
-  name?: ThemeName;
-  pages?: string | PageDirOption | undefined;
-  schema: z.ZodSchema<Config>;
-  modules?: ExportTypes | undefined
-}>
-
-type UserOptions<
-  Config extends ConfigDefault, 
-> = Prettify<{
-  config: Config;
-  pages?: AstroThemePagesOptions<ThemeName> | undefined
-  overrides?: AstroThemeModulesOptions<ThemeName> | undefined;
-}>
 
 const thisFile = validateFile(import.meta.url)
 
