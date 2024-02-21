@@ -3,9 +3,15 @@
   "private": true,
   "version": "1.0.0",
   "description": "",
-  "scripts": {},
+  "scripts": {
+    "lint": "biome check .",
+		"lint:fix": "biome check --apply ."
+  },
   "license": "MIT",
   "devDependencies": {
     "astro": "^4.4.0"
+  },
+  "dependencies": {
+    "@biomejs/biome": "^1.5.3"
   }
 }
