@@ -6,7 +6,7 @@ import FileTree from "../../../components/file-tree.astro"
 
 ## Why?
 
-Astro Theme Provider allows you to export your theme as an integration from a npm package that can be configured from inside the Astro config. 
+Astro Theme Provider allows you to author your theme as an integration
 
 ```ts
 import { defineConfig } from 'astro/config';
@@ -24,7 +24,7 @@ export default defineConfig({
 });
 ```
 
-## How it Works 
+## How it Works
 
 ### Package Structure
 
@@ -35,7 +35,7 @@ export default defineConfig({
   - css/
     - styles.css
   - components/
-    - Heading.astro
+    - Card.astro
   - layouts/
     - Layout.astro
   - pages/
@@ -71,10 +71,13 @@ export default defineTheme({
 
 ### Authoring Pages/Layouts/Components
 
+Virtual modules are automatically generated from the files inside your package. These virtual modules are used to author pages, layouts, and components for your theme:
+
 ```tsx
 ---
 import { Layout } from 'my-theme/layouts';
 import { Card } from 'my-theme/components';
+import { logo } from 'my-theme/assets'
 import 'my-theme/css';
 ---
 ```
