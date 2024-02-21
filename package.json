@@ -2,19 +2,20 @@
   "name": "theme-provider-root",
   "private": true,
   "packageManager": "pnpm@8.15.2",
-	"engines": {
-		"node": ">=18.19.0"
-	},
+  "engines": {
+    "node": ">=18.19.0"
+  },
   "scripts": {
     "playground:dev": "pnpm --filter playground dev",
-		"docs:dev": "pnpm --filter docs dev",
-		"changeset": "changeset",
+    "docs:dev": "pnpm --filter docs dev",
+    "changeset": "changeset",
     "lint": "biome check .",
     "lint:fix": "biome check --apply ."
   },
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "@biomejs/biome": "^1.5.3",
-    "@changesets/cli": "^2.27.1"
+    "@changesets/cli": "^2.27.1",
+    "astro": "^4.4.1"
   }
 }
