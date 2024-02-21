@@ -1,10 +1,10 @@
-import type { APIRoute } from 'astro';
+import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async () => {
-  return new Response(
-    JSON.stringify({
-      name: 'Levi',
-      description: 'cat'
-    })
-  )
-}
+	return new Response(
+		JSON.stringify({
+			name: "Levi",
+			description: "cat",
+		}),
+	);
+};
