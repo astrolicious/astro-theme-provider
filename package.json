@@ -2,7 +2,10 @@
   "name": "theme-provider-root",
   "private": true,
   "version": "1.0.0",
-  "description": "",
+  "packageManager": "pnpm@8.15.2",
+	"engines": {
+		"node": ">=18.19.0"
+	},
   "scripts": {
     "playground:dev": "pnpm --filter playground dev",
 		"docs:dev": "pnpm --filter docs dev",
