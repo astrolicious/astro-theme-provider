@@ -139,16 +139,17 @@ export function validateFile(path: string | undefined, options?: { base?: string
 
   // Check if path is a file URL
   if (path.startsWith('file:/')) {
-    if (extname(path)) {
-      path = dirname(fileURLToPath(path))
-    } else {
-      throw new AstroError(`Expected file path but received directory path`, path)
-    }
+    path = fileURLToPath(path)
   }
 
   // Check if path is relative
   if (!isAbsolute(path)) {
     path = resolve(base, path)
+  }
+
+  // Check if path is a file
+  if (!extname(path)) {
+    throw new AstroError(`Expected file path but received directory`, path)
   }
 
   // Check if path exists
