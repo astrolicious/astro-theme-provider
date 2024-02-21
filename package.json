@@ -4,14 +4,16 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "playground:dev": "pnpm --filter playground dev",
+		"docs:dev": "pnpm --filter docs dev",
+		"changeset": "changeset",
+    "release": "changeset publish",
     "lint": "biome check .",
-		"lint:fix": "biome check --apply ."
+    "lint:fix": "biome check --apply ."
   },
   "license": "MIT",
-  "devDependencies": {
-    "astro": "^4.4.0"
-  },
   "dependencies": {
-    "@biomejs/biome": "^1.5.3"
+    "@biomejs/biome": "^1.5.3",
+    "@changesets/cli": "^2.27.1"
   }
 }
