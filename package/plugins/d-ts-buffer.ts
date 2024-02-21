@@ -1,6 +1,7 @@
 import { definePlugin } from "astro-integration-kit";
 import { addDts } from "astro-integration-kit/utilities";
 import { LineBuffer, wrapWithBrackets } from '../utils';
+import type { NestedStringArray } from "../types";
 
 export default definePlugin({
   name: "createDtsBuffer",
@@ -68,9 +69,9 @@ function createDtsBuffer() {
     return (
       [
         global.lines,
-        [...interfaces.entries()].map(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare interface ${name} `)).flat(),
-        [...namespaces.entries()].map(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare ${name} `)).flat(),
-        [...modules.entries()].map(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare module "${name}" `)).flat(),
+        [...interfaces.entries()].flatMap(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare interface ${name} `)),
+        [...namespaces.entries()].flatMap(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare ${name} `)),
+        [...modules.entries()].flatMap(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare module "${name}" `)),
       ].flat(8).join('\n')
     )
   }
