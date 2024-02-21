@@ -15,8 +15,8 @@ importers:
   package:
     dependencies:
       astro-pages:
-        specifier: ^0.1.4
-        version: 0.1.4(astro@4.0.0)
+        specifier: ^0.1.5
+        version: 0.1.5(astro-integration-kit@0.1.2)(astro@4.0.0)
       callsites:
         specifier: ^4.1.0
         version: 4.1.0
@@ -788,13 +788,15 @@ packages:
       defu: 6.1.4
       pathe: 1.1.2
 
-  /astro-pages@0.1.4(astro@4.0.0):
-    resolution: {integrity: sha512-w5rL70MpXBRbhdkLYoNlE7foHRzzNujoKLJafNpLNSMC6+CVoVNLvMl5onxIYd710sQTQJJuiyg/JO+3erNl8w==}
+  /astro-pages@0.1.5(astro-integration-kit@0.1.2)(astro@4.0.0):
+    resolution: {integrity: sha512-7nF4rfdWZlbYXrU9kII2qZQLugBlRYjgqqLxahlQiqqeGOwZH8E3mw2MpOucaY90D9srTzV89rnFA5YyZmDDfA==}
+    peerDependencies:
+      astro: ^4.4.0
+      astro-integration-kit: ^0.3.0
     dependencies:
-      '@types/node': 20.11.19
+      astro: 4.0.0(@types/node@20.11.19)
       astro-integration-kit: 0.1.2(astro@4.0.0)
-    transitivePeerDependencies:
-      - astro
+      fast-glob: 3.3.2
     dev: false
 
   /astro@4.0.0(@types/node@20.11.19):

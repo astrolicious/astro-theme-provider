@@ -29,7 +29,7 @@
     "fast-glob": "^3.3.2"
   },
   "dependencies": {
-    "astro-pages": "^0.1.4",
+    "astro-pages": "^0.1.5",
     "callsites": "^4.1.0",
     "validate-npm-package-name": "^5.0.0"
   }

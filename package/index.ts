@@ -344,7 +344,7 @@ export default function<
           Object.assign(authorOptions.pages, { cwd, log: "minimal" })
 
           // Initialize route injection
-          const { patterns, injectPages } = addPageDir(authorOptions.pages)
+          const { pages, injectPages } = addPageDir(authorOptions.pages)
           
           options.pages ??= {} as NonNullable<typeof options.pages>
 
@@ -352,7 +352,7 @@ export default function<
           addLinesToDtsInterface(
             'AstroThemePagesAuthored',
             wrapWithBrackets(
-              Object.entries(patterns).map(([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`),
+              Object.entries(pages).map(([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`),
               `"${themeName}": `
             )
           )
@@ -363,13 +363,13 @@ export default function<
           // Filter out routes the theme user toggled off
           for (let oldPattern of Object.keys(options.pages)) {
             // Skip route patterns that are not defined by author
-            if (!patterns?.[oldPattern!]) continue
+            if (!pages?.[oldPattern!]) continue
 
             const newPattern = options.pages[oldPattern as keyof typeof options.pages]
 
             // If user passes falsy value remove the route
             if (!newPattern) {
-              delete patterns[oldPattern]
+              delete pages[oldPattern]
               continue
             }
             
@@ -382,11 +382,11 @@ export default function<
                 throw new AstroError(`Invalid page override, pattern must contain the same params in the same location`, `New: ${newPattern}\nOld: ${oldPattern}`)
               }
               // Add new pattern
-              patterns[newPattern] = patterns[oldPattern]!
+              pages[newPattern] = pages[oldPattern]!
               // Add page type to buffer
               pageOverrideBuffer.add(`"${oldPattern}": "${newPattern}";`)
               // Remove old pattern
-              delete patterns[oldPattern]
+              delete pages[oldPattern]
               continue
             }
           }
@@ -406,7 +406,7 @@ export default function<
           addLinesToDtsInterface(
             'AstroThemePagesInjected',
             wrapWithBrackets(
-              Object.entries(patterns).map(([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`),
+              Object.entries(pages).map(([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`),
               `"${themeName}": `
             )
           )
