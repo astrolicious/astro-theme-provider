@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import type { AstroIntegration } from "astro";
 import {
@@ -15,6 +15,7 @@ import type {
 	AuthorOptions,
 	ConfigDefault,
 	ExportTypes,
+	PackageJSON,
 	UserOptions,
 } from "./types";
 import {
@@ -61,9 +62,7 @@ export default function <Config extends ConfigDefault>(
 	const cwd = validateDirectory(entrypoint);
 
 	// Theme's `package.json`
-	const pkg = {
-		name: "",
-	};
+	const pkg: PackageJSON = {};
 
 	try {
 		// Safely read theme's `package.json` file, parse into Object, assign keys/values to `pkg`
@@ -146,6 +145,52 @@ export default function <Config extends ConfigDefault>(
 								moduleName,
 							)}).default;`;
 						};
+
+					// If package is not private, warn theme author about issues with package
+					if (!pkg.private) {
+						// Warn theme author if `astro-integration` keyword does not exist inside 'package.json'
+						if (!pkg?.keywords?.includes("astro-integration")) {
+							logger.warn(
+								`Add the 'astro-integration' keyword to your theme's 'package.json'!\tAstro uses this value to support the command 'astro add ${themeName}'\n\n\t"keywords": [ "astro-integration" ],\n`,
+							);
+						}
+
+						// Warn theme author if no 'description' property exists inside 'package.json'
+						if (!pkg?.description) {
+							logger.warn(
+								`Add a 'description' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"description": "My awesome Astro theme!",\n`,
+							);
+						}
+
+						// Warn theme author if no 'homepage' property exists inside 'package.json'
+						if (!pkg?.homepage) {
+							logger.warn(
+								`Add a 'homepage' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"homepage": "https://github.com/UserName/my-theme",\n`,
+							);
+						}
+
+						// Warn theme author if no 'repository' property exists inside 'package.json'
+						if (!pkg?.repository) {
+							logger.warn(
+								`Add a 'repository' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"repository": ${JSON.stringify(
+									{
+										type: "git",
+										url: "https://github.com/UserName/my-theme",
+										directory: "package",
+									},
+									null,
+									4,
+								).replace(/\n/g, "\n\t")},\n`,
+							);
+						}
+
+						// Warn theme author if package does not have a README
+						if (!existsSync(resolve(cwd, "README.md"))) {
+							logger.warn(
+								`Add a 'README.md' to the root of your theme's package!\tNPM uses this file to populate the package page https://www.npmjs.com/package/${themeName}\n`,
+							);
+						}
+					}
 
 					// HMR for `astro-theme-provider` package
 					watchIntegration({

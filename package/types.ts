@@ -14,6 +14,21 @@ export type ExportTypes = Record<
 	undefined | null | false | string | string[] | Record<string, string>
 >;
 
+export interface PackageJSON {
+	private?: boolean;
+	name?: string;
+	description?: string;
+	keywords?: string[];
+	homepage?: string;
+	repository?:
+		| string
+		| {
+				type: string;
+				url: string;
+				directory?: string;
+		  };
+}
+
 export type AuthorOptions<Config extends ConfigDefault> = Prettify<{
 	entrypoint?: string;
 	name?: ThemeName;
