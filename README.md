@@ -4,7 +4,7 @@ Easily create theme integrations for Astro
 
 ### [Documentation](https://astro-theme-provider.netlify.app)
 
-### [Package](packages/astro-theme-provider)
+### [Package](package)
 
 ```ts
 import defineTheme from 'astro-theme-provider';
@@ -27,7 +27,7 @@ export default defineConfig({
     MyTheme({
       config: {
         title: "Hey!",
-        description: "This is a theme created using",
+        description: "This is a theme integration!",
       },
       pages: {
         '/404': false, // Toggle routes off
