@@ -30,7 +30,7 @@ export interface PackageJSON {
 }
 
 export interface PublicDirOption {
-	dir: string;
+	dir?: string | null | undefined;
 	copy?: "before" | "after";
 }
 

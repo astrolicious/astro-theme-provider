@@ -1,5 +1,6 @@
-import { existsSync, readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { cpSync, createReadStream, existsSync, readFileSync } from "node:fs";
+import { dirname, extname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { AstroIntegration } from "astro";
 import {
 	addDts,
@@ -27,18 +28,17 @@ import {
 	LineBuffer,
 	camelCase,
 	createDtsBuffer,
+	createResolver,
 	errorMap,
 	globToModule,
 	isAbsoluteFile,
 	isCSSFile,
 	isImageFile,
-	validateDirectory,
-	validateFile,
 	validatePattern,
 	wrapWithBrackets,
 } from "./utils";
 
-const thisFile = validateFile(import.meta.url);
+const thisFile = fileURLToPath(import.meta.url);
 
 export default function <Config extends ConfigDefault>(
 	authorOptions: AuthorOptions<Config>,
@@ -56,30 +56,42 @@ export default function <Config extends ConfigDefault>(
 		}
 	}
 
-	// Theme's `index.ts`
-	const entrypoint = validateFile(authorOptions.entrypoint);
+	// Will be assigned value when 'astro:config:setup' hook runs
+	let srcDir: string;
+	let publicDir: string;
+	let outDir: string;
 
-	// Theme's root directory
-	const cwd = validateDirectory(entrypoint);
+	const {
+		base: cwd,
+		toAbsolute,
+		toAbsoluteDir,
+		toAbsoluteDirSafe,
+		toAbsoluteFileSafe,
+	} = createResolver(authorOptions.entrypoint);
+
+	// Theme's `index.ts`
+	const entrypoint = toAbsoluteFileSafe(authorOptions.entrypoint);
 
 	// Defaults for 'public' folder
 	const publicOptions: PublicDirOption = {
-		dir: "static",
-		copy: "before"
-	}
+		copy: "before",
+	};
 
 	// If public option is string, turn it into object
-	if (typeof authorOptions.public === "string") {
+	if (!authorOptions.public || typeof authorOptions.public === "string") {
 		authorOptions.public = {
-			dir: authorOptions.public
-		}
+			dir: authorOptions.public,
+		};
 	}
 
 	// Override defaults with author options
-	Object.assign(publicOptions, authorOptions.public)
+	Object.assign(publicOptions, authorOptions.public);
 
 	// Get public directory
-	publicOptions.dir = validateDirectory(publicOptions.dir, { base: cwd })
+
+	const staticDir = toAbsoluteDir(publicOptions.dir || "public");
+
+	const staticDirExists = (staticDir && existsSync(staticDir)) || false;
 
 	// Default virtual modules
 	const moduleOptions: ModuleOptions = {
@@ -99,7 +111,7 @@ export default function <Config extends ConfigDefault>(
 		// Safely read theme's `package.json` file, parse into Object, assign keys/values to `pkgJSON`
 		Object.assign(
 			pkgJSON,
-			JSON.parse(readFileSync(resolve(cwd, "package.json"), "utf-8")),
+			JSON.parse(readFileSync(toAbsoluteFileSafe("package.json"), "utf-8")),
 		);
 	} catch (error) {}
 
@@ -146,7 +158,9 @@ export default function <Config extends ConfigDefault>(
 					addWatchFile,
 					injectRoute,
 				}) => {
-					const srcDir = validateDirectory(config.srcDir.toString());
+					srcDir = fileURLToPath(config.srcDir.toString());
+					publicDir = fileURLToPath(config.publicDir.toString());
+					outDir = fileURLToPath(config.outDir.toString());
 
 					const {
 						addLinesToDts,
@@ -157,13 +171,11 @@ export default function <Config extends ConfigDefault>(
 
 					const resolveAuthorImport = (id: string, base = "./") =>
 						JSON.stringify(
-							id.startsWith(".")
-								? validateFile(join(base, id), { base: cwd })
-								: id,
+							id.startsWith(".") ? toAbsolute(join(base, id)) : id,
 						);
 
 					const resolveUserImport = (id: string) =>
-						id.startsWith(".") ? validateFile(id, { base: srcDir }) : id;
+						id.startsWith(".") ? resolve(srcDir, id) : id;
 
 					const moduleEntriesToTypes =
 						(moduleName: string) =>
@@ -225,7 +237,7 @@ export default function <Config extends ConfigDefault>(
 
 					// HMR for `astro-theme-provider` package
 					watchIntegration({
-						dir: validateDirectory(thisFile),
+						dir: dirname(thisFile),
 						command,
 						updateConfig,
 						addWatchFile,
@@ -464,7 +476,7 @@ export default function <Config extends ConfigDefault>(
 					}
 
 					// Overwrite/force cwd for finding routes
-					Object.assign(authorOptions.pages, { cwd, log: "minimal" });
+					Object.assign(authorOptions.pages, { cwd });
 
 					// Initialize route injection
 					const { pages, injectPages } = addPageDir({
@@ -560,6 +572,56 @@ export default function <Config extends ConfigDefault>(
 						srcDir: config.srcDir,
 						logger,
 					});
+				},
+				"astro:server:setup": ({ logger, server }) => {
+					if (!staticDirExists) return;
+					// Handle static assets in public during dev
+					server.middlewares.use("/", (req, res, next) => {
+						// Trim query params from path
+						const path = req.url?.replace(/\?.*$/, "");
+						// Check if url is a file/asset path
+						if (path && extname(path) && !path.startsWith("/@")) {
+							// Create path relative to custom public dir
+							const asset = resolve(staticDir!, `.${path!}`);
+							if (existsSync(asset)) {
+								// Skip asset if it will be overwrriten by asset in real public dir
+								if (
+									publicOptions.copy === "before" &&
+									existsSync(resolve(publicDir, `.${path!}`))
+								) {
+									next();
+								}
+
+								// Return asset from theme's public folder
+								try {
+									createReadStream(asset).pipe(res);
+								} catch {
+									logger.warn(
+										`Failed to serve theme asset:\t${path}\t${asset}`,
+									);
+									next();
+								}
+							} else next();
+						} else next();
+					});
+				},
+				"astro:build:setup": ({ logger }) => {
+					if (publicOptions.copy !== "before" || !staticDirExists) return;
+					try {
+						// Copy theme's public dir into build output, assets will be overwritten by assets in theme users public dir
+						cpSync(staticDir!, outDir, { recursive: true });
+					} catch {
+						logger.warn("Failed to copy public dir into output: " + staticDir);
+					}
+				},
+				"astro:build:done": ({ logger }) => {
+					if (publicOptions.copy !== "after" || !staticDirExists) return;
+					try {
+						// Copy custom public dir into build output, assets will overwrite assets in theme users public dir
+						cpSync(staticDir!, outDir, { recursive: true });
+					} catch {
+						logger.warn("Failed to copy public dir into output: " + staticDir);
+					}
 				},
 			},
 		};
