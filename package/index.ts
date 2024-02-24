@@ -16,6 +16,7 @@ import type {
 	ConfigDefault,
 	ExportTypes,
 	PackageJSON,
+	PublicDirOption,
 	UserOptions,
 } from "./types";
 import {
@@ -62,7 +63,7 @@ export default function <Config extends ConfigDefault>(
 	const cwd = validateDirectory(entrypoint);
 
 	// Defaults for 'public' folder
-	const publicOptions = {
+	const publicOptions: PublicDirOption = {
 		dir: "static",
 		copy: "before"
 	}
