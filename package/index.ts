@@ -62,18 +62,18 @@ export default function <Config extends ConfigDefault>(
 	const cwd = validateDirectory(entrypoint);
 
 	// Theme's `package.json`
-	const pkg: PackageJSON = {};
+	const pkgJSON: PackageJSON = {};
 
 	try {
-		// Safely read theme's `package.json` file, parse into Object, assign keys/values to `pkg`
+		// Safely read theme's `package.json` file, parse into Object, assign keys/values to `pkgJSON`
 		Object.assign(
-			pkg,
+			pkgJSON,
 			JSON.parse(readFileSync(resolve(cwd, "package.json"), "utf-8")),
 		);
 	} catch (error) {}
 
 	// Assign name from `package.json` as theme name
-	const themeName = pkg.name || authorOptions.name;
+	const themeName = pkgJSON.name || authorOptions.name;
 
 	// If no name exists throw an error
 	if (!themeName) {
@@ -147,30 +147,30 @@ export default function <Config extends ConfigDefault>(
 						};
 
 					// If package is not private, warn theme author about issues with package
-					if (!pkg.private) {
+					if (!pkgJSON.private) {
 						// Warn theme author if `astro-integration` keyword does not exist inside 'package.json'
-						if (!pkg?.keywords?.includes("astro-integration")) {
+						if (!pkgJSON?.keywords?.includes("astro-integration")) {
 							logger.warn(
 								`Add the 'astro-integration' keyword to your theme's 'package.json'!\tAstro uses this value to support the command 'astro add ${themeName}'\n\n\t"keywords": [ "astro-integration" ],\n`,
 							);
 						}
 
 						// Warn theme author if no 'description' property exists inside 'package.json'
-						if (!pkg?.description) {
+						if (!pkgJSON?.description) {
 							logger.warn(
 								`Add a 'description' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"description": "My awesome Astro theme!",\n`,
 							);
 						}
 
 						// Warn theme author if no 'homepage' property exists inside 'package.json'
-						if (!pkg?.homepage) {
+						if (!pkgJSON?.homepage) {
 							logger.warn(
 								`Add a 'homepage' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"homepage": "https://github.com/UserName/my-theme",\n`,
 							);
 						}
 
 						// Warn theme author if no 'repository' property exists inside 'package.json'
-						if (!pkg?.repository) {
+						if (!pkgJSON?.repository) {
 							logger.warn(
 								`Add a 'repository' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"repository": ${JSON.stringify(
 									{
