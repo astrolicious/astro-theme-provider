@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, opendir } from "node:fs";
 import { basename, dirname, extname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { AstroError } from "astro/errors";
@@ -106,72 +106,98 @@ export function isAbsoluteFile(path: string) {
 	return isAbsolute(path) && !!extname(path) && existsSync(path);
 }
 
-export function validateFile(
-	path: string | undefined,
-	options?: { base?: string },
-) {
-	const { base = "./" } = options || {};
-
-	if (!path || typeof path !== "string") {
-		throw new AstroError(`File is undefined`, path);
+export function createResolver(base?: string | undefined | null) {
+	if (!base) {
+		throw new AstroError(
+			`'base' path for 'createResolver()' is invalid!`,
+			`${base}`,
+		);
 	}
 
-	// Check if path is a file
-	if (!extname(path)) {
-		throw new AstroError(`Path is not a file`, path);
+	if (base.startsWith("file:/")) {
+		base = fileURLToPath(base);
 	}
 
-	// Check if path is a file URL
-	if (path.startsWith("file:/")) {
-		path = fileURLToPath(path);
+	if (extname(base)) {
+		base = dirname(base);
 	}
 
-	// Check if path is relative
-	if (!isAbsolute(path)) {
-		path = resolve(base, path);
+	if (!isAbsolute(base)) {
+		throw new AstroError(`'base' path cannot be a relative path!`, base);
 	}
 
-	// Check if path is a file
-	if (!extname(path)) {
-		throw new AstroError(`Expected file path but received directory`, path);
+	if (!existsSync(base)) {
+		throw new AstroError(`'base' path does not exist!`, base);
 	}
 
-	// Check if path exists
-	if (!existsSync(path)) {
-		throw new AstroError(`File does not exist`, path);
+	function toAbsolute(path: string | undefined | null = "./") {
+		if (!path) {
+			return null;
+		}
+
+		// Check if path is a file URL
+		if (path.startsWith("file:/")) {
+			path = fileURLToPath(path);
+		}
+
+		// Check if path is relative
+		if (!isAbsolute(path)) {
+			path = resolve(base!, path);
+		}
+
+		return path;
 	}
 
-	return path.replace(/\\/g, "/");
-}
+	function toAbsoluteDir(path?: string | undefined | null) {
+		path = toAbsolute(path);
 
-export function validateDirectory(path?: string, options?: { base?: string }) {
-	const { base = "./" } = options || {};
+		if (path && extname(path)) {
+			path = dirname(path);
+		}
 
-	if (!path || typeof path !== "string") {
-		throw new AstroError(`Path is undefined`, path);
+		return path;
 	}
 
-	// Check if path is a file URL
-	if (path.startsWith("file:/")) {
-		path = fileURLToPath(path);
+	function toAbsoluteFile(path?: string | undefined | null) {
+		path = toAbsolute(path);
+
+		if (path && !extname(path)) {
+			return null;
+		}
+
+		return path;
 	}
 
-	// Check if path is relative
-	if (!isAbsolute(path)) {
-		path = resolve(base, path);
+	function toAbsoluteDirSafe(path?: string | undefined | null) {
+		const file = toAbsoluteDir(path);
+		if (!file) {
+			throw new AstroError(`Invalid directory path!`, path || "");
+		}
+		if (!existsSync(file)) {
+			throw new AstroError(`File does not exist!`, file);
+		}
+		return file;
 	}
 
-	// Check if path is a file
-	if (extname(path)) {
-		path = dirname(path);
+	function toAbsoluteFileSafe(path?: string | undefined | null) {
+		const dir = toAbsoluteFile(path);
+		if (!dir) {
+			throw new AstroError(`Invalid directory path!`, path || "");
+		}
+		if (!existsSync(dir)) {
+			throw new AstroError(`Directory does not exist!`, dir);
+		}
+		return dir;
 	}
 
-	// Check if path exists
-	if (!existsSync(path)) {
-		throw new AstroError(`Directory does not exist`, path);
-	}
-
-	return path.replace(/\\/g, "/");
+	return {
+		base,
+		toAbsolute,
+		toAbsoluteDir,
+		toAbsoluteFile,
+		toAbsoluteDirSafe,
+		toAbsoluteFileSafe,
+	};
 }
 
 export {
