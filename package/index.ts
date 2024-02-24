@@ -65,7 +65,6 @@ export default function <Config extends ConfigDefault>(
 		base: cwd,
 		toAbsolute,
 		toAbsoluteDir,
-		toAbsoluteDirSafe,
 		toAbsoluteFileSafe,
 	} = createResolver(authorOptions.entrypoint);
 
