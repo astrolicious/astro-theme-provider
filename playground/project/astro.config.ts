@@ -23,5 +23,3 @@ export default defineConfig({
 		}),
 	],
 });
-
-type tt = Parameters<typeof MyTheme>[0];
