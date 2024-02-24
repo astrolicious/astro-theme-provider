@@ -23,8 +23,8 @@
     "./types": "./types.ts"
   },
   "devDependencies": {
-    "@types/node": "^20.11.19",
-    "astro": "^4.4.1",
+    "@types/node": "^20.11.20",
+    "astro": "^4.4.4",
     "astro-integration-kit": "^0.3.0",
     "fast-glob": "^3.3.2"
   },
