@@ -14,7 +14,7 @@ import validatePackageName from "validate-npm-package-name";
 import type {
 	AuthorOptions,
 	ConfigDefault,
-	ExportTypes,
+	ModuleOptions,
 	PackageJSON,
 	PublicDirOption,
 	UserOptions,
@@ -80,6 +80,17 @@ export default function <Config extends ConfigDefault>(
 
 	// Get public directory
 	publicOptions.dir = validateDirectory(publicOptions.dir, { base: cwd })
+
+	// Default virtual modules
+	const moduleOptions: ModuleOptions = {
+		css: GLOB_CSS,
+		assets: GLOB_IMAGES,
+		layouts: GLOB_ASTRO,
+		components: GLOB_COMPONENTS,
+	};
+
+	// Override default module options with author options
+	Object.assign(moduleOptions, authorOptions.modules);
 
 	// Theme's `package.json`
 	const pkgJSON: PackageJSON = {};
@@ -398,18 +409,8 @@ export default function <Config extends ConfigDefault>(
 						);
 					}
 
-					// Default modules
-					const defaultModules: ExportTypes = {
-						css: GLOB_CSS,
-						assets: GLOB_IMAGES,
-						layouts: GLOB_ASTRO,
-						components: GLOB_COMPONENTS,
-					};
-
-					Object.assign(defaultModules, authorOptions.modules);
-
 					// Dynamically create virtual modules using globs and/or export objects defined by theme author or user
-					for (let [moduleName, option] of Object.entries(defaultModules)) {
+					for (let [moduleName, option] of Object.entries(moduleOptions)) {
 						if (!option) continue;
 
 						if (moduleName === "config") {
