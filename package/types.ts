@@ -29,10 +29,16 @@ export interface PackageJSON {
 		  };
 }
 
+export interface PublicDirOption {
+	dir: string;
+	copy?: "before" | "after";
+}
+
 export type AuthorOptions<Config extends ConfigDefault> = Prettify<{
 	entrypoint?: string;
 	name?: ThemeName;
 	pages?: string | PageDirOption | undefined;
+	public?: string | PublicDirOption | undefined;
 	schema: z.ZodSchema<Config>;
 	modules?: ExportTypes | undefined;
 }>;
