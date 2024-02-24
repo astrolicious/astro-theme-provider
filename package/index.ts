@@ -61,6 +61,25 @@ export default function <Config extends ConfigDefault>(
 	// Theme's root directory
 	const cwd = validateDirectory(entrypoint);
 
+	// Defaults for 'public' folder
+	const publicOptions = {
+		dir: "static",
+		copy: "before"
+	}
+
+	// If public option is string, turn it into object
+	if (typeof authorOptions.public === "string") {
+		authorOptions.public = {
+			dir: authorOptions.public
+		}
+	}
+
+	// Override defaults with author options
+	Object.assign(publicOptions, authorOptions.public)
+
+	// Get public directory
+	publicOptions.dir = validateDirectory(publicOptions.dir, { base: cwd })
+
 	// Theme's `package.json`
 	const pkgJSON: PackageJSON = {};
 
