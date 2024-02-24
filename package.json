@@ -16,6 +16,6 @@
   "devDependencies": {
     "@biomejs/biome": "^1.5.3",
     "@changesets/cli": "^2.27.1",
-    "astro": "^4.4.1"
+    "astro": "^4.4.4"
   }
 }
