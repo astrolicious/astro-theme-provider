@@ -23,13 +23,13 @@
     "./types": "./types.ts"
   },
   "devDependencies": {
-    "@types/node": "^20.11.20",
-    "astro": "^4.4.4",
-    "astro-integration-kit": "^0.3.0",
+    "@types/node": "^20.11.24",
+    "astro": "^4.4.9",
+    "astro-integration-kit": "^0.5.0",
     "fast-glob": "^3.3.2"
   },
   "dependencies": {
-    "astro-pages": "^0.1.5",
+    "astro-pages": "^0.2.0",
     "callsites": "^4.1.0",
     "validate-npm-package-name": "^5.0.0"
   }

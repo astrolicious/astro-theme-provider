@@ -61,31 +61,17 @@ export function createDtsBuffer() {
 		global.add(type, depth - 1);
 	}
 
-	function addLinesToDtsInterface(
-		name: string,
-		type: string | NestedStringArray,
-		depth = 0,
-	) {
-		if (!interfaces.has(name))
-			interfaces.set(name, new LineBuffer(type, depth));
+	function addLinesToDtsInterface(name: string, type: string | NestedStringArray, depth = 0) {
+		if (!interfaces.has(name)) interfaces.set(name, new LineBuffer(type, depth));
 		else interfaces.get(name)!.add(type, depth);
 	}
 
-	function addLinesToDtsNamespace(
-		name: string,
-		type: string | NestedStringArray,
-		depth = 0,
-	) {
-		if (!namespaces.has(name))
-			namespaces.set(name, new LineBuffer(type, depth));
+	function addLinesToDtsNamespace(name: string, type: string | NestedStringArray, depth = 0) {
+		if (!namespaces.has(name)) namespaces.set(name, new LineBuffer(type, depth));
 		else namespaces.get(name)!.add(type, depth);
 	}
 
-	function addLinesToDtsModule(
-		name: string,
-		type: string | NestedStringArray,
-		depth = 0,
-	) {
+	function addLinesToDtsModule(name: string, type: string | NestedStringArray, depth = 0) {
 		if (!modules.has(name)) modules.set(name, new LineBuffer(type, depth));
 		else modules.get(name)!.add(type, depth);
 	}
@@ -97,12 +83,8 @@ export function createDtsBuffer() {
 			[...interfaces.entries()].flatMap(([name, buffer]) =>
 				wrapWithBrackets(buffer.lines, `\ndeclare interface ${name} `),
 			),
-			[...namespaces.entries()].flatMap(([name, buffer]) =>
-				wrapWithBrackets(buffer.lines, `\ndeclare ${name} `),
-			),
-			[...modules.entries()].flatMap(([name, buffer]) =>
-				wrapWithBrackets(buffer.lines, `\ndeclare module "${name}" `),
-			),
+			[...namespaces.entries()].flatMap(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare ${name} `)),
+			[...modules.entries()].flatMap(([name, buffer]) => wrapWithBrackets(buffer.lines, `\ndeclare module "${name}" `)),
 		]
 			.flat(8)
 			.join("\n");

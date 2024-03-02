@@ -5,28 +5,10 @@ import { AstroError } from "astro/errors";
 import fg from "fast-glob";
 
 // https://github.com/withastro/astro/blob/main/packages/astro/src/assets/consts.ts#L17
-const IMAGE_FORMATS = [
-	"jpeg",
-	"jpg",
-	"png",
-	"tiff",
-	"webp",
-	"gif",
-	"svg",
-	"avif",
-];
+const IMAGE_FORMATS = ["jpeg", "jpg", "png", "tiff", "webp", "gif", "svg", "avif"];
 
 // https://github.com/withastro/astro/blob/main/packages/astro/src/core/constants.ts#L5
-const MARKDOWN_FORMATS = [
-	"markdown",
-	"mdown",
-	"mdwn",
-	"mdoc",
-	"mkdn",
-	"mdx",
-	"mkd",
-	"md",
-];
+const MARKDOWN_FORMATS = ["markdown", "mdown", "mdwn", "mdoc", "mkdn", "mdx", "mkd", "md"];
 
 const CSS_FORMATS = ["css", "scss", "sass", "styl", "less"];
 
@@ -63,16 +45,10 @@ export function isAstroFile(path: string): boolean {
 }
 
 export function camelCase(str: string) {
-	return str.replace(/(-|<|>|:|"|\/|\\|\||\?|\*|\s)./g, (x) =>
-		x[1]!.toUpperCase(),
-	);
+	return str.replace(/(-|<|>|:|"|\/|\\|\||\?|\*|\s)./g, (x) => x[1]!.toUpperCase());
 }
 
-export function globToModule(
-	glob: string | string[],
-	path: string,
-	cwd: string,
-) {
+export function globToModule(glob: string | string[], path: string, cwd: string) {
 	const files = fg.sync([glob, "!**/node_modules"].flat(), {
 		cwd: resolve(cwd, path),
 		absolute: true,
@@ -88,14 +64,10 @@ export function globToModule(
 	return files.every((file) => isCSSFile(file)) ? files : obj;
 }
 
-const normalizePattern = (slug: string) =>
-	(slug.startsWith("[") && slug) || "/";
+const normalizePattern = (slug: string) => (slug.startsWith("[") && slug) || "/";
 
 export function validatePattern(newPattern: string, oldPattern: string) {
-	return (
-		newPattern.split("/").map(normalizePattern).join("") ===
-		oldPattern.split("/").map(normalizePattern).join("")
-	);
+	return newPattern.split("/").map(normalizePattern).join("") === oldPattern.split("/").map(normalizePattern).join("");
 }
 
 // Files/Directories/Paths/URLs
@@ -108,10 +80,7 @@ export function isAbsoluteFile(path: string) {
 
 export function createResolver(base?: string | undefined | null) {
 	if (!base) {
-		throw new AstroError(
-			`'base' path for 'createResolver()' is invalid!`,
-			`${base}`,
-		);
+		throw new AstroError(`'base' path for 'createResolver()' is invalid!`, `${base}`);
 	}
 
 	if (base.startsWith("file:/")) {
