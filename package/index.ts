@@ -8,6 +8,7 @@ import {
 	watchIntegration,
 } from "astro-integration-kit/utilities";
 import { addPageDir } from "astro-pages";
+import type { IntegrationOption as PageIntegrationOption } from "astro-pages/types";
 import { AstroError } from "astro/errors";
 import callsites from "callsites";
 // @ts-ignore
@@ -475,15 +476,10 @@ export default function <Config extends ConfigDefault>(
 					}
 
 					// Overwrite/force cwd for finding routes
-					Object.assign(authorOptions.pages, { cwd });
+					Object.assign(authorOptions.pages, { cwd, config, logger });
 
 					// Initialize route injection
-					const { pages, injectPages } = addPageDir({
-						...authorOptions.pages,
-						config,
-						logger,
-						injectRoute,
-					});
+					const { pages, injectPages } = addPageDir(authorOptions.pages as PageIntegrationOption);
 
 					options.pages ??= {} as NonNullable<typeof options.pages>;
 
@@ -561,7 +557,7 @@ export default function <Config extends ConfigDefault>(
 					);
 
 					// Inject routes/pages
-					injectPages();
+					injectPages(injectRoute);
 
 					// Write generated types to .d.ts file
 					addDts({
