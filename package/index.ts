@@ -2,25 +2,14 @@ import { cpSync, createReadStream, existsSync, readFileSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AstroIntegration } from "astro";
-import {
-	addDts,
-	addVirtualImport,
-	watchIntegration,
-} from "astro-integration-kit/utilities";
+import { addDts, addVirtualImports, watchIntegration } from "astro-integration-kit/utilities";
 import { addPageDir } from "astro-pages";
 import type { IntegrationOption as PageIntegrationOption } from "astro-pages/types";
 import { AstroError } from "astro/errors";
 import callsites from "callsites";
 // @ts-ignore
 import validatePackageName from "validate-npm-package-name";
-import type {
-	AuthorOptions,
-	ConfigDefault,
-	ModuleOptions,
-	PackageJSON,
-	PublicDirOption,
-	UserOptions,
-} from "./types";
+import type { AuthorOptions, ConfigDefault, ModuleOptions, PackageJSON, PublicDirOption, UserOptions } from "./types";
 import {
 	GLOB_ASTRO,
 	GLOB_COMPONENTS,
@@ -41,9 +30,7 @@ import {
 
 const thisFile = fileURLToPath(import.meta.url);
 
-export default function <Config extends ConfigDefault>(
-	authorOptions: AuthorOptions<Config>,
-) {
+export default function <Config extends ConfigDefault>(authorOptions: AuthorOptions<Config>) {
 	if (!authorOptions.entrypoint) {
 		// Loop over reversed stack traces
 		// Get file path of trace
@@ -62,12 +49,7 @@ export default function <Config extends ConfigDefault>(
 	let publicDir: string;
 	let outDir: string;
 
-	const {
-		base: cwd,
-		toAbsolute,
-		toAbsoluteDir,
-		toAbsoluteFileSafe,
-	} = createResolver(authorOptions.entrypoint);
+	const { base: cwd, toAbsolute, toAbsoluteDir, toAbsoluteFileSafe } = createResolver(authorOptions.entrypoint);
 
 	// Theme's `index.ts`
 	const entrypoint = toAbsoluteFileSafe(authorOptions.entrypoint);
@@ -109,10 +91,7 @@ export default function <Config extends ConfigDefault>(
 
 	try {
 		// Safely read theme's `package.json` file, parse into Object, assign keys/values to `pkgJSON`
-		Object.assign(
-			pkgJSON,
-			JSON.parse(readFileSync(toAbsoluteFileSafe("package.json"), "utf-8")),
-		);
+		Object.assign(pkgJSON, JSON.parse(readFileSync(toAbsoluteFileSafe("package.json"), "utf-8")));
 	} catch (error) {}
 
 	// Assign name from `package.json` as theme name
@@ -120,9 +99,7 @@ export default function <Config extends ConfigDefault>(
 
 	// If no name exists throw an error
 	if (!themeName) {
-		throw new AstroError(
-			`Could not find name for theme! Add a name in your 'package.json' or to your author config`,
-		);
+		throw new AstroError(`Could not find name for theme! Add a name in your 'package.json' or to your author config`);
 	}
 
 	// Validate that the theme name is a valid package name
@@ -150,43 +127,26 @@ export default function <Config extends ConfigDefault>(
 		return {
 			name: themeName,
 			hooks: {
-				"astro:config:setup": ({
-					command,
-					config,
-					logger,
-					updateConfig,
-					addWatchFile,
-					injectRoute,
-				}) => {
+				"astro:config:setup": ({ command, config, logger, updateConfig, addWatchFile, injectRoute }) => {
 					srcDir = fileURLToPath(config.srcDir.toString());
 					publicDir = fileURLToPath(config.publicDir.toString());
 					outDir = fileURLToPath(config.outDir.toString());
 
-					const {
-						addLinesToDts,
-						addLinesToDtsInterface,
-						addLinesToDtsModule,
-						compileDtsBuffer,
-					} = createDtsBuffer();
+					const virtualImports: Record<string, string> = {};
+
+					const { addLinesToDts, addLinesToDtsInterface, addLinesToDtsModule, compileDtsBuffer } = createDtsBuffer();
 
 					const resolveAuthorImport = (id: string, base = "./") =>
-						JSON.stringify(
-							id.startsWith(".") ? toAbsolute(join(base, id)) : id,
-						);
+						JSON.stringify(id.startsWith(".") ? toAbsolute(join(base, id)) : id);
 
-					const resolveUserImport = (id: string) =>
-						id.startsWith(".") ? resolve(srcDir, id) : id;
+					const resolveUserImport = (id: string) => (id.startsWith(".") ? resolve(srcDir, id) : id);
 
 					const moduleEntriesToTypes =
 						(moduleName: string) =>
 						([name, path]: [string, string]) => {
 							if (isCSSFile(path)) return ``;
-							if (isImageFile(path))
-								return `${camelCase(name)}: import("astro").ImageMetadata;`;
-							return `${camelCase(name)}: typeof import(${resolveAuthorImport(
-								path,
-								moduleName,
-							)}).default;`;
+							if (isImageFile(path)) return `${camelCase(name)}: import("astro").ImageMetadata;`;
+							return `${camelCase(name)}: typeof import(${resolveAuthorImport(path, moduleName)}).default;`;
 						};
 
 					// If package is not private, warn theme author about issues with package
@@ -252,17 +212,10 @@ export default function <Config extends ConfigDefault>(
 					});
 
 					// Create virtual module for config (`my-theme/config`)
-					addVirtualImport({
-						name: themeName + "/config",
-						content: `export default ${JSON.stringify(userConfig)}`,
-						updateConfig,
-					});
+					virtualImports[themeName + "/config"] = `export default ${JSON.stringify(userConfig)}`;
 
 					// Generate types for virtual module (`my-theme/config`)
-					addLinesToDtsModule(themeName + "/config", [
-						`const config: ThemeConfig`,
-						`export default config`,
-					]);
+					addLinesToDtsModule(themeName + "/config", [`const config: ThemeConfig`, `export default config`]);
 
 					// Generate Modules
 
@@ -302,70 +255,49 @@ export default function <Config extends ConfigDefault>(
 
 						modulesAuthoredBuffer.add([`${moduleName}: string[]`]);
 
-						const overrides =
-							options?.overrides?.[
-								moduleName as keyof AstroThemeModulesOptions<ThemeName>
-							];
+						const overrides = options?.overrides?.[moduleName as keyof AstroThemeModulesOptions<ThemeName>];
 
 						// Append user's "overrides" to array module
 						if (overrides && Array.isArray(overrides)) {
 							modulesOverridesBuffer.add([`${moduleName}: string[]`]);
-							array = [
-								...array,
-								...overrides.map((path) => resolveUserImport(path)),
-							];
+							array = [...array, ...overrides.map((path) => resolveUserImport(path))];
 						}
 
 						// Add "import only" virtual module from array of entrypoints (mostly used for CSS)
-						addVirtualImport({
-							name: themeName + "/" + moduleName,
-							content: array
-								.map((path) => `import ${resolveAuthorImport(path)};`)
-								.join(""),
-							updateConfig,
-						});
+						virtualImports[themeName + "/" + moduleName] = array
+							.map((path) => `import ${resolveAuthorImport(path)};`)
+							.join("");
 
 						modulesExportsBuffer.add([`${moduleName}: string[]`]);
 
 						addLinesToDtsModule(themeName + "/" + moduleName, "");
 					}
 
-					function objToVirtualModule(
-						moduleName: string,
-						exports: Record<string, string>,
-					) {
+					function objToVirtualModule(moduleName: string, exports: Record<string, string>) {
 						// Generate types for exports
-						let exportedTypes = Object.entries(exports).map(
-							moduleEntriesToTypes(moduleName),
-						);
+						let exportedTypes = Object.entries(exports).map(moduleEntriesToTypes(moduleName));
 
 						if (exportedTypes.length < 1) return; // Skip empty objects
 
 						// Add exportedTypes to buffer for AstroThemeModulesAuthored interface
-						modulesAuthoredBuffer.add(
-							wrapWithBrackets(exportedTypes, `${moduleName}: `),
-						);
+						modulesAuthoredBuffer.add(wrapWithBrackets(exportedTypes, `${moduleName}: `));
 
 						// Override exports with user's overrides
 						const overrides =
-							(options?.overrides?.[
-								moduleName as keyof AstroThemeModulesOptions<ThemeName>
-							] as Record<string, string>) || {};
+							(options?.overrides?.[moduleName as keyof AstroThemeModulesOptions<ThemeName>] as Record<
+								string,
+								string
+							>) || {};
 
 						if (Object.keys(overrides).length > 0) {
 							// Create User module for overrding component inside author module, does not include user overrides ex:"my-theme:components" to prevent circular imports
-							addVirtualImport({
-								name: themeName + ":" + moduleName,
-								content: Object.entries(exports)
-									.map(
-										([name, path]) =>
-											`export { default as ${camelCase(
-												name,
-											)} } from ${resolveAuthorImport(path, moduleName)};`,
-									)
-									.join(""),
-								updateConfig,
-							});
+							virtualImports[themeName + ":" + moduleName] = Object.entries(exports)
+								.map(
+									([name, path]) =>
+										`export { default as ${camelCase(name)} } from ${resolveAuthorImport(path, moduleName)};`,
+								)
+								.join("");
+
 							// Add types for virtual module
 							addLinesToDtsModule(
 								themeName + ":" + moduleName,
@@ -382,33 +314,21 @@ export default function <Config extends ConfigDefault>(
 
 							// Add overrides to buffer for AstroThemeModulesOverrides interface
 							modulesOverridesBuffer.add(
-								wrapWithBrackets(
-									Object.entries(overrides).map(
-										moduleEntriesToTypes(moduleName),
-									),
-									`${moduleName}: `,
-								),
+								wrapWithBrackets(Object.entries(overrides).map(moduleEntriesToTypes(moduleName)), `${moduleName}: `),
 							);
 						}
 
 						// Recalculate exportedTypes to include overrides
-						exportedTypes = Object.entries(exports).map(
-							moduleEntriesToTypes(moduleName),
-						);
+						exportedTypes = Object.entries(exports).map(moduleEntriesToTypes(moduleName));
 
 						// Create main author module with user's overrides
-						addVirtualImport({
-							name: themeName + "/" + moduleName,
-							content: Object.entries(exports)
-								.map(
-									([name, path]) =>
-										`export { default as ${camelCase(
-											name,
-										)} } from ${resolveAuthorImport(path, moduleName)};`,
-								)
-								.join(""),
-							updateConfig,
-						});
+						virtualImports[themeName + "/" + moduleName] = Object.entries(exports)
+							.map(
+								([name, path]) =>
+									`export { default as ${camelCase(name)} } from ${resolveAuthorImport(path, moduleName)};`,
+							)
+							.join("");
+
 						// Add export types for virtual module
 						addLinesToDtsModule(
 							themeName + "/" + moduleName,
@@ -416,9 +336,7 @@ export default function <Config extends ConfigDefault>(
 						);
 
 						// Add exportedTypes with overrides to buffer for AstroThemeModulesInjected interface
-						modulesExportsBuffer.add(
-							wrapWithBrackets(exportedTypes, `${moduleName}: `),
-						);
+						modulesExportsBuffer.add(wrapWithBrackets(exportedTypes, `${moduleName}: `));
 					}
 
 					// Dynamically create virtual modules using globs and/or export objects defined by theme author or user
@@ -426,9 +344,7 @@ export default function <Config extends ConfigDefault>(
 						if (!option) continue;
 
 						if (moduleName === "config") {
-							logger.warn(
-								`Export name 'config' is reserved for the config module '${themeName}/config'`,
-							);
+							logger.warn(`Export name 'config' is reserved for the config module '${themeName}/config'`);
 							continue;
 						}
 
@@ -488,8 +404,7 @@ export default function <Config extends ConfigDefault>(
 						"AstroThemePagesAuthored",
 						wrapWithBrackets(
 							Object.entries(pages).map(
-								([pattern, entrypoint]) =>
-									`"${pattern}": typeof import("${entrypoint}").default;`,
+								([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`,
 							),
 							`"${themeName}": `,
 						),
@@ -503,8 +418,7 @@ export default function <Config extends ConfigDefault>(
 						// Skip pages that are not defined by author
 						if (!pages?.[oldPattern!]) continue;
 
-						const newPattern =
-							options.pages[oldPattern as keyof typeof options.pages];
+						const newPattern = options.pages[oldPattern as keyof typeof options.pages];
 
 						// If user passes falsy value remove the route
 						if (!newPattern) {
@@ -549,8 +463,7 @@ export default function <Config extends ConfigDefault>(
 						"AstroThemePagesInjected",
 						wrapWithBrackets(
 							Object.entries(pages).map(
-								([pattern, entrypoint]) =>
-									`"${pattern}": typeof import("${entrypoint}").default;`,
+								([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`,
 							),
 							`"${themeName}": `,
 						),
@@ -558,6 +471,13 @@ export default function <Config extends ConfigDefault>(
 
 					// Inject routes/pages
 					injectPages(injectRoute);
+
+					// Add virtual modules
+					addVirtualImports({
+						name: themeName,
+						updateConfig,
+						imports: virtualImports
+					})
 
 					// Write generated types to .d.ts file
 					addDts({
@@ -580,10 +500,7 @@ export default function <Config extends ConfigDefault>(
 							const asset = resolve(staticDir!, `.${path!}`);
 							if (existsSync(asset)) {
 								// Skip asset if it will be overwrriten by asset in real public dir
-								if (
-									publicOptions.copy === "before" &&
-									existsSync(resolve(publicDir, `.${path!}`))
-								) {
+								if (publicOptions.copy === "before" && existsSync(resolve(publicDir, `.${path!}`))) {
 									next();
 								}
 
@@ -591,9 +508,7 @@ export default function <Config extends ConfigDefault>(
 								try {
 									createReadStream(asset).pipe(res);
 								} catch {
-									logger.warn(
-										`Failed to serve theme asset:\t${path}\t${asset}`,
-									);
+									logger.warn(`Failed to serve theme asset:\t${path}\t${asset}`);
 									next();
 								}
 							} else next();
