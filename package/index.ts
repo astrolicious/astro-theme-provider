@@ -476,8 +476,8 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 					addVirtualImports({
 						name: themeName,
 						updateConfig,
-						imports: virtualImports
-					})
+						imports: virtualImports,
+					});
 
 					// Write generated types to .d.ts file
 					addDts({

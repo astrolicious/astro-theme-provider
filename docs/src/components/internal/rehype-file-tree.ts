@@ -43,10 +43,7 @@ export const fileTreeProcessor = rehype().use(() => (tree: Element, file) => {
 		if (node.type !== "element") return CONTINUE;
 		// Strip nodes that only contain newlines
 		node.children = node.children.filter(
-			(child) =>
-				child.type === "comment" ||
-				child.type !== "text" ||
-				!/^\n+$/.test(child.value),
+			(child) => child.type === "comment" || child.type !== "text" || !/^\n+$/.test(child.value),
 		);
 
 		if (node.tagName !== "li") return CONTINUE;
@@ -62,17 +59,9 @@ export const fileTreeProcessor = rehype().use(() => (tree: Element, file) => {
 			firstChild.value = filename || "";
 			comment.push(fragments.join(" "));
 		}
-		const subTreeIndex = otherChildren.findIndex(
-			(child) => child.type === "element" && child.tagName === "ul",
-		);
-		const commentNodes =
-			subTreeIndex > -1
-				? otherChildren.slice(0, subTreeIndex)
-				: [...otherChildren];
-		otherChildren.splice(
-			0,
-			subTreeIndex > -1 ? subTreeIndex : otherChildren.length,
-		);
+		const subTreeIndex = otherChildren.findIndex((child) => child.type === "element" && child.tagName === "ul");
+		const commentNodes = subTreeIndex > -1 ? otherChildren.slice(0, subTreeIndex) : [...otherChildren];
+		otherChildren.splice(0, subTreeIndex > -1 ? subTreeIndex : otherChildren.length);
 		comment.push(...commentNodes);
 
 		const firstChildTextContent = firstChild ? toString(firstChild) : "";
@@ -80,22 +69,14 @@ export const fileTreeProcessor = rehype().use(() => (tree: Element, file) => {
 		// Decide a node is a directory if it ends in a `/` or contains another list.
 		const isDirectory =
 			/\/\s*$/.test(firstChildTextContent) ||
-			otherChildren.some(
-				(child) => child.type === "element" && child.tagName === "ul",
-			);
+			otherChildren.some((child) => child.type === "element" && child.tagName === "ul");
 		const isPlaceholder = /^\s*(\.{3}|…)\s*$/.test(firstChildTextContent);
-		const isHighlighted =
-			firstChild?.type === "element" && firstChild.tagName === "strong";
+		const isHighlighted = firstChild?.type === "element" && firstChild.tagName === "strong";
 		const hasContents = otherChildren.length > 0;
 
-		const fileExtension = isDirectory
-			? "dir"
-			: firstChildTextContent.trim().split(".").pop() || "";
+		const fileExtension = isDirectory ? "dir" : firstChildTextContent.trim().split(".").pop() || "";
 
-		const icon = h(
-			"span",
-			isDirectory ? FolderIcon : FileIcon(firstChildTextContent),
-		);
+		const icon = h("span", isDirectory ? FolderIcon : FileIcon(firstChildTextContent));
 		if (!icon.properties) icon.properties = {};
 		if (isDirectory) {
 			icon.children.unshift(h("span", { class: "sr-only" }, directoryLabel));
@@ -108,10 +89,7 @@ export const fileTreeProcessor = rehype().use(() => (tree: Element, file) => {
 		const treeEntry = h(
 			"span",
 			{ class: "tree-entry" },
-			h("span", { class: isHighlighted ? "highlight" : "" }, [
-				isPlaceholder ? null : icon,
-				firstChild,
-			]),
+			h("span", { class: isHighlighted ? "highlight" : "" }, [isPlaceholder ? null : icon, firstChild]),
 			Text(comment.length > 0 ? " " : ""),
 			comment.length > 0 ? h("span", { class: "comment" }, ...comment) : Text(),
 		);

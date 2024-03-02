@@ -9,10 +9,7 @@ export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
 export type ConfigDefault = Record<string, unknown>;
 
-export type ModuleOptions = Record<
-	string,
-	undefined | null | false | string | string[] | Record<string, string>
->;
+export type ModuleOptions = Record<string, undefined | null | false | string | string[] | Record<string, string>>;
 
 export interface PackageJSON {
 	private?: boolean;
