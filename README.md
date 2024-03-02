@@ -1,10 +1,17 @@
 # `astro-theme-provider`
 
+[![npm version](https://img.shields.io/npm/v/astro-theme-provider?labelColor=red&color=grey)](https://www.npmjs.com/package/astro-theme-provider)
+![beta](https://img.shields.io/badge/WIP-orange)
+[![readme](https://img.shields.io/badge/README-blue)](package)
+[![template](https://img.shields.io/badge/Theme_Template-green)](https://github.com/BryceRussell/astro-theme-template)
+
 Easily create theme integrations for Astro
 
 ### [Documentation](https://astro-theme-provider.netlify.app)
 
-### [Package](package)
+### Example
+
+**Authoring a Theme**:
 
 ```ts
 import defineTheme from 'astro-theme-provider';
@@ -17,6 +24,8 @@ export default defineTheme({
   })
 })
 ```
+
+**Using a Theme**:
 
 ```ts
 import { defineConfig } from 'astro/config';
