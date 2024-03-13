@@ -1,23 +1,21 @@
 {
-  "name": "my-theme",
-  "private": true,
-  "description": "My awesome theme!",
-  "license": "MIT",
-  "homepage": "https://github.com/UserName/my-theme",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/UserName/my-theme",
-    "directory": "package"
-  },
-  "keywords": [
-    "astro-integration"
-  ],
-  "scripts": {},
-  "devDependencies": {
-    "@types/node": "^20.11.20",
-    "astro": "^4.4.4"
-  },
-  "dependencies": {
-    "astro-theme-provider": "workspace:^"
-  }
+	"name": "my-theme",
+	"private": true,
+	"description": "My awesome theme!",
+	"license": "MIT",
+	"homepage": "https://github.com/UserName/my-theme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/UserName/my-theme",
+		"directory": "package"
+	},
+	"keywords": ["astro-integration"],
+	"scripts": {},
+	"devDependencies": {
+		"@types/node": "^20.11.20",
+		"astro": "^4.4.4"
+	},
+	"dependencies": {
+		"astro-theme-provider": "workspace:^"
+	}
 }

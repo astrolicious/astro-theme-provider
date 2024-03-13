@@ -1,21 +1,21 @@
 ---
 //https://github.com/withastro/starlight/blob/main/docs/src/components/file-tree.astro
 
-import { fileTreeProcessor } from './internal/rehype-file-tree';
+import { fileTreeProcessor } from "./internal/rehype-file-tree";
 
-const content = await Astro.slots.render('default');
+const content = await Astro.slots.render("default");
 if (!/^\s*<ul>/.test(content)) {
 	throw new Error(
 		`<FileTree> component expects its content to be an unordered list but found HTML starting with “${content.slice(
 			0,
-			20
-		)}...”`
+			20,
+		)}...”`,
 	);
 }
 
 const processedContent = await fileTreeProcessor.process({
 	value: content,
-	data: { directoryLabel: 'Directory' },
+	data: { directoryLabel: "Directory" },
 });
 ---
 

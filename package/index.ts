@@ -127,6 +127,12 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 		return {
 			name: themeName,
 			hooks: {
+				"astro:db:setup": ({ extendDb }) => {
+					const configEntrypoint = resolve(cwd, "db/cofig.ts");
+					const seedEntrypoint = resolve(cwd, "db/seed.ts");
+					if (existsSync(configEntrypoint)) extendDb({ configEntrypoint });
+					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
+				},
 				"astro:config:setup": ({ command, config, logger, updateConfig, addWatchFile, injectRoute }) => {
 					srcDir = fileURLToPath(config.srcDir.toString());
 					publicDir = fileURLToPath(config.publicDir.toString());
