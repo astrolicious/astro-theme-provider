@@ -29,6 +29,9 @@ importers:
       astro-pages:
         specifier: ^0.2.1
         version: 0.2.1(astro-integration-kit@0.6.0)(astro@4.5.4)
+      astro-public:
+        specifier: ^0.0.4
+        version: 0.0.4(astro@4.5.4)
       callsites:
         specifier: ^4.1.0
         version: 4.1.0
@@ -299,11 +302,6 @@ packages:
     resolution: {integrity: sha512-uLls06UVKgFG9QD4OeFYLEGteMIAa5kpTPcFL28yuCIIzsf6ZyKZMllKVOCZFhiZ5ptnwX4mtKdWCBE/uT4amg==}
     engines: {node: '>=6.9.0'}
 
-  /@babel/helper-plugin-utils@7.24.0:
-    resolution: {integrity: sha512-9cUznXMG0+FxRuJfvL82QlTqIzhVW9sL0KjMPHhAOOvpQGL8QtdxnBKILjBqxlHyliz0yCa1G903ZXI/FuHy2w==}
-    engines: {node: '>=6.9.0'}
-    dev: false
-
   /@babel/helper-simple-access@7.22.5:
     resolution: {integrity: sha512-n0H99E/K+Bika3++WNL17POvo4rKWZ7lZEp1Q+fStVbUi8nxPQEBOlTmCOxW/0JsS56SKKQ+ojAe2pHKJHN35w==}
     engines: {node: '>=6.9.0'}
@@ -412,9 +410,9 @@ packages:
       '@babel/core': 7.24.0
       '@babel/helper-annotate-as-pure': 7.22.5
       '@babel/helper-module-imports': 7.22.15
-      '@babel/helper-plugin-utils': 7.24.0
+      '@babel/helper-plugin-utils': 7.22.5
       '@babel/plugin-syntax-jsx': 7.23.3(@babel/core@7.24.0)
-      '@babel/types': 7.24.0
+      '@babel/types': 7.23.9
     dev: false
 
   /@babel/runtime@7.23.9:
@@ -1662,6 +1660,14 @@ packages:
       astro: 4.5.4(@types/node@20.11.28)
       astro-integration-kit: 0.6.0(astro@4.5.4)
       fast-glob: 3.3.2
+    dev: false
+
+  /astro-public@0.0.4(astro@4.5.4):
+    resolution: {integrity: sha512-8lm3Oivqk00guR1mjguefHlKLXrkmDo/nnAGbv5SqW/Rgt7pyGv5rI14rR4UbeHK77y70InRX+yatpzoCausaw==}
+    peerDependencies:
+      astro: ^4.4.0
+    dependencies:
+      astro: 4.5.4(@types/node@20.11.28)
     dev: false
 
   /astro@4.4.4(@types/node@20.11.20):
