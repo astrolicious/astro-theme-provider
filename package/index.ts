@@ -356,11 +356,6 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 
 					for (const [name, buffer] of Object.entries(interfaceBuffers)) {
 						if (!buffer) continue
-						console.log(`
-						declare interface ${name} {
-							${buffer}
-						}
-					`)
 						themeTypesBuffer += `
 							declare interface ${name} {
 								${buffer}
