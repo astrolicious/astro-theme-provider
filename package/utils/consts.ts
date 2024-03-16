@@ -22,4 +22,4 @@ export const GLOB_UI_FRAMEWORK = `**.{${UI_FRAMEWORK_FORMATS.join(",")}}`;
 export const GLOB_COMPONENTS = `**.{astro,${UI_FRAMEWORK_FORMATS.join(",")}}`;
 export const GLOB_PAGES = `**.{astro,${API_FORMATS.join(",")}}`;
 
-export const GLOB_IGNORE = [ "!**/node_modules" ]
+export const GLOB_IGNORE = ["!**/node_modules"];

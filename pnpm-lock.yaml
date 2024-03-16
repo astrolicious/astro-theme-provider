@@ -22,16 +22,16 @@ importers:
     dependencies:
       astro:
         specifier: '>=3'
-        version: 4.5.4(@types/node@20.11.28)
+        version: 4.5.5(@types/node@20.11.28)
       astro-integration-kit:
         specifier: ^0.6.0
-        version: 0.6.0(astro@4.5.4)
+        version: 0.6.0(astro@4.5.5)
       astro-pages:
         specifier: ^0.2.1
-        version: 0.2.1(astro-integration-kit@0.6.0)(astro@4.5.4)
+        version: 0.2.1(astro-integration-kit@0.6.0)(astro@4.5.5)
       astro-public:
         specifier: ^0.0.4
-        version: 0.0.4(astro@4.5.4)
+        version: 0.0.4(astro@4.5.5)
       callsites:
         specifier: ^4.1.0
         version: 4.1.0
@@ -137,7 +137,7 @@ packages:
       remark-parse: 11.0.0
       remark-rehype: 11.1.0
       remark-smartypants: 2.1.0
-      shiki: 1.1.7
+      shiki: 1.2.0
       unified: 11.0.4
       unist-util-remove-position: 5.0.0
       unist-util-visit: 5.0.0
@@ -302,6 +302,11 @@ packages:
     resolution: {integrity: sha512-uLls06UVKgFG9QD4OeFYLEGteMIAa5kpTPcFL28yuCIIzsf6ZyKZMllKVOCZFhiZ5ptnwX4mtKdWCBE/uT4amg==}
     engines: {node: '>=6.9.0'}
 
+  /@babel/helper-plugin-utils@7.24.0:
+    resolution: {integrity: sha512-9cUznXMG0+FxRuJfvL82QlTqIzhVW9sL0KjMPHhAOOvpQGL8QtdxnBKILjBqxlHyliz0yCa1G903ZXI/FuHy2w==}
+    engines: {node: '>=6.9.0'}
+    dev: false
+
   /@babel/helper-simple-access@7.22.5:
     resolution: {integrity: sha512-n0H99E/K+Bika3++WNL17POvo4rKWZ7lZEp1Q+fStVbUi8nxPQEBOlTmCOxW/0JsS56SKKQ+ojAe2pHKJHN35w==}
     engines: {node: '>=6.9.0'}
@@ -410,9 +415,9 @@ packages:
       '@babel/core': 7.24.0
       '@babel/helper-annotate-as-pure': 7.22.5
       '@babel/helper-module-imports': 7.22.15
-      '@babel/helper-plugin-utils': 7.22.5
+      '@babel/helper-plugin-utils': 7.24.0
       '@babel/plugin-syntax-jsx': 7.23.3(@babel/core@7.24.0)
-      '@babel/types': 7.23.9
+      '@babel/types': 7.24.0
     dev: false
 
   /@babel/runtime@7.23.9:
@@ -1420,8 +1425,8 @@ packages:
     dev: false
     optional: true
 
-  /@shikijs/core@1.1.7:
-    resolution: {integrity: sha512-gTYLUIuD1UbZp/11qozD3fWpUTuMqPSf3svDMMrL0UmlGU7D9dPw/V1FonwAorCUJBltaaESxq90jrSjQyGixg==}
+  /@shikijs/core@1.2.0:
+    resolution: {integrity: sha512-OlFvx+nyr5C8zpcMBnSGir0YPD6K11uYhouqhNmm1qLiis4GA7SsGtu07r9gKS9omks8RtQqHrJL4S+lqWK01A==}
     dev: false
 
   /@types/babel__core@7.20.5:
@@ -1622,7 +1627,7 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /astro-integration-kit@0.6.0(astro@4.5.4):
+  /astro-integration-kit@0.6.0(astro@4.5.5):
     resolution: {integrity: sha512-BCURops+Is7pRemMG2jo3f8WJRDUBS4mvIeReSDsgAlqep6Rknva9i5vpP5OSs6BLy3nx+nWlCzTQTB/c9hZyg==}
     peerDependencies:
       '@vitejs/plugin-react': ^4.2.1
@@ -1646,28 +1651,28 @@ packages:
       vue:
         optional: true
     dependencies:
-      astro: 4.5.4(@types/node@20.11.28)
+      astro: 4.5.5(@types/node@20.11.28)
       pathe: 1.1.2
       recast: 0.23.6
     dev: false
 
-  /astro-pages@0.2.1(astro-integration-kit@0.6.0)(astro@4.5.4):
+  /astro-pages@0.2.1(astro-integration-kit@0.6.0)(astro@4.5.5):
     resolution: {integrity: sha512-gcaBIO3uk/YtFTkRhRem5NKmDZSOMT5ZFNUAynhy5rUQ4Uph7k0Cn340EZ4YPUIOa6SnO2PehuLlOu6THJ++nA==}
     peerDependencies:
       astro: '>=3'
       astro-integration-kit: '>=0.1.0'
     dependencies:
-      astro: 4.5.4(@types/node@20.11.28)
-      astro-integration-kit: 0.6.0(astro@4.5.4)
+      astro: 4.5.5(@types/node@20.11.28)
+      astro-integration-kit: 0.6.0(astro@4.5.5)
       fast-glob: 3.3.2
     dev: false
 
-  /astro-public@0.0.4(astro@4.5.4):
+  /astro-public@0.0.4(astro@4.5.5):
     resolution: {integrity: sha512-8lm3Oivqk00guR1mjguefHlKLXrkmDo/nnAGbv5SqW/Rgt7pyGv5rI14rR4UbeHK77y70InRX+yatpzoCausaw==}
     peerDependencies:
       astro: ^4.4.0
     dependencies:
-      astro: 4.5.4(@types/node@20.11.28)
+      astro: 4.5.5(@types/node@20.11.28)
     dev: false
 
   /astro@4.4.4(@types/node@20.11.20):
@@ -1752,8 +1757,8 @@ packages:
       - terser
       - typescript
 
-  /astro@4.5.4(@types/node@20.11.28):
-    resolution: {integrity: sha512-qwMyBn36wXvaCzdCmdbyCxLQGG5hTa3saNdHdqS20Yn1b7Z7oqqcWOb2UjFuq6O8dFqZxU8Hq0/pGFscvsYtJA==}
+  /astro@4.5.5(@types/node@20.11.28):
+    resolution: {integrity: sha512-gZ3jR06dLmY9/SMkKMr+3pRSrUjhuwjnXt+9abFJV3WGwhCnLZbSNsTBrLMsaFHpAS1ReJChcTWyKRCvs/jCIQ==}
     engines: {node: '>=18.14.1', npm: '>=6.14.0'}
     hasBin: true
     dependencies:
@@ -1807,7 +1812,7 @@ packages:
       rehype: 13.0.1
       resolve: 1.22.8
       semver: 7.6.0
-      shiki: 1.1.7
+      shiki: 1.2.0
       string-width: 7.1.0
       strip-ansi: 7.1.0
       tsconfck: 3.0.3
@@ -4444,10 +4449,10 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
 
-  /shiki@1.1.7:
-    resolution: {integrity: sha512-9kUTMjZtcPH3i7vHunA6EraTPpPOITYTdA5uMrvsJRexktqP0s7P3s9HVK80b4pP42FRVe03D7fT3NmJv2yYhw==}
+  /shiki@1.2.0:
+    resolution: {integrity: sha512-xLhiTMOIUXCv5DqJ4I70GgQCtdlzsTqFLZWcMHHG3TAieBUbvEGthdrlPDlX4mL/Wszx9C6rEcxU6kMlg4YlxA==}
     dependencies:
-      '@shikijs/core': 1.1.7
+      '@shikijs/core': 1.2.0
     dev: false
 
   /shikiji-core@0.9.19:
