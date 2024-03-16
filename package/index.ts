@@ -263,13 +263,12 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 					*/
 
 					// Handle 'authorOptions.pages' default
-					if (!authorOptions.pages || typeof authorOptions.pages === "string") {
-						authorOptions.pages = {
-							dir: authorOptions.pages || "pages",
-						};
+					authorOptions.pages ||= "pages"
+
+					if (typeof authorOptions.pages === "string") {
+						authorOptions.pages = { dir: authorOptions.pages };
 					}
 
-					// Overwrite/force cwd for finding routes
 					Object.assign(authorOptions.pages, { cwd: themeRoot, config, logger });
 
 					// Initialize route injection
