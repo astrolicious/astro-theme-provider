@@ -1,4 +1,4 @@
-import { extname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AstroIntegration } from "astro";
 import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit/utilities";
@@ -13,10 +13,11 @@ import { type AuthorOptions, type ConfigDefault, type ModuleOptions, type UserOp
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./utils/consts.ts";
 import { PackageJSON, warnThemePackage } from "./utils/package.ts";
 import { addLeadingSlash, normalizePath, stringToDirectory, stringToFilepath, validatePattern } from "./utils/path.ts";
-import { getVirtualModuleTypes, globToModuleObject, virtualModuleObject } from "./utils/generate-imports.ts";
+import { getVirtualModuleTypes, globToModuleObject, virtualModuleObject } from "./utils/virtual.ts";
 import { errorMap } from "./utils/error-map.ts";
 
 const thisFile = stringToFilepath("./", import.meta.url);
+const thisRoot = stringToDirectory("./", thisFile)
 
 export default function <Config extends ConfigDefault>(authorOptions: AuthorOptions<Config>) {
 	if (!authorOptions.entrypoint) {
@@ -30,16 +31,14 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 		}
 	}
 
-	const entrypoint = stringToFilepath("./", authorOptions.entrypoint!);
-	const cwd = stringToDirectory("./", entrypoint);
+	// Theme package entrypoint (/package/index.ts)
+	const themeEntrypoint = stringToFilepath("./", authorOptions.entrypoint!);
 
-	// Will be assigned value when 'astro:config:setup' hook runs
-	let srcDir: string;
-	let publicDir: string;
-	let outDir: string;
+	// Theme package root (/package)
+	const themeRoot = stringToDirectory("./", themeEntrypoint);
 
-	// Theme's `package.json`
-	const themePackage = new PackageJSON(cwd);
+	// Theme `package.json`
+	const themePackage = new PackageJSON(themeRoot);
 
 	// Assign theme name
 	const themeName = themePackage.json.name || authorOptions.name || "my-theme";
@@ -53,6 +52,11 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 			[...isValidName.errors, ...isValidName.warnings].join(", "),
 		);
 	}
+	
+	// Will be assigned value when 'astro:config:setup' hook runs
+	let srcDir: string;
+	let publicDir: string;
+	let outDir: string;
 
 	return (userOptions: UserOptions<Config>): AstroIntegration => {
 		const parsed = authorOptions.schema.safeParse(userOptions.config, { errorMap });
@@ -64,6 +68,9 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 			);
 		}
 
+
+
+		
 		const userConfig = parsed.data;
 
 		return {
@@ -76,9 +83,9 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
 				"astro:config:setup": ({ command, config, logger, updateConfig, addWatchFile, injectRoute }) => {
-					srcDir = fileURLToPath(config.srcDir.toString());
-					publicDir = fileURLToPath(config.publicDir.toString());
-					outDir = fileURLToPath(config.outDir.toString());
+					srcDir = stringToDirectory("./", config.srcDir.toString());
+					publicDir = stringToDirectory("./", config.publicDir.toString());
+					outDir = stringToDirectory("./", config.outDir.toString());
 
 					const moduleBuffers: Record<string, string> = {};
 
@@ -98,17 +105,17 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 					// Warn about issues with theme's `package.json`
 					warnThemePackage(themePackage, logger);
 
-					// HMR for `astro-theme-provider` package
-					// watchIntegration({
-					// 	dir: dirname(thisFile),
-					// 	command,
-					// 	updateConfig,
-					// 	addWatchFile,
-					// });
+					//HMR for `astro-theme-provider` package
+					watchIntegration({
+						dir: thisRoot,
+						command,
+						updateConfig,
+						addWatchFile,
+					});
 
 					// HMR for theme author's package
 					watchIntegration({
-						dir: cwd,
+						dir: themeRoot,
 						command,
 						updateConfig,
 						addWatchFile,
@@ -116,12 +123,11 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 
 					// Initialize "public" directory
 					authorOptions.public ||= "public"
-
 					addIntegration({
 						integration: staticDir(
 							typeof authorOptions.public === "string"
-								? { dir: authorOptions.public, cwd }
-								: { ...authorOptions.public, cwd }
+								? { dir: authorOptions.public, cwd: themeRoot }
+								: { ...authorOptions.public, cwd: themeRoot }
 						),
 						config,
 						logger,
@@ -136,18 +142,16 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 
 					*/
 
-					// Default virtual modules
+					// Default assign default options for virtual modules
 					const moduleOptions: ModuleOptions = {
 						css: GLOB_CSS,
 						assets: GLOB_IMAGES,
 						layouts: GLOB_ASTRO,
 						components: GLOB_COMPONENTS,
+						...authorOptions.modules
 					};
 
-					// Override default module options with author options
-					Object.assign(moduleOptions, authorOptions.modules);
-
-					// Dynamically create virtual modules using globs and/or export objects defined by theme author or user
+					// Dynamically create virtual modules using globs, imports, or exports
 					for (const [name, path] of Object.entries(moduleOptions)) {
 						if (!path) continue;
 
@@ -157,7 +161,7 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 						}
 
 						const moduleName = normalizePath(join(themeName, name));
-						const moduleRoot = normalizePath(resolve(cwd, name));
+						const moduleRoot = normalizePath(resolve(themeRoot, name));
 
 						let virtualModule = {} as ReturnType<typeof virtualModuleObject>;
 
@@ -235,7 +239,7 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 					}
 
 					// Overwrite/force cwd for finding routes
-					Object.assign(authorOptions.pages, { cwd, config, logger });
+					Object.assign(authorOptions.pages, { cwd: themeRoot, config, logger });
 
 					// Initialize route injection
 					const { pages, injectPages } = addPageDir(authorOptions.pages as PageIntegrationOption);
