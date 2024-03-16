@@ -37,6 +37,9 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 	// Theme package root (/package)
 	const themeRoot = stringToDirectory("./", themeEntrypoint);
 
+	// Theme src dir (/package/src)
+	const themeSrc = stringToDirectory(themeRoot, authorOptions.srcDir || "src")
+
 	// Theme `package.json`
 	const themePackage = new PackageJSON(themeRoot);
 

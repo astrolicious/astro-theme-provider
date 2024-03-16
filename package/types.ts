@@ -33,6 +33,7 @@ export interface PackageJSONOptions {
 
 export type AuthorOptions<Config extends ConfigDefault> = Prettify<{
 	entrypoint?: string;
+	srcDir?: string;
 	name?: ThemeName;
 	pages?: string | PageDirOption | undefined;
 	public?: string | StaticDirOption | undefined;
