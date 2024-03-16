@@ -102,6 +102,37 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 						[themeName + "/config"]: `export default ${JSON.stringify(userConfig)}`,
 					};
 
+					let themeTypesBuffer = `
+						type Prettify<T> = { [K in keyof T]: T[K]; } & {};
+
+						type ThemeName = "${themeName}";
+						type ThemeConfig = NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]
+
+						declare type AstroThemes = keyof AstroThemeConfigs;
+
+						declare type AstroThemeConfigs = {
+							"${themeName}": ThemeConfig
+						}
+
+						declare type AstroThemeModulesGet<Name extends keyof AstroThemeModulesAuthored> = AstroThemeModulesAuthored[Name]
+
+						declare type AstroThemeModulesOptions<Name extends keyof AstroThemeModulesAuthored> = {
+							[Module in keyof AstroThemeModulesGet<Name>]?:
+								AstroThemeModulesGet<Name>[Module] extends Record<string, any>
+									? AstroThemeModulesGet<Name>[Module] extends string[]
+										?	AstroThemeModulesGet<Name>[Module]
+										: { [Export in keyof AstroThemeModulesGet<Name>[Module]]?: string }
+									: never
+						} & {}
+						
+						declare type AstroThemePagesOptions<Name extends keyof AstroThemePagesAuthored> = Prettify<Partial<Record<keyof AstroThemePagesAuthored[Name], string | boolean>>>
+						
+						declare module "${themeName}" {
+							const config: ThemeConfig;
+							export default config;
+						}
+					`;
+
 					// Warn about issues with theme's `package.json`
 					warnThemePackage(themePackage, logger);
 
@@ -186,9 +217,9 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 						let typesModuleContent = getVirtualModuleTypes(virtualModule, ({ name, type }) => `\nexport const ${name}: ${type}`);
 
 						interfaceBuffers["AstroThemeModulesAuthored"] += `
-							${moduleName}: {
+							"${moduleName}": {
 								${typesObjectContent}
-							}
+							},
 						`;
 
 						if (userConfig.overrides) {
@@ -200,9 +231,9 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 							moduleBuffers[altModuleName] = typesModuleContent;
 
 							interfaceBuffers["AstroThemeModulesOverrides"] += `
-								${moduleName}: {
+								"${moduleName}": {
 									${typesObjectContent}
-								}
+								},
 							`;
 						}
 
@@ -211,9 +242,9 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 						typesModuleContent = getVirtualModuleTypes(virtualModule, ({ name, type }) => `\nexport const ${name}: ${type}`);
 
 						interfaceBuffers["AstroThemeModulesInjected"] += `
-							${moduleName}: {
+							"${moduleName}": {
 								${typesObjectContent}
-							}
+							},
 						`;
 
 						// Create virtuaL import
@@ -323,38 +354,22 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 						imports: virtualImports,
 					});
 
-					let themeTypesBuffer = `
-            type Prettify<T> = { [K in keyof T]: T[K]; } & {};
-  
-            type ThemeName = "${themeName}";
-            type ThemeConfig = NonNullable<Parameters<typeof import("${entrypoint}").default>[0]>["config"]
-  
-            declare type AstroThemes = keyof AstroThemeConfigs;
-
-            declare type AstroThemeConfigs = {
-              "${themeName}": ThemeConfig
-            }
-  
-            declare type AstroThemeModulesGet<Name extends keyof AstroThemeModulesAuthored> = AstroThemeModulesAuthored[Name]
-  
-            declare type AstroThemeModulesOptions<Name extends keyof AstroThemeModulesAuthored> = {
-              [Module in keyof AstroThemeModulesGet<Name>]?:
-                AstroThemeModulesGet<Name>[Module] extends Record<string, any>
-                  ? AstroThemeModulesGet<Name>[Module] extends string[]
-                    ?	AstroThemeModulesGet<Name>[Module]
-                    : { [Export in keyof AstroThemeModulesGet<Name>[Module]]?: string }
-                  : never
-            } & {}
-            
-            declare type AstroThemePagesOptions<Name extends keyof AstroThemePagesAuthored> = Prettify<Partial<Record<keyof AstroThemePagesAuthored[Name], string | boolean>>>
-						
-						declare module "${themeName}" {
-							const config: ThemeConfig;
-							export default config;
+					for (const [name, buffer] of Object.entries(interfaceBuffers)) {
+						if (!buffer) continue
+						console.log(`
+						declare interface ${name} {
+							${buffer}
 						}
-					`;
+					`)
+						themeTypesBuffer += `
+							declare interface ${name} {
+								${buffer}
+							}
+						`
+					}
 
 					for (const [name, buffer] of Object.entries(moduleBuffers)) {
+						if (!buffer) continue
 						themeTypesBuffer += `
 							declare module "${name}" {
 								${buffer}
