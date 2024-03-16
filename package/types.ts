@@ -32,11 +32,11 @@ export interface PackageJSONOptions {
 }
 
 export type AuthorOptions<Config extends ConfigDefault> = Prettify<{
+	name?: ThemeName;
 	entrypoint?: string;
 	srcDir?: string;
-	name?: ThemeName;
-	pages?: string | PageDirOption | undefined;
-	public?: string | StaticDirOption | undefined;
+	publicDir?: string | StaticDirOption | undefined;
+	pageDir?: string | PageDirOption | undefined;
 	schema: z.ZodSchema<Config>;
 	modules?: ModuleOptions | undefined;
 }>;
