@@ -1,25 +1,42 @@
 import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { AstroIntegration } from "astro";
 import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit/utilities";
 import { addPageDir } from "astro-pages";
-import type { IntegrationOption as PageIntegrationOption } from "astro-pages/types";
+import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOption } from "astro-pages/types";
 import staticDir from "astro-public";
+import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
 import callsites from "callsites";
 // @ts-ignore
 import validatePackageName from "validate-npm-package-name";
 import { type AuthorOptions, type ConfigDefault, type ModuleOptions, type UserOptions } from "./types";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./utils/consts.ts";
+import { errorMap } from "./utils/error-map.ts";
+import { tryToCreateDirectory } from "./utils/fs.ts";
 import { PackageJSON, warnThemePackage } from "./utils/package.ts";
 import { addLeadingSlash, normalizePath, stringToDirectory, stringToFilepath, validatePattern } from "./utils/path.ts";
 import { getVirtualModuleTypes, globToModuleObject, virtualModuleObject } from "./utils/virtual.ts";
-import { errorMap } from "./utils/error-map.ts";
 
 const thisFile = stringToFilepath("./", import.meta.url);
-const thisRoot = stringToDirectory("./", thisFile)
+const thisRoot = stringToDirectory("./", thisFile);
 
 export default function <Config extends ConfigDefault>(authorOptions: AuthorOptions<Config>) {
+	// Handle defaults
+
+	authorOptions.srcDir ||= "src";
+
+	authorOptions.pageDir ||= "pages";
+
+	if (typeof authorOptions.pageDir === "string") {
+		authorOptions.pageDir = { dir: authorOptions.pageDir } as PageDirOption;
+	}
+
+	authorOptions.publicDir ||= "public";
+
+	if (typeof authorOptions.publicDir === "string") {
+		authorOptions.publicDir = { dir: authorOptions.publicDir } as PublicDirOption;
+	}
+
 	if (!authorOptions.entrypoint) {
 		// Assume the first path before `file://` URL is the theme package's entrypoint
 		for (const callsite of callsites().reverse()) {
@@ -37,8 +54,15 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 	// Theme package root (/package)
 	const themeRoot = stringToDirectory("./", themeEntrypoint);
 
-	// Theme src dir (/package/src)
-	const themeSrc = stringToDirectory(themeRoot, authorOptions.srcDir || "src")
+	// Force relative paths to resolve relative to theme root
+	Object.assign(authorOptions.pageDir, { cwd: themeRoot });
+	Object.assign(authorOptions.publicDir, { cwd: themeRoot });
+
+	// Theme source dir (/package/src)
+	const themeSrc = stringToDirectory(themeRoot, authorOptions.srcDir, false);
+
+	// Create theme src if it doesnt exist
+	tryToCreateDirectory(themeSrc);
 
 	// Theme `package.json`
 	const themePackage = new PackageJSON(themeRoot);
@@ -55,7 +79,7 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 			[...isValidName.errors, ...isValidName.warnings].join(", "),
 		);
 	}
-	
+
 	// Will be assigned value when 'astro:config:setup' hook runs
 	let srcDir: string;
 	let publicDir: string;
@@ -71,9 +95,6 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 			);
 		}
 
-
-
-		
 		const userConfig = parsed.data;
 
 		return {
@@ -92,6 +113,12 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 
 					const moduleBuffers: Record<string, string> = {};
 
+					const virtualImports: Record<string, string> = {
+						[themeName + "/config"]: `export default ${JSON.stringify(userConfig)}`,
+					};
+
+					type InterfaceNames = keyof typeof interfaceBuffers;
+
 					const interfaceBuffers = {
 						AstroThemeModulesAuthored: "",
 						AstroThemeModulesOverrides: "",
@@ -101,8 +128,8 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 						AstroThemePagesInjected: "",
 					};
 
-					const virtualImports: Record<string, string> = {
-						[themeName + "/config"]: `export default ${JSON.stringify(userConfig)}`,
+					const extendInterface: Partial<Record<InterfaceNames, (typeof interfaceBuffers)[InterfaceNames]>> = {
+						AstroThemePagesInjected: "AstroThemePagesAuthored",
 					};
 
 					let themeTypesBuffer = `
@@ -155,14 +182,8 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 						addWatchFile,
 					});
 
-					// Initialize "public" directory
-					authorOptions.public ||= "public"
 					addIntegration({
-						integration: staticDir(
-							typeof authorOptions.public === "string"
-								? { dir: authorOptions.public, cwd: themeRoot }
-								: { ...authorOptions.public, cwd: themeRoot }
-						),
+						integration: staticDir(authorOptions.publicDir!),
 						config,
 						logger,
 						updateConfig,
@@ -182,7 +203,7 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 						assets: GLOB_IMAGES,
 						layouts: GLOB_ASTRO,
 						components: GLOB_COMPONENTS,
-						...authorOptions.modules
+						...authorOptions.modules,
 					};
 
 					// Dynamically create virtual modules using globs, imports, or exports
@@ -217,7 +238,10 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 						if (!virtualModule?.name) continue;
 
 						let typesObjectContent = getVirtualModuleTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
-						let typesModuleContent = getVirtualModuleTypes(virtualModule, ({ name, type }) => `\nexport const ${name}: ${type}`);
+						let typesModuleContent = getVirtualModuleTypes(
+							virtualModule,
+							({ name, type }) => `\nexport const ${name}: ${type}`,
+						);
 
 						interfaceBuffers["AstroThemeModulesAuthored"] += `
 							"${moduleName}": {
@@ -227,7 +251,7 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 
 						if (userConfig.overrides) {
 							// This is meant to be a temporary fix/workaround for ciruclar imports when overriding
-							const altModuleName = moduleName.replace(/\//, ":")
+							const altModuleName = moduleName.replace(/\//, ":");
 
 							virtualImports[altModuleName] = virtualModule.content;
 
@@ -242,7 +266,10 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 
 						// Re-generate content to include user overrides
 						typesObjectContent = getVirtualModuleTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
-						typesModuleContent = getVirtualModuleTypes(virtualModule, ({ name, type }) => `\nexport const ${name}: ${type}`);
+						typesModuleContent = getVirtualModuleTypes(
+							virtualModule,
+							({ name, type }) => `\nexport const ${name}: ${type}`,
+						);
 
 						interfaceBuffers["AstroThemeModulesInjected"] += `
 							"${moduleName}": {
@@ -254,7 +281,7 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 						virtualImports[moduleName] = virtualModule.content;
 
 						// Generate types for virtual import
-						moduleBuffers[moduleName] = typesModuleContent
+						moduleBuffers[moduleName] = typesModuleContent;
 					}
 
 					/*
@@ -265,33 +292,26 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 
 					*/
 
-					// Handle 'authorOptions.pages' default
-					authorOptions.pages ||= "pages"
-
-					if (typeof authorOptions.pages === "string") {
-						authorOptions.pages = { dir: authorOptions.pages };
-					}
-
-					Object.assign(authorOptions.pages, { cwd: themeRoot, config, logger });
-
 					// Initialize route injection
-					const { pages, injectPages } = addPageDir(authorOptions.pages as PageIntegrationOption);
+					const { pages, injectPages } = addPageDir({
+						...(authorOptions.pageDir as PageDirOption),
+						config,
+						logger,
+					} as PageDirIntegrationOption);
 
-					userOptions.pages ??= {} as NonNullable<typeof userOptions.pages>;
+					userOptions.pages ||= {} as NonNullable<typeof userOptions.pages>;
 
 					// Generate types for possibly injected routes
-					// addLinesToDtsInterface(
-					// 	"AstroThemePagesAuthored",
-					// 	wrapWithBrackets(
-					// 		Object.entries(pages).map(
-					// 			([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`,
-					// 		),
-					// 		`"${themeName}": `,
-					// 	),
-					// );
+					interfaceBuffers["AstroThemePagesAuthored"] += `
+						"${themeName}": {
+							${Object.entries(pages).map(
+								([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`,
+							)}
+						},
+					`;
 
 					// Buffer for AstroThemePagesOverrides interface
-					let typesPageBuffer = "";
+					let pageOverrideBuffer = "";
 
 					// Filter out routes the theme user toggled off
 					for (const oldPattern of Object.keys(userOptions.pages)) {
@@ -321,7 +341,7 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 							// Add new pattern
 							pages[newPattern] = pages[oldPattern]!;
 							// Add types to buffer
-							typesPageBuffer += `\n"${oldPattern}": "${newPattern}";`;
+							pageOverrideBuffer += `\n"${oldPattern}": "${newPattern}";`;
 							continue;
 						}
 					}
@@ -333,6 +353,14 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 					// 		wrapWithBrackets(pageOverrideBuffer.lines, `"${themeName}": `),
 					// 	);
 					// }
+
+					if (pageOverrideBuffer) {
+						interfaceBuffers["AstroThemePagesInjected"] += `
+							"${themeName}": {
+								${pageOverrideBuffer}
+							},
+						`;
+					}
 
 					// Generate types for injected routes
 					// addLinesToDtsInterface(
@@ -357,21 +385,22 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 					});
 
 					for (const [name, buffer] of Object.entries(interfaceBuffers)) {
-						if (!buffer) continue
+						if (!buffer) continue;
+						const extension = extendInterface[name as InterfaceNames];
 						themeTypesBuffer += `
-							declare interface ${name} {
+							declare interface ${name} ${extension ? `extends ${extension} ` : ""}{
 								${buffer}
 							}
-						`
+						`;
 					}
 
 					for (const [name, buffer] of Object.entries(moduleBuffers)) {
-						if (!buffer) continue
+						if (!buffer) continue;
 						themeTypesBuffer += `
 							declare module "${name}" {
 								${buffer}
 							}
-						`
+						`;
 					}
 
 					// Write generated types to .d.ts file
@@ -387,15 +416,3 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 		};
 	};
 }
-
-// export {
-// 	GLOB_CSS,
-// 	GLOB_API,
-// 	GLOB_DATA,
-// 	GLOB_ASTRO,
-// 	GLOB_IMAGES,
-// 	GLOB_MARKDOWN,
-// 	GLOB_UI_FRAMEWORK,
-// 	GLOB_COMPONENTS,
-// 	GLOB_PAGES,
-// } from "./utils";

@@ -35,8 +35,8 @@ export type AuthorOptions<Config extends ConfigDefault> = Prettify<{
 	name?: ThemeName;
 	entrypoint?: string;
 	srcDir?: string;
-	publicDir?: string | StaticDirOption | undefined;
-	pageDir?: string | PageDirOption | undefined;
+	publicDir?: string | StaticDirOption;
+	pageDir?: string | PageDirOption;
 	schema: z.ZodSchema<Config>;
 	modules?: ModuleOptions | undefined;
 }>;
