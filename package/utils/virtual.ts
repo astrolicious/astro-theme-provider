@@ -90,8 +90,8 @@ export function globToModuleObject(cwd: string, glob: string | string[]): Module
 
 	for (const file of files.reverse()) {
 		if (shouldBeNamespaceImport(file)) {
-			imports.push(file)
-			continue
+			imports.push(file);
+			continue;
 		}
 		const name = basename(file).slice(0, -extname(file).length);
 		exports[name] = file;
@@ -99,7 +99,7 @@ export function globToModuleObject(cwd: string, glob: string | string[]): Module
 
 	return {
 		imports,
-		exports
+		exports,
 	};
 }
 
@@ -143,7 +143,7 @@ export function getModuleExportsContent(exports: ResolvedModuleExports) {
 
 export function getVirtualModuleTypes(
 	module: VirtualModule,
-	create: ({ name, path, type }: { name: string; path: string, type: string }) => string,
+	create: ({ name, path, type }: { name: string; path: string; type: string }) => string,
 ) {
 	let buffer = "";
 
