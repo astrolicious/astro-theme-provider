@@ -165,6 +165,5 @@ export function getVirtualModuleTypes(
 		buffer += line;
 	}
 
-	console.log("GENERATED TYPES", buffer , '\n')
 	return buffer;
 }
