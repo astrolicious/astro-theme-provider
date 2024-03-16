@@ -27,6 +27,10 @@ export function addLeadingAndTrailingSlashes(path: string) {
 	return `/${removeLeadingAndTrailingSlashes(path)}/`;
 }
 
+export function normalizePath(path: string) {
+	return path.replace(/\\+|\/+/g, "/");
+}
+
 export function normalizePattern(pattern: string) {
 	return removeLeadingAndTrailingSlashes(pattern)
 		.split("/")
