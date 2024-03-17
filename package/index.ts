@@ -217,17 +217,8 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 					*/
 
-					// Default assign default options for virtual modules
-					const moduleOptions: ModuleOptions = {
-						css: GLOB_CSS,
-						assets: GLOB_IMAGES,
-						layouts: GLOB_ASTRO,
-						components: GLOB_COMPONENTS,
-						...authorOptions.modules,
-					};
-
 					// Dynamically create virtual modules using globs, imports, or exports
-					for (const [name, path] of Object.entries(moduleOptions)) {
+					for (const [name, path] of Object.entries(authorOptions.modules)) {
 						if (!path) continue;
 
 						if (["config", "pages", "public", "content", "db"].includes(name)) {
@@ -246,7 +237,6 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 						if (typeof path === "object") {
 							if (Array.isArray(path)) {
-								if (path.length < 1) continue;
 								virtualModule = virtualModuleObject(moduleName, { imports: path });
 							} else {
 								virtualModule = virtualModuleObject(moduleName, { exports: path });
