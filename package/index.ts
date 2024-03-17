@@ -145,19 +145,12 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						[themeName + "/config"]: `export default ${JSON.stringify(userConfig)}`,
 					};
 
-					type InterfaceNames = keyof typeof interfaceBuffers;
-
 					const interfaceBuffers = {
 						AstroThemeModulesAuthored: "",
 						AstroThemeModulesOverrides: "",
 						AstroThemeModulesInjected: "",
 						AstroThemePagesAuthored: "",
 						AstroThemePagesOverrides: "",
-						AstroThemePagesInjected: "",
-					};
-
-					const extendInterface: Partial<Record<InterfaceNames, (typeof interfaceBuffers)[InterfaceNames]>> = {
-						AstroThemePagesInjected: "AstroThemePagesAuthored",
 					};
 
 					let themeTypesBuffer = `
@@ -183,9 +176,11 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 									: never
 						} & {}
 						
-						declare type AstroThemePagesOptions<Name extends keyof AstroThemePagesAuthored> = Prettify<Partial<Record<keyof AstroThemePagesAuthored[Name], string | boolean>>>
+						declare type AstroThemePagesOverridesOptions<Name extends keyof AstroThemePagesAuthored> = Prettify<Partial<Record<keyof AstroThemePagesAuthored[Name], string | boolean>>>
+
+						declare type AstroThemePagesInjected = AstroThemePagesOverrides & AstroThemePagesAuthored
 						
-						declare module "${themeName}" {
+						declare module "${themeName}/config" {
 							const config: ThemeConfig;
 							export default config;
 						}
@@ -260,8 +255,6 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 								virtualModule = virtualModuleObject(moduleName, { exports: path });
 							}
 						}
-
-						console.log("RESOLVED MODULE", virtualModule);
 
 						if (!virtualModule?.name) continue;
 
@@ -374,32 +367,11 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						}
 					}
 
-					//  Generate types for author pages overriden by a user
-					// if (pageOverrideBuffer.lines.length > 0) {
-					// 	addLinesToDtsInterface(
-					// 		"AstroThemePagesOverrides",
-					// 		wrapWithBrackets(pageOverrideBuffer.lines, `"${themeName}": `),
-					// 	);
-					// }
-
-					if (pageOverrideBuffer) {
-						interfaceBuffers["AstroThemePagesInjected"] += `
-							"${themeName}": {
-								${pageOverrideBuffer}
-							},
-						`;
-					}
-
-					// Generate types for injected routes
-					// addLinesToDtsInterface(
-					// 	"AstroThemePagesInjected",
-					// 	wrapWithBrackets(
-					// 		Object.entries(pages).map(
-					// 			([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`,
-					// 		),
-					// 		`"${themeName}": `,
-					// 	),
-					// );
+					interfaceBuffers["AstroThemePagesOverrides"] += `
+						"${themeName}": {
+							${pageOverrideBuffer}
+						},
+					`;
 
 					// Inject routes/pages
 					injectPages(injectRoute);
@@ -414,9 +386,8 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 					for (const [name, buffer] of Object.entries(interfaceBuffers)) {
 						if (!buffer) continue;
-						const extension = extendInterface[name as InterfaceNames];
 						themeTypesBuffer += `
-							declare interface ${name} ${extension ? `extends ${extension} ` : ""}{
+							declare interface ${name} {
 								${buffer}
 							}
 						`;
