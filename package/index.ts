@@ -59,14 +59,14 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	// Merge author options with default options
 	mergeOptions(authorOptions, partialAuthorOptions);
 
-	// Force options
-	mergeOptions(authorOptions, {
-		pageDir: { cwd: themeRoot },
-		publicDir: { cwd: themeRoot },
-	});
-
 	// Theme source dir (/package/src)
 	const themeSrc = stringToDirectory(themeRoot, authorOptions.srcDir);
+	
+	// Force options
+	mergeOptions(authorOptions, {
+		pageDir: { cwd: themeSrc },
+		publicDir: { cwd: themeSrc },
+	});
 
 	// Theme `package.json`
 	const themePackage = new PackageJSON(themeRoot);
