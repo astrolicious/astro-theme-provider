@@ -14,10 +14,10 @@ export default defineConfig({
 			},
 			overrides: {
 				css: [
-					// "./custom.css"
+					// "./src/custom.css"
 				],
 				components: {
-					// Heading: './CustomHeading.astro'
+					// Heading: './src/CustomHeading.astro'
 				},
 			},
 		}),

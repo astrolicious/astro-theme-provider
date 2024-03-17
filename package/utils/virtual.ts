@@ -2,6 +2,8 @@ import { basename, extname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import fg from "fast-glob";
 import { CSS_FORMATS, GLOB_IGNORE, IMAGE_FORMATS } from "./consts.ts";
+import { mergeOptions } from "./options.ts";
+import { normalizePath } from "./path.ts";
 
 // const resolveUserId = (id: string, base = "./") => (id.startsWith(".") ? resolve(srcDir, id) : id);
 
@@ -53,7 +55,7 @@ function shouldBeNamespaceImport(path: string) {
 }
 
 function resolveId(id: string, base = "./") {
-	return id.startsWith(".") ? resolve(base, id) : id;
+	return normalizePath(id.startsWith(".") ? resolve(base, id) : id);
 }
 
 function resolveImportArray(imports: ModuleImports, store?: Set<string>): ResolvedModuleImports {
@@ -82,6 +84,14 @@ export function resolveExportObject(exports: ModuleExports): ResolvedModuleExpor
 	}
 
 	return resolved;
+}
+
+export function resolveModuleObject(module: ModuleObject): ResolvedModuleObject {
+	const { imports = [], exports = {} } = module
+	return {
+		imports: resolveImportArray(imports),
+		exports: resolveExportObject(exports)
+	}
 }
 
 export function convertToModuleObject(option: ModuleImports | ModuleExports | ModuleObject): ModuleObject {
@@ -128,6 +138,14 @@ export function virtualModuleObject(name: string, { imports = [], exports = {} }
 		exports: resolvedExports,
 		content: getModuleContent(resolvedImports, resolvedExports),
 	};
+}
+
+export function mergeVirtualModule(target: VirtualModule, source: ResolvedModuleObject) {
+	const { imports, exports } = source
+	target.imports.push(...imports)
+	mergeOptions(target.exports, exports)
+	target.content = getModuleContent(target.imports, target.exports)
+	return target
 }
 
 export function getModuleContent(imports: ResolvedModuleImports, exports: ResolvedModuleExports) {

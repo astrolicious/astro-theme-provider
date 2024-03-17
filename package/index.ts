@@ -15,7 +15,7 @@ import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./utils/cons
 import { errorMap } from "./utils/error-map.ts";
 import { PackageJSON, warnThemePackage } from "./utils/package.ts";
 import { addLeadingSlash, normalizePath, stringToDirectory, stringToFilepath, validatePattern } from "./utils/path.ts";
-import { convertToModuleObject, getVirtualModuleTypes, globToModuleObject, virtualModuleObject } from "./utils/virtual.ts";
+import { convertToModuleObject, getVirtualModuleTypes, globToModuleObject, mergeVirtualModule, resolveModuleObject, virtualModuleObject } from "./utils/virtual.ts";
 import { mergeOptions } from "./utils/options.ts";
 
 const thisFile = stringToFilepath("./", import.meta.url);
@@ -46,7 +46,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 			layouts: GLOB_ASTRO,
 			components: GLOB_COMPONENTS,
 		},
-	} as Required<AuthorOptions<z.ZodRecord<z.ZodTypeAny>>>;
+	} as Required<AuthorOptions<z.ZodRecord>>;
 
 	if (typeof authorOptions.pageDir === "string") {
 		authorOptions.pageDir = { dir: authorOptions.pageDir } as PageDirOption;
@@ -96,7 +96,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 		const userConfig = parsed.data;
 
-		userOptions.config = userConfig;
+		userOptions.config = userConfig
 
 		return {
 			name: themeName,
@@ -202,7 +202,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							option = globToModuleObject(moduleRoot, option)
 						}
 
-						const virtualModule = virtualModuleObject(moduleName, convertToModuleObject(option));
+						let virtualModule = virtualModuleObject(moduleName, convertToModuleObject(option));
 
 						if (!virtualModule) continue;
 
@@ -218,8 +218,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							},
 						`;
 
-						if (userConfig.overrides) {
-							// This is meant to be a temporary fix/workaround for ciruclar imports when overriding
+						if (userOptions.overrides[name]) {
 							const altModuleName = moduleName.replace(/\//, ":");
 
 							virtualImports[altModuleName] = virtualModule.content;
@@ -231,6 +230,10 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 									${typesObjectContent}
 								},
 							`;
+
+							const moduleOverride = resolveModuleObject(convertToModuleObject(userOptions.overrides[name]))
+
+							virtualModule = mergeVirtualModule(virtualModule, moduleOverride);
 						}
 
 						// Re-generate content to include user overrides
