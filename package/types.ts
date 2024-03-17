@@ -8,12 +8,6 @@ export type NestedStringArray = ValueOrArray<string>;
 
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
-export type ConfigDefault = {
-	config: Record<string, unknown>;
-	pages: Record<string, boolean>;
-	overrides: Record<string, string[] | Record<string, string>>;
-};
-
 export type ModuleOptions = Record<string, undefined | null | false | string | string[] | Record<string, string>>;
 
 export interface PackageJSONOptions {
@@ -31,7 +25,7 @@ export interface PackageJSONOptions {
 		  };
 }
 
-export type AuthorOptions<Config extends ConfigDefault> = Prettify<{
+export type AuthorOptions<Config extends Record<string, unknown>> = Prettify<{
 	name?: ThemeName;
 	entrypoint?: string;
 	srcDir?: string;
@@ -41,8 +35,8 @@ export type AuthorOptions<Config extends ConfigDefault> = Prettify<{
 	modules?: ModuleOptions | undefined;
 }>;
 
-export type UserOptions<Config extends ConfigDefault> = Prettify<{
+export type UserOptions<Config extends Record<string, unknown>> = Prettify<{
 	config: Config;
-	pages?: AstroThemePagesOptions<ThemeName> | undefined;
+	pages?: AstroThemePagesOverridesOptions<ThemeName> | undefined;
 	overrides?: AstroThemeModulesOptions<ThemeName> | undefined;
 }>;
