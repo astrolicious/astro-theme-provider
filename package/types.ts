@@ -25,17 +25,17 @@ export interface PackageJSONOptions {
 		  };
 }
 
-export type AuthorOptions<Config extends Record<string, unknown>> = Prettify<{
+export type AuthorOptions<Config extends z.ZodTypeAny> = Prettify<{
 	name?: ThemeName;
 	entrypoint?: string;
 	srcDir?: string;
 	publicDir?: string | StaticDirOption;
 	pageDir?: string | PageDirOption;
-	schema: z.ZodSchema<Config>;
-	modules?: ModuleOptions | undefined;
+	schema?: z.infer<Config>;
+	modules?: ModuleOptions;
 }>;
 
-export type UserOptions<Config extends Record<string, unknown>> = Prettify<{
+export type UserOptions<Config extends z.ZodTypeAny> = Prettify<{
 	config: Config;
 	pages?: AstroThemePagesOverridesOptions<ThemeName> | undefined;
 	overrides?: AstroThemeModulesOptions<ThemeName> | undefined;
