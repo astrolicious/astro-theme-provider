@@ -10,47 +10,16 @@ import { z } from "astro/zod";
 import callsites from "callsites";
 // @ts-ignore
 import validatePackageName from "validate-npm-package-name";
-import type { AuthorOptions, ModuleOptions, UserOptions } from "./types";
+import type { AuthorOptions, UserOptions } from "./types";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./utils/consts.ts";
 import { errorMap } from "./utils/error-map.ts";
 import { PackageJSON, warnThemePackage } from "./utils/package.ts";
 import { addLeadingSlash, normalizePath, stringToDirectory, stringToFilepath, validatePattern } from "./utils/path.ts";
 import { getVirtualModuleTypes, globToModuleObject, virtualModuleObject } from "./utils/virtual.ts";
+import { mergeOptions } from "./utils/options.ts";
 
 const thisFile = stringToFilepath("./", import.meta.url);
 const thisRoot = stringToDirectory("./", thisFile);
-
-function mergeOptions(target: Record<any, any>, source: Record<any, any>) {
-	const merge = { ...target };
-
-	for (const key in source) {
-		const value = source[key];
-
-		if (typeof value === "object" && value !== null) {
-			if (
-				typeof merge[key] === "object" &&
-				merge[key] !== null &&
-				// Skip zod schemas
-				!("_def" in value && "parse" in value && "safeParse" in value)
-			) {
-				// Combine object values
-				merge[key] = mergeOptions(merge[key], value);
-				continue;
-			}
-
-			if (Array.isArray(value) && Array.isArray(merge[key])) {
-				// Combine array values
-				merge[key].push(...value);
-				continue;
-			}
-		}
-
-		// Overwrite all other values
-		merge[key] = value;
-	}
-
-	return Object.assign(target, merge);
-}
 
 export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: AuthorOptions<Config>) {
 	// Theme package entrypoint (/package/index.ts)
@@ -103,7 +72,7 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	const themePackage = new PackageJSON(themeRoot);
 
 	// Assign theme name
-	const themeName = themePackage.json.name || authorOptions.name || "my-theme";
+	const themeName = themePackage.json.name || authorOptions.name;
 
 	// Validate that the theme name is a valid package name
 	const isValidName = validatePackageName(themeName);
@@ -140,7 +109,7 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 				},
 				"astro:config:setup": ({ command, config, logger, updateConfig, addWatchFile, injectRoute }) => {
 					const virtualImports: Record<string, string> = {
-						[themeName + "/config"]: `export default ${JSON.stringify(userConfig)}`,
+						[`${themeName}/config`]: `export default ${JSON.stringify(userConfig)}`,
 					};
 
 					const moduleBuffers: Record<string, string> = {
@@ -227,9 +196,9 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						}
 
 						const moduleName = normalizePath(join(themeName, name));
-						const moduleRoot = normalizePath(resolve(themeRoot, name));
+						const moduleRoot = normalizePath(resolve(themeSrc, name));
 
-						let virtualModule = {} as ReturnType<typeof virtualModuleObject>;
+						let virtualModule: ReturnType<typeof virtualModuleObject> | null = null;
 
 						if (typeof path === "string") {
 							virtualModule = virtualModuleObject(moduleName, globToModuleObject(moduleRoot, path));
@@ -243,7 +212,7 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							}
 						}
 
-						if (!virtualModule?.name) continue;
+						if (!virtualModule) continue;
 
 						let typesObjectContent = getVirtualModuleTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
 						let typesModuleContent = getVirtualModuleTypes(
