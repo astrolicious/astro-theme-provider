@@ -49,17 +49,17 @@ function mergeOptions(target: Record<any, any>, source: Record<any, any>) {
 		merge[key] = value;
 	}
 
-	return Object.assign(target, merge)
+	return Object.assign(target, merge);
 }
 
 export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: AuthorOptions<Config>) {
 	// Theme package entrypoint (/package/index.ts)
 	const themeEntrypoint = callsites()
 		.reverse()
-		.map(callsite => (callsite as NodeJS.CallSite).getScriptNameOrSourceURL())
+		.map((callsite) => (callsite as NodeJS.CallSite).getScriptNameOrSourceURL())
 		// Assume the first path before `file://` path is the entrypoint
-		.find(path => path && !path.startsWith("file://") && path !== thisFile)!
-	
+		.find((path) => path && !path.startsWith("file://") && path !== thisFile)!;
+
 	// Theme package root (/package)
 	const themeRoot = stringToDirectory("./", themeEntrypoint);
 
@@ -93,7 +93,7 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	// Force options
 	mergeOptions(authorOptions, {
 		pageDir: { cwd: themeRoot },
-		publicDir: { cwd: themeRoot }
+		publicDir: { cwd: themeRoot },
 	});
 
 	// Theme source dir (/package/src)

@@ -1,39 +1,35 @@
 {
-  "name": "astro-theme-provider",
-  "version": "0.0.3",
-  "description": "Easily create theme integrations for Astro",
-  "keywords": [
-    "astro",
-    "withastro",
-    "astro-integration"
-  ],
-  "author": "Bryce Russell",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/brycerussell/astro-theme-provider",
-    "directory": "packages/astro-theme-provider"
-  },
-  "bugs": "https://github.com/brycerussell/astro-theme-provider/issues",
-  "homepage": "https://github.com/brycerussell/astro-theme-provider",
-  "scripts": {},
-  "type": "module",
-  "exports": {
-    ".": "./index.ts",
-    "./types": "./types.ts"
-  },
-  "peerDependencies": {
-    "astro": ">=3"
-  },
-  "devDependencies": {
-    "@types/node": "^20.11.28"
-  },
-  "dependencies": {
-    "astro-integration-kit": "^0.6.0",
-    "astro-pages": "^0.2.1",
-    "astro-public": "^0.0.4",
-    "callsites": "^4.1.0",
-    "fast-glob": "^3.3.2",
-    "validate-npm-package-name": "^5.0.0"
-  }
+	"name": "astro-theme-provider",
+	"version": "0.0.3",
+	"description": "Easily create theme integrations for Astro",
+	"keywords": ["astro", "withastro", "astro-integration"],
+	"author": "Bryce Russell",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/brycerussell/astro-theme-provider",
+		"directory": "packages/astro-theme-provider"
+	},
+	"bugs": "https://github.com/brycerussell/astro-theme-provider/issues",
+	"homepage": "https://github.com/brycerussell/astro-theme-provider",
+	"scripts": {},
+	"type": "module",
+	"exports": {
+		".": "./index.ts",
+		"./types": "./types.ts"
+	},
+	"peerDependencies": {
+		"astro": ">=3"
+	},
+	"devDependencies": {
+		"@types/node": "^20.11.28"
+	},
+	"dependencies": {
+		"astro-integration-kit": "^0.6.0",
+		"astro-pages": "^0.2.1",
+		"astro-public": "^0.0.4",
+		"callsites": "^4.1.0",
+		"fast-glob": "^3.3.2",
+		"validate-npm-package-name": "^5.0.0"
+	}
 }
