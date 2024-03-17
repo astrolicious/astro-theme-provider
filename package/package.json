@@ -20,7 +20,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^20.11.26",
-		"astro": "^4.5.2",
+		"astro": "^4.5.5",
 		"astro-integration-kit": "^0.5.1",
 		"fast-glob": "^3.3.2"
 	},
