@@ -6,13 +6,13 @@ import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOp
 import staticDir from "astro-public";
 import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
+import { z } from "astro/zod";
 import callsites from "callsites";
 // @ts-ignore
 import validatePackageName from "validate-npm-package-name";
-import { type AuthorOptions, type ConfigDefault, type ModuleOptions, type UserOptions } from "./types";
+import type { AuthorOptions, ModuleOptions, UserOptions } from "./types";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./utils/consts.ts";
 import { errorMap } from "./utils/error-map.ts";
-import { tryToCreateDirectory } from "./utils/fs.ts";
 import { PackageJSON, warnThemePackage } from "./utils/package.ts";
 import { addLeadingSlash, normalizePath, stringToDirectory, stringToFilepath, validatePattern } from "./utils/path.ts";
 import { getVirtualModuleTypes, globToModuleObject, virtualModuleObject } from "./utils/virtual.ts";
@@ -20,49 +20,84 @@ import { getVirtualModuleTypes, globToModuleObject, virtualModuleObject } from "
 const thisFile = stringToFilepath("./", import.meta.url);
 const thisRoot = stringToDirectory("./", thisFile);
 
-export default function <Config extends ConfigDefault>(authorOptions: AuthorOptions<Config>) {
-	// Handle defaults
+function mergeOptions(target: Record<any, any>, source: Record<any, any>) {
+	const merge = { ...target };
 
-	authorOptions.srcDir ||= "src";
+	for (const key in source) {
+		const value = source[key];
 
-	authorOptions.pageDir ||= "pages";
+		if (typeof value === "object" && value !== null) {
+			if (
+				typeof merge[key] === "object" &&
+				merge[key] !== null &&
+				// Skip zod schemas
+				!("_def" in value && "parse" in value && "safeParse" in value)
+			) {
+				// Combine object values
+				merge[key] = mergeOptions(merge[key], value);
+				continue;
+			}
+
+			if (Array.isArray(value) && Array.isArray(merge[key])) {
+				// Combine array values
+				merge[key].push(...value);
+				continue;
+			}
+		}
+
+		// Overwrite all other values
+		merge[key] = value;
+	}
+
+	return Object.assign(target, merge)
+}
+
+export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: AuthorOptions<Config>) {
+	// Theme package entrypoint (/package/index.ts)
+	const themeEntrypoint = callsites()
+		.reverse()
+		.map(callsite => (callsite as NodeJS.CallSite).getScriptNameOrSourceURL())
+		// Assume the first path before `file://` path is the entrypoint
+		.find(path => path && !path.startsWith("file://") && path !== thisFile)!
+	
+	// Theme package root (/package)
+	const themeRoot = stringToDirectory("./", themeEntrypoint);
+
+	// Default options
+	const authorOptions = {
+		name: "my-theme",
+		entrypoint: themeEntrypoint,
+		srcDir: "src",
+		pageDir: "pages",
+		publicDir: "public",
+		schema: z.record(z.any()),
+		modules: {
+			css: GLOB_CSS,
+			assets: GLOB_IMAGES,
+			layouts: GLOB_ASTRO,
+			components: GLOB_COMPONENTS,
+		},
+	} as Required<AuthorOptions<Config>>;
 
 	if (typeof authorOptions.pageDir === "string") {
 		authorOptions.pageDir = { dir: authorOptions.pageDir } as PageDirOption;
 	}
 
-	authorOptions.publicDir ||= "public";
-
 	if (typeof authorOptions.publicDir === "string") {
 		authorOptions.publicDir = { dir: authorOptions.publicDir } as PublicDirOption;
 	}
 
-	if (!authorOptions.entrypoint) {
-		// Assume the first path before `file://` URL is the theme package's entrypoint
-		for (const callsite of callsites().reverse()) {
-			const file = (callsite as NodeJS.CallSite).getScriptNameOrSourceURL();
-			if (file && !file.startsWith("file://") && file !== thisFile) {
-				authorOptions.entrypoint = file;
-				break;
-			}
-		}
-	}
+	// Merge author options with default options
+	mergeOptions(authorOptions, partialAuthorOptions);
 
-	// Theme package entrypoint (/package/index.ts)
-	const themeEntrypoint = stringToFilepath("./", authorOptions.entrypoint!);
-
-	// Theme package root (/package)
-	const themeRoot = stringToDirectory("./", themeEntrypoint);
-
-	// Force relative paths to resolve relative to theme root
-	Object.assign(authorOptions.pageDir, { cwd: themeRoot });
-	Object.assign(authorOptions.publicDir, { cwd: themeRoot });
+	// Force options
+	mergeOptions(authorOptions, {
+		pageDir: { cwd: themeRoot },
+		publicDir: { cwd: themeRoot }
+	});
 
 	// Theme source dir (/package/src)
-	const themeSrc = stringToDirectory(themeRoot, authorOptions.srcDir, false);
-
-	// Create theme src if it doesnt exist
-	tryToCreateDirectory(themeSrc);
+	const themeSrc = stringToDirectory(themeRoot, authorOptions.srcDir);
 
 	// Theme `package.json`
 	const themePackage = new PackageJSON(themeRoot);
@@ -80,11 +115,6 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 		);
 	}
 
-	// Will be assigned value when 'astro:config:setup' hook runs
-	let srcDir: string;
-	let publicDir: string;
-	let outDir: string;
-
 	return (userOptions: UserOptions<Config>): AstroIntegration => {
 		const parsed = authorOptions.schema.safeParse(userOptions.config, { errorMap });
 
@@ -97,6 +127,8 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 
 		const userConfig = parsed.data;
 
+		userOptions.config = userConfig;
+
 		return {
 			name: themeName,
 			hooks: {
@@ -107,10 +139,6 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
 				"astro:config:setup": ({ command, config, logger, updateConfig, addWatchFile, injectRoute }) => {
-					srcDir = stringToDirectory("./", config.srcDir.toString());
-					publicDir = stringToDirectory("./", config.publicDir.toString());
-					outDir = stringToDirectory("./", config.outDir.toString());
-
 					const moduleBuffers: Record<string, string> = {};
 
 					const virtualImports: Record<string, string> = {
