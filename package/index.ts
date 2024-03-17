@@ -15,13 +15,13 @@ import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./utils/cons
 import { errorMap } from "./utils/error-map.ts";
 import { PackageJSON, warnThemePackage } from "./utils/package.ts";
 import { addLeadingSlash, normalizePath, stringToDirectory, stringToFilepath, validatePattern } from "./utils/path.ts";
-import { getVirtualModuleTypes, globToModuleObject, virtualModuleObject } from "./utils/virtual.ts";
+import { convertToModuleObject, getVirtualModuleTypes, globToModuleObject, virtualModuleObject } from "./utils/virtual.ts";
 import { mergeOptions } from "./utils/options.ts";
 
 const thisFile = stringToFilepath("./", import.meta.url);
 const thisRoot = stringToDirectory("./", thisFile);
 
-export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: AuthorOptions<Config>) {
+export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: AuthorOptions<Schema>) {
 	// Theme package entrypoint (/package/index.ts)
 	const themeEntrypoint = callsites()
 		.reverse()
@@ -46,7 +46,7 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 			layouts: GLOB_ASTRO,
 			components: GLOB_COMPONENTS,
 		},
-	} as Required<AuthorOptions<Config>>;
+	} as Required<AuthorOptions<z.ZodRecord<z.ZodTypeAny>>>;
 
 	if (typeof authorOptions.pageDir === "string") {
 		authorOptions.pageDir = { dir: authorOptions.pageDir } as PageDirOption;
@@ -84,7 +84,7 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 		);
 	}
 
-	return (userOptions: UserOptions<Config>): AstroIntegration => {
+	return (userOptions: UserOptions<Schema>): AstroIntegration => {
 		const parsed = authorOptions.schema.safeParse(userOptions.config, { errorMap });
 
 		if (!parsed.success) {
@@ -187,8 +187,8 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					*/
 
 					// Dynamically create virtual modules using globs, imports, or exports
-					for (const [name, path] of Object.entries(authorOptions.modules)) {
-						if (!path) continue;
+					for (let [name, option] of Object.entries(authorOptions.modules)) {
+						if (!option) continue;
 
 						if (["config", "pages", "public", "content", "db"].includes(name)) {
 							logger.warn(`Export name '${name}' is reserved for the built in virtual import '${themeName}/${name}'`);
@@ -198,19 +198,11 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						const moduleName = normalizePath(join(themeName, name));
 						const moduleRoot = normalizePath(resolve(themeSrc, name));
 
-						let virtualModule: ReturnType<typeof virtualModuleObject> | null = null;
-
-						if (typeof path === "string") {
-							virtualModule = virtualModuleObject(moduleName, globToModuleObject(moduleRoot, path));
+						if (typeof option === "string") {
+							option = globToModuleObject(moduleRoot, option)
 						}
 
-						if (typeof path === "object") {
-							if (Array.isArray(path)) {
-								virtualModule = virtualModuleObject(moduleName, { imports: path });
-							} else {
-								virtualModule = virtualModuleObject(moduleName, { exports: path });
-							}
-						}
+						const virtualModule = virtualModuleObject(moduleName, convertToModuleObject(option));
 
 						if (!virtualModule) continue;
 

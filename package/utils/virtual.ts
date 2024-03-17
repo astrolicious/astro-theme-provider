@@ -5,29 +5,31 @@ import { CSS_FORMATS, GLOB_IGNORE, IMAGE_FORMATS } from "./consts.ts";
 
 // const resolveUserId = (id: string, base = "./") => (id.startsWith(".") ? resolve(srcDir, id) : id);
 
-type ModuleImports = (ModuleImports | string | false | null | undefined)[];
+export type ImportOption = string | false | null | undefined
 
-interface ModuleExports {
-	[name: string]: string | false | null | undefined;
+export type ModuleImports = (ImportOption | ModuleImports)[];
+
+export interface ModuleExports {
+	[name: string]: ImportOption;
 }
 
-type ResolvedModuleImports = string[];
+export type ResolvedModuleImports = string[];
 
-interface ResolvedModuleExports {
+export interface ResolvedModuleExports {
 	[name: string]: string;
 }
 
-interface ModuleObject {
+export interface ModuleObject {
 	imports?: ModuleImports;
 	exports?: ModuleExports;
 }
 
-interface ResolvedModuleObject {
+export interface ResolvedModuleObject {
 	imports: ResolvedModuleImports;
 	exports: ResolvedModuleExports;
 }
 
-interface VirtualModule {
+export interface VirtualModule {
 	name: string;
 	imports: ResolvedModuleImports;
 	exports: ResolvedModuleExports;
@@ -80,6 +82,19 @@ export function resolveExportObject(exports: ModuleExports): ResolvedModuleExpor
 	}
 
 	return resolved;
+}
+
+export function convertToModuleObject(option: ModuleImports | ModuleExports | ModuleObject): ModuleObject {
+	if (Array.isArray(option)) {
+		option = { imports: option, exports: {} }
+	}
+
+	const { 
+		imports = [], 
+		exports = option as ModuleExports
+	} = option as ModuleObject
+	
+	return { imports, exports }
 }
 
 export function globToModuleObject(cwd: string, glob: string | string[]): ModuleObject {
