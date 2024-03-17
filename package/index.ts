@@ -139,10 +139,12 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
 				"astro:config:setup": ({ command, config, logger, updateConfig, addWatchFile, injectRoute }) => {
-					const moduleBuffers: Record<string, string> = {};
-
 					const virtualImports: Record<string, string> = {
 						[themeName + "/config"]: `export default ${JSON.stringify(userConfig)}`,
+					};
+
+					const moduleBuffers: Record<string, string> = {
+						[`${themeName}/config`]: "\nconst config: ThemeConfig;\nexport default config;",
 					};
 
 					const interfaceBuffers = {
@@ -179,11 +181,6 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						declare type AstroThemePagesOverridesOptions<Name extends keyof AstroThemePagesAuthored> = Prettify<Partial<Record<keyof AstroThemePagesAuthored[Name], string | boolean>>>
 
 						declare type AstroThemePagesInjected = AstroThemePagesOverrides & AstroThemePagesAuthored
-						
-						declare module "${themeName}/config" {
-							const config: ThemeConfig;
-							export default config;
-						}
 					`;
 
 					// Warn about issues with theme's `package.json`
@@ -313,12 +310,14 @@ export default function <Config extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 					*/
 
-					// Initialize route injection
-					const { pages, injectPages } = addPageDir({
+					const pageDirOption = {
 						...(authorOptions.pageDir as PageDirOption),
 						config,
 						logger,
-					} as PageDirIntegrationOption);
+					} as PageDirIntegrationOption;
+
+					// Initialize route injection
+					const { pages, injectPages } = addPageDir(pageDirOption);
 
 					userOptions.pages ||= {} as NonNullable<typeof userOptions.pages>;
 
