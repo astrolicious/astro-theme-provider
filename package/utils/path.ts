@@ -48,7 +48,7 @@ export function stringToDirectory(base: string, path: string, safe = true): stri
 	}
 
 	if (!isAbsolute(path)) {
-		path = resolve(base, path);
+		path = resolve(stringToDirectory("./", base), path);
 	}
 
 	if (extname(path)) {
