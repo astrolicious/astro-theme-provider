@@ -24,18 +24,18 @@ export interface PackageJSONOptions {
 		  };
 }
 
-export type AuthorOptions<Config extends z.ZodTypeAny> = Prettify<{
+export type AuthorOptions<Schema extends z.ZodTypeAny> = Prettify<{
 	name?: ThemeName;
 	entrypoint?: string;
 	srcDir?: string;
 	publicDir?: string | StaticDirOption;
 	pageDir?: string | PageDirOption;
-	schema?: z.infer<Config>;
+	schema?: Schema;
 	modules?: Record<string, string | ModuleImports | ModuleExports | ModuleObject>;
 }>;
 
-export type UserOptions<Config extends z.ZodTypeAny> = Prettify<{
-	config: Config;
+export type UserOptions<Schema extends z.ZodTypeAny> = Prettify<{
+	config: z.infer<Schema>;
 	pages?: AstroThemePagesOverridesOptions<ThemeName> | undefined;
 	overrides?: AstroThemeModulesOptions<ThemeName> | undefined;
 }>;
