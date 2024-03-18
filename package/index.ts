@@ -27,12 +27,12 @@ import {
 } from "./utils/path.ts";
 import {
 	convertToModuleObject,
+	createVirtualModule,
 	getModuleObjectTypes,
 	globToModuleObject,
 	isEmptyModuleOption,
 	mergeIntoModuleObject,
 	resolveModuleObject,
-	createVirtualModule,
 } from "./utils/virtual.ts";
 
 const thisFile = stringToFilepath("./", import.meta.url);

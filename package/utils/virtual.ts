@@ -24,7 +24,7 @@ export interface ModuleObject {
 }
 
 export interface ResolvedModuleObject extends ModuleObject {
-	resolved: true,
+	resolved: true;
 	imports: ResolvedModuleImports;
 	exports: ResolvedModuleExports;
 }
@@ -133,14 +133,17 @@ export function createVirtualModule(name: string, module: ModuleObject): Virtual
 	};
 }
 
-export function mergeIntoModuleObject<T extends S, S extends ModuleObject | ResolvedModuleObject | VirtualModule>(target: T, source: S): T {
+export function mergeIntoModuleObject<T extends S, S extends ModuleObject | ResolvedModuleObject | VirtualModule>(
+	target: T,
+	source: S,
+): T {
 	if (!(source as ResolvedModuleObject)?.resolved) {
-		source = resolveModuleObject(source) as S
+		source = resolveModuleObject(source) as S;
 	}
 
 	target = mergeOptions(target, source) as T;
 
-	if ('content' in target) {
+	if ("content" in target) {
 		target.content = getModuleContent(target);
 	}
 
