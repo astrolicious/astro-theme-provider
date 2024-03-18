@@ -117,9 +117,9 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					};
 
 					const interfaceBuffers = {
-						AstroThemeImports: "",
-						AstroThemeImportOverrides: "",
-						AstroThemeImportsResolved: "",
+						AstroThemeExports: "",
+						AstroThemeExportOverrides: "",
+						AstroThemeExportsResolved: "",
 						AstroThemePagesAuthored: "",
 						AstroThemePagesOverrides: "",
 					};
@@ -136,9 +136,9 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							"${themeName}": ThemeConfig
 						}
 
-						declare type GetAstroThemeImports<Name extends keyof AstroThemeConfigs> = AstroThemeImports[Name]
+						declare type GetAstroThemeExports<Name extends keyof AstroThemeConfigs> = AstroThemeExports[Name]
 
-						declare type AstroThemeImportOverrideOptions<Name extends keyof AstroThemeConfigs, Imports = GetAstroThemeImports<Name>> = {
+						declare type AstroThemeExportOverrideOptions<Name extends keyof AstroThemeConfigs, Imports = GetAstroThemeExports<Name>> = {
 							[Module in keyof Imports]?:
 								Imports[Module] extends Record<string, any>
 									? Imports[Module] extends string[]
@@ -210,7 +210,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							({ name, type }) => `\nexport const ${name}: ${type}`,
 						);
 
-						interfaceBuffers["AstroThemeImports"] += `
+						interfaceBuffers["AstroThemeExports"] += `
 							"${name}": ${
 								typesObjectContent
 								? `{\n${typesObjectContent}\n}`
@@ -218,7 +218,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							},
 						`
 
-						const override = userOptions.overrides?.[name as keyof GetAstroThemeImports<ThemeName>]
+						const override = userOptions.overrides?.[name as keyof GetAstroThemeExports<ThemeName>]
 
 						if (override) {
 							const altModuleName = moduleName.replace(/\//, ":");
@@ -231,7 +231,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 								moduleBuffers[altModuleName] = typesModuleContent;
 	
 								if (moduleOverrideTypes) {
-									interfaceBuffers["AstroThemeImportOverrides"] += `
+									interfaceBuffers["AstroThemeExportOverrides"] += `
 										"${name}": {
 											${moduleOverrideTypes}
 										},
@@ -256,7 +256,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						moduleBuffers[moduleName] = typesModuleContent;
 
 						
-						interfaceBuffers["AstroThemeImportsResolved"] += `
+						interfaceBuffers["AstroThemeExportsResolved"] += `
 							"${name}": ${
 								typesObjectContent
 								? `{\n${typesObjectContent}\n}`
