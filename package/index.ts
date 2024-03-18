@@ -194,14 +194,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						updateConfig,
 					});
 
-					/*
-
-					
-							Virtual Imports/Modules/Overrides
-
-
-					*/
-
 					// Dynamically create virtual modules using globs, imports, or exports
 					for (let [name, option] of Object.entries(authorOptions.modules)) {
 						if (!option) continue;
@@ -274,14 +266,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							"${name}": ${typesObjectContent ? `{\n${typesObjectContent}\n}` : "string[]"},
 						`;
 					}
-
-					/*
-					
-
-							Pages/Routing
-
-
-					*/
 
 					const pageDirOption = {
 						...(authorOptions.pageDir as PageDirOption),
