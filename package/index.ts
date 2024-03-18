@@ -1,4 +1,6 @@
+import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
+import type { AstroDbIntegration } from "@astrojs/db/types";
 import type { AstroIntegration } from "astro";
 import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit/utilities";
 import { addPageDir } from "astro-pages";
@@ -102,7 +104,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 		config: userConfigUnparsed,
 		pages: userPages = {},
 		overrides: userOverrides = {},
-	}: UserOptions<Schema>): AstroIntegration => {
+	}: UserOptions<Schema>): AstroIntegration & AstroDbIntegration => {
 		const parsed = authorOptions.schema.safeParse(userConfigUnparsed, { errorMap });
 
 		if (!parsed.success) {
@@ -118,8 +120,8 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 			name: themeName,
 			hooks: {
 				"astro:db:setup": ({ extendDb }) => {
-					const configEntrypoint = resolve(cwd, "db/cofig.ts");
-					const seedEntrypoint = resolve(cwd, "db/seed.ts");
+					const configEntrypoint = resolve(themeRoot, "db/cofig.ts");
+					const seedEntrypoint = resolve(themeRoot, "db/seed.ts");
 					if (existsSync(configEntrypoint)) extendDb({ configEntrypoint });
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
