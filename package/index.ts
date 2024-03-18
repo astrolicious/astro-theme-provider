@@ -84,8 +84,12 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 		);
 	}
 
-	return (userOptions: UserOptions<Schema>): AstroIntegration => {
-		const parsed = authorOptions.schema.safeParse(userOptions.config, { errorMap });
+	return ({
+		config: userConfigUnparsed,
+		pages: userPages = {},
+		overrides: userOverrides = {}
+	}: UserOptions<Schema>): AstroIntegration => {
+		const parsed = authorOptions.schema.safeParse(userConfigUnparsed, { errorMap });
 
 		if (!parsed.success) {
 			throw new AstroError(
@@ -95,8 +99,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 		}
 
 		const userConfig = parsed.data;
-
-		userOptions.config = userConfig
 
 		return {
 			name: themeName,
@@ -218,7 +220,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							},
 						`
 
-						const override = userOptions.overrides?.[name as keyof GetAstroThemeExports<ThemeName>]
+						const override = userOverrides[name as keyof GetAstroThemeExports<ThemeName>]
 
 						if (override) {
 							const altModuleName = moduleName.replace(/\//, ":");
@@ -255,7 +257,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						// Generate types for virtual import
 						moduleBuffers[moduleName] = typesModuleContent;
 
-						
 						interfaceBuffers["AstroThemeExportsResolved"] += `
 							"${name}": ${
 								typesObjectContent
@@ -282,8 +283,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					// Initialize route injection
 					const { pages, injectPages } = addPageDir(pageDirOption);
 
-					userOptions.pages ||= {} as NonNullable<typeof userOptions.pages>;
-
 					// Generate types for possibly injected routes
 					interfaceBuffers["AstroThemePagesAuthored"] += Object.entries(pages).map(
 						([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`,
@@ -293,11 +292,11 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					let pageOverrideBuffer = "";
 
 					// Filter out routes the theme user toggled off
-					for (const oldPattern of Object.keys(userOptions.pages)) {
+					for (const oldPattern of Object.keys(userPages)) {
 						// Skip pages that are not defined by author
 						if (!pages?.[oldPattern!]) continue;
 
-						let newPattern = userOptions.pages[oldPattern as keyof typeof userOptions.pages];
+						let newPattern = userPages[oldPattern as keyof typeof userPages];
 
 						// If user passes falsy value remove the route
 						if (!newPattern) {
@@ -314,12 +313,12 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 									`New: ${newPattern}\nOld: ${oldPattern}`,
 								);
 							}
-							// Remove old pattern
-							delete pages[oldPattern];
 							// Add new pattern
 							pages[newPattern] = pages[oldPattern]!;
 							// Add types to buffer
 							pageOverrideBuffer += `\n"${oldPattern}": "${newPattern}";`;
+							// Remove old pattern
+							delete pages[oldPattern];
 							continue;
 						}
 					}
