@@ -5,6 +5,12 @@ export function mergeOptions(target: Record<any, any>, source: Record<any, any>)
 		const value = source[key];
 
 		if (typeof value === "object" && value !== null) {
+			if (Array.isArray(value) && Array.isArray(merge[key])) {
+				// Combine array values
+				merge[key].push(...value);
+				continue;
+			}
+
 			if (
 				typeof merge[key] === "object" &&
 				merge[key] !== null &&
@@ -15,17 +21,11 @@ export function mergeOptions(target: Record<any, any>, source: Record<any, any>)
 				merge[key] = mergeOptions(merge[key], value);
 				continue;
 			}
-
-			if (Array.isArray(value) && Array.isArray(merge[key])) {
-				// Combine array values
-				merge[key].push(...value);
-				continue;
-			}
 		}
 
 		// Overwrite all other values
 		merge[key] = value;
 	}
 
-	return Object.assign(target, merge);
+	return merge;
 }

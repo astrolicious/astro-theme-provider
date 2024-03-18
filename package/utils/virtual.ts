@@ -23,15 +23,14 @@ export interface ModuleObject {
 	exports?: ModuleExports;
 }
 
-export interface ResolvedModuleObject {
+export interface ResolvedModuleObject extends ModuleObject {
+	resolved: true,
 	imports: ResolvedModuleImports;
 	exports: ResolvedModuleExports;
 }
 
-export interface VirtualModule {
+export interface VirtualModule extends ResolvedModuleObject {
 	name: string;
-	imports: ResolvedModuleImports;
-	exports: ResolvedModuleExports;
 	content: string;
 }
 
@@ -88,6 +87,7 @@ export function resolveExportObject(exports: ModuleExports): ResolvedModuleExpor
 export function resolveModuleObject(module: ModuleObject): ResolvedModuleObject {
 	const { imports = [], exports = {} } = module;
 	return {
+		resolved: true,
 		imports: resolveImportArray(imports),
 		exports: resolveExportObject(exports),
 	};
@@ -124,7 +124,7 @@ export function globToModuleObject(cwd: string, glob: string | string[]): Module
 	};
 }
 
-export function virtualModuleObject(name: string, module: ModuleObject): VirtualModule {
+export function createVirtualModule(name: string, module: ModuleObject): VirtualModule {
 	const resolved = resolveModuleObject(module);
 	return {
 		name,
@@ -133,9 +133,17 @@ export function virtualModuleObject(name: string, module: ModuleObject): Virtual
 	};
 }
 
-export function mergeVirtualModule(target: VirtualModule, source: ResolvedModuleObject) {
-	mergeOptions(target, source);
-	target.content = getModuleContent(target);
+export function mergeIntoModuleObject<T extends S, S extends ModuleObject | ResolvedModuleObject | VirtualModule>(target: T, source: S): T {
+	if (!(source as ResolvedModuleObject)?.resolved) {
+		source = resolveModuleObject(source) as S
+	}
+
+	target = mergeOptions(target, source) as T;
+
+	if ('content' in target) {
+		target.content = getModuleContent(target);
+	}
+
 	return target;
 }
 

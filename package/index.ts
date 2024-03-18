@@ -29,9 +29,10 @@ import {
 	convertToModuleObject,
 	getModuleObjectTypes,
 	globToModuleObject,
-	mergeVirtualModule,
+	isEmptyModuleOption,
+	mergeIntoModuleObject,
 	resolveModuleObject,
-	virtualModuleObject,
+	createVirtualModule,
 } from "./utils/virtual.ts";
 
 const thisFile = stringToFilepath("./", import.meta.url);
@@ -49,7 +50,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	const themeRoot = stringToDirectory("./", themeEntrypoint);
 
 	// Default options
-	const authorOptions = {
+	let authorOptions = {
 		name: "my-theme",
 		entrypoint: themeEntrypoint,
 		srcDir: "src",
@@ -73,16 +74,16 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	}
 
 	// Merge author options with default options
-	mergeOptions(authorOptions, partialAuthorOptions);
+	authorOptions = mergeOptions(authorOptions, partialAuthorOptions) as Required<AuthorOptions<z.ZodRecord>>;
 
 	// Theme source dir (/package/src)
 	const themeSrc = stringToDirectory(themeRoot, authorOptions.srcDir);
 
 	// Force options
-	mergeOptions(authorOptions, {
+	authorOptions = mergeOptions(authorOptions, {
 		pageDir: { cwd: themeSrc },
 		publicDir: { cwd: themeSrc },
-	});
+	}) as Required<AuthorOptions<z.ZodRecord>>;
 
 	// Theme `package.json`
 	const themePackage = new PackageJSON(themeRoot);
@@ -212,7 +213,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							option = globToModuleObject(moduleRoot, option);
 						}
 
-						let virtualModule = virtualModuleObject(moduleName, convertToModuleObject(option));
+						let virtualModule = createVirtualModule(moduleName, convertToModuleObject(option));
 
 						let typesObjectContent = getModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
 						let typesModuleContent = getModuleObjectTypes(
@@ -234,7 +235,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 								({ name, type }) => `\n${name}: ${type}`,
 							);
 
-							if (moduleOverrideTypes) {
+							if (!isEmptyModuleOption(moduleOverride)) {
 								virtualImports[altModuleName] = virtualModule.content;
 
 								moduleBuffers[altModuleName] = typesModuleContent;
@@ -247,7 +248,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 									`;
 								}
 
-								virtualModule = mergeVirtualModule(virtualModule, moduleOverride);
+								virtualModule = mergeIntoModuleObject(virtualModule, moduleOverride);
 							}
 						}
 
@@ -257,7 +258,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							virtualModule,
 							({ name, type }) => `\nexport const ${name}: ${type}`,
 						);
-
 						// Add virtual import
 						virtualImports[moduleName] = virtualModule.content;
 
@@ -268,7 +268,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							"${name}": ${typesObjectContent ? `{\n${typesObjectContent}\n}` : "string[]"},
 						`;
 					}
-
 					const pageDirOption = {
 						...(authorOptions.pageDir as PageDirOption),
 						config,
