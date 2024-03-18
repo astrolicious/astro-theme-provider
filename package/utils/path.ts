@@ -43,7 +43,7 @@ export function normalizePath(path: string) {
 export function normalizePattern(pattern: string) {
 	return removeLeadingAndTrailingSlashes(pattern)
 		.split("/")
-		.map((slug) => (slug.startsWith("[") ? slug : "/"))
+		.map((slug) => (slug.includes("[") ? slug : "/"))
 		.join("");
 }
 
