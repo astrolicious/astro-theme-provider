@@ -1,11 +1,8 @@
 import { basename, extname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import fg from "fast-glob";
 import { CSS_FORMATS, GLOB_IGNORE, IMAGE_FORMATS } from "./consts.ts";
 import { mergeOptions } from "./options.ts";
 import { normalizePath } from "./path.ts";
-
-// const resolveUserId = (id: string, base = "./") => (id.startsWith(".") ? resolve(srcDir, id) : id);
 
 export type ImportOption = string | false | null | undefined
 
@@ -75,12 +72,12 @@ function resolveImportArray(imports: ModuleImports, store?: Set<string>): Resolv
 	return Array.from(store);
 }
 
-export function isEmptyModuleOption(option: ModuleImports | ModuleExports | ModuleObject) {
+export function isEmptyModuleOption(option: ModuleImports | ModuleExports | ModuleObject | VirtualModule): boolean {
 	if (Array.isArray(option)) {
 		option = { imports: option, exports: {} }
 	}
 
-	const { imports = [], exports = {} } = option
+	const { imports = [], exports = option } = option
 
 	return ((!imports || !!imports.length) && (!exports || !!Object.keys(exports).length))
 }
@@ -138,27 +135,22 @@ export function globToModuleObject(cwd: string, glob: string | string[]): Module
 	};
 }
 
-export function virtualModuleObject(name: string, { imports = [], exports = {} }: ModuleObject): VirtualModule {
-	const resolvedExports = resolveExportObject(exports);
-	const resolvedImports = resolveImportArray(imports);
-
+export function virtualModuleObject(name: string, module: ModuleObject): VirtualModule {
+	const resolved = resolveModuleObject(module)
 	return {
 		name,
-		imports: resolvedImports,
-		exports: resolvedExports,
-		content: getModuleContent(resolvedImports, resolvedExports),
+		content: getModuleContent(resolved),
+		...resolved
 	};
 }
 
 export function mergeVirtualModule(target: VirtualModule, source: ResolvedModuleObject) {
-	const { imports, exports } = source
-	target.imports.push(...imports)
-	mergeOptions(target.exports, exports)
-	target.content = getModuleContent(target.imports, target.exports)
+	mergeOptions(target, source)
+	target.content = getModuleContent(target)
 	return target
 }
 
-export function getModuleContent(imports: ResolvedModuleImports, exports: ResolvedModuleExports) {
+export function getModuleContent({ imports, exports }: ResolvedModuleObject | VirtualModule) {
 	return `${getModuleImportsContent(imports)}\n${getModuleExportsContent(exports)}`;
 }
 
