@@ -13,10 +13,24 @@ import validatePackageName from "validate-npm-package-name";
 import type { AuthorOptions, UserOptions } from "./types";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./utils/consts.ts";
 import { errorMap } from "./utils/error-map.ts";
-import { PackageJSON, warnThemePackage } from "./utils/package.ts";
-import { addLeadingSlash, normalizePath, removeTrailingSlash, stringToDirectory, stringToFilepath, validatePattern } from "./utils/path.ts";
-import { convertToModuleObject, getModuleObjectTypes, globToModuleObject, mergeVirtualModule, resolveModuleObject, virtualModuleObject } from "./utils/virtual.ts";
 import { mergeOptions } from "./utils/options.ts";
+import { PackageJSON, warnThemePackage } from "./utils/package.ts";
+import {
+	addLeadingSlash,
+	normalizePath,
+	removeTrailingSlash,
+	stringToDirectory,
+	stringToFilepath,
+	validatePattern,
+} from "./utils/path.ts";
+import {
+	convertToModuleObject,
+	getModuleObjectTypes,
+	globToModuleObject,
+	mergeVirtualModule,
+	resolveModuleObject,
+	virtualModuleObject,
+} from "./utils/virtual.ts";
 
 const thisFile = stringToFilepath("./", import.meta.url);
 const thisRoot = stringToDirectory("./", thisFile);
@@ -61,7 +75,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 	// Theme source dir (/package/src)
 	const themeSrc = stringToDirectory(themeRoot, authorOptions.srcDir);
-	
+
 	// Force options
 	mergeOptions(authorOptions, {
 		pageDir: { cwd: themeSrc },
@@ -87,7 +101,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	return ({
 		config: userConfigUnparsed,
 		pages: userPages = {},
-		overrides: userOverrides = {}
+		overrides: userOverrides = {},
 	}: UserOptions<Schema>): AstroIntegration => {
 		const parsed = authorOptions.schema.safeParse(userConfigUnparsed, { errorMap });
 
@@ -201,7 +215,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						const moduleRoot = normalizePath(resolve(themeSrc, name));
 
 						if (typeof option === "string") {
-							option = globToModuleObject(moduleRoot, option)
+							option = globToModuleObject(moduleRoot, option);
 						}
 
 						let virtualModule = virtualModuleObject(moduleName, convertToModuleObject(option));
@@ -213,25 +227,24 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						);
 
 						interfaceBuffers["AstroThemeExports"] += `
-							"${name}": ${
-								typesObjectContent
-								? `{\n${typesObjectContent}\n}`
-								: 'string[]'
-							},
-						`
+							"${name}": ${typesObjectContent ? `{\n${typesObjectContent}\n}` : "string[]"},
+						`;
 
-						const override = userOverrides[name as keyof GetAstroThemeExports<ThemeName>]
+						const override = userOverrides[name as keyof GetAstroThemeExports<ThemeName>];
 
 						if (override) {
 							const altModuleName = moduleName.replace(/\//, ":");
-							const moduleOverride = resolveModuleObject(convertToModuleObject(override))
-							const moduleOverrideTypes = getModuleObjectTypes(moduleOverride, ({ name, type }) => `\n${name}: ${type}`);
-							
+							const moduleOverride = resolveModuleObject(convertToModuleObject(override));
+							const moduleOverrideTypes = getModuleObjectTypes(
+								moduleOverride,
+								({ name, type }) => `\n${name}: ${type}`,
+							);
+
 							if (moduleOverrideTypes) {
 								virtualImports[altModuleName] = virtualModule.content;
-	
+
 								moduleBuffers[altModuleName] = typesModuleContent;
-	
+
 								if (moduleOverrideTypes) {
 									interfaceBuffers["AstroThemeExportOverrides"] += `
 										"${name}": {
@@ -239,13 +252,13 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 										},
 									`;
 								}
-	
+
 								virtualModule = mergeVirtualModule(virtualModule, moduleOverride);
 							}
 						}
 
 						// Re-generate virtual module types to include user overrides
-						typesObjectContent = getModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`)
+						typesObjectContent = getModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
 						typesModuleContent = getModuleObjectTypes(
 							virtualModule,
 							({ name, type }) => `\nexport const ${name}: ${type}`,
@@ -258,12 +271,8 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						moduleBuffers[moduleName] = typesModuleContent;
 
 						interfaceBuffers["AstroThemeExportsResolved"] += `
-							"${name}": ${
-								typesObjectContent
-								? `{\n${typesObjectContent}\n}`
-								: 'string[]'
-							},
-						`
+							"${name}": ${typesObjectContent ? `{\n${typesObjectContent}\n}` : "string[]"},
+						`;
 					}
 
 					/*
@@ -284,9 +293,9 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					const { pages, injectPages } = addPageDir(pageDirOption);
 
 					// Generate types for possibly injected routes
-					interfaceBuffers["AstroThemePagesAuthored"] += Object.entries(pages).map(
-						([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`,
-					).join('');
+					interfaceBuffers["AstroThemePagesAuthored"] += Object.entries(pages)
+						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
+						.join("");
 
 					// Buffer for AstroThemePagesOverrides interface
 					let pageOverrideBuffer = "";

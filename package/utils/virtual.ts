@@ -4,7 +4,7 @@ import { GLOB_IGNORE } from "./consts.ts";
 import { mergeOptions } from "./options.ts";
 import { isCSSFile, isImageFile, normalizePath } from "./path.ts";
 
-export type ImportOption = string | false | null | undefined
+export type ImportOption = string | false | null | undefined;
 
 export type ModuleImports = (ImportOption | ModuleImports)[];
 
@@ -66,12 +66,12 @@ function resolveImportArray(imports: ModuleImports, store?: Set<string>): Resolv
 
 export function isEmptyModuleOption(option: ModuleImports | ModuleExports | ModuleObject | VirtualModule): boolean {
 	if (Array.isArray(option)) {
-		option = { imports: option, exports: {} }
+		option = { imports: option, exports: {} };
 	}
 
-	const { imports = [], exports = option } = option
+	const { imports = [], exports = option } = option;
 
-	return ((!imports || !!imports.length) && (!exports || !!Object.keys(exports).length))
+	return (!imports || !!imports.length) && (!exports || !!Object.keys(exports).length);
 }
 
 export function resolveExportObject(exports: ModuleExports): ResolvedModuleExports {
@@ -86,24 +86,21 @@ export function resolveExportObject(exports: ModuleExports): ResolvedModuleExpor
 }
 
 export function resolveModuleObject(module: ModuleObject): ResolvedModuleObject {
-	const { imports = [], exports = {} } = module
+	const { imports = [], exports = {} } = module;
 	return {
 		imports: resolveImportArray(imports),
-		exports: resolveExportObject(exports)
-	}
+		exports: resolveExportObject(exports),
+	};
 }
 
 export function convertToModuleObject(option: ModuleImports | ModuleExports | ModuleObject): ModuleObject {
 	if (Array.isArray(option)) {
-		option = { imports: option, exports: {} }
+		option = { imports: option, exports: {} };
 	}
 
-	const { 
-		imports = [], 
-		exports = option as ModuleExports
-	} = option as ModuleObject
-	
-	return { imports, exports }
+	const { imports = [], exports = option as ModuleExports } = option as ModuleObject;
+
+	return { imports, exports };
 }
 
 export function globToModuleObject(cwd: string, glob: string | string[]): ModuleObject {
@@ -128,18 +125,18 @@ export function globToModuleObject(cwd: string, glob: string | string[]): Module
 }
 
 export function virtualModuleObject(name: string, module: ModuleObject): VirtualModule {
-	const resolved = resolveModuleObject(module)
+	const resolved = resolveModuleObject(module);
 	return {
 		name,
 		content: getModuleContent(resolved),
-		...resolved
+		...resolved,
 	};
 }
 
 export function mergeVirtualModule(target: VirtualModule, source: ResolvedModuleObject) {
-	mergeOptions(target, source)
-	target.content = getModuleContent(target)
-	return target
+	mergeOptions(target, source);
+	target.content = getModuleContent(target);
+	return target;
 }
 
 export function getModuleContent({ imports, exports }: ResolvedModuleObject | VirtualModule) {
