@@ -1,5 +1,10 @@
 import type { ZodErrorMap } from "astro/zod";
 
+/**
+ * This is a modified version of Astro's error map. source:
+ * https://github.com/withastro/astro/blob/main/packages/astro/src/content/error-map.ts
+ */
+
 type TypeOrLiteralErrByPathEntry = {
 	code: "invalid_type" | "invalid_literal";
 	received: unknown;
