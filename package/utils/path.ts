@@ -2,6 +2,15 @@ import { existsSync } from "node:fs";
 import { dirname, extname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { AstroError } from "astro/errors";
+import { CSS_FORMATS, IMAGE_FORMATS } from "./consts";
+
+export function isImageFile(path: string): boolean {
+	return IMAGE_FORMATS.includes(extname(path).slice(1).toLowerCase());
+}
+
+export function isCSSFile(path: string): boolean {
+	return CSS_FORMATS.includes(extname(path).slice(1).toLowerCase());
+}
 
 export function removeLeadingSlash(path: string) {
 	return path.replace(/\/+$/, "");

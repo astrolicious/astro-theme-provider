@@ -1,8 +1,8 @@
 import { basename, extname, resolve } from "node:path";
 import fg from "fast-glob";
-import { CSS_FORMATS, GLOB_IGNORE, IMAGE_FORMATS } from "./consts.ts";
+import { GLOB_IGNORE } from "./consts.ts";
 import { mergeOptions } from "./options.ts";
-import { normalizePath } from "./path.ts";
+import { isCSSFile, isImageFile, normalizePath } from "./path.ts";
 
 export type ImportOption = string | false | null | undefined
 
@@ -37,14 +37,6 @@ export interface VirtualModule {
 
 function camelCase(str: string) {
 	return str.replace(/(-|<|>|:|"|\/|\\|\||\?|\*|\s)./g, (x) => x[1]!.toUpperCase());
-}
-
-function isImageFile(path: string): boolean {
-	return IMAGE_FORMATS.includes(extname(path).slice(1).toLowerCase());
-}
-
-function isCSSFile(path: string): boolean {
-	return CSS_FORMATS.includes(extname(path).slice(1).toLowerCase());
 }
 
 function shouldBeNamespaceImport(path: string) {
