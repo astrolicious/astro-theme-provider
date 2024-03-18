@@ -75,6 +75,16 @@ function resolveImportArray(imports: ModuleImports, store?: Set<string>): Resolv
 	return Array.from(store);
 }
 
+export function isEmptyModuleOption(option: ModuleImports | ModuleExports | ModuleObject) {
+	if (Array.isArray(option)) {
+		option = { imports: option, exports: {} }
+	}
+
+	const { imports = [], exports = {} } = option
+
+	return ((!imports || !!imports.length) && (!exports || !!Object.keys(exports).length))
+}
+
 export function resolveExportObject(exports: ModuleExports): ResolvedModuleExports {
 	const resolved: ResolvedModuleExports = {};
 
@@ -174,8 +184,8 @@ export function getModuleExportsContent(exports: ResolvedModuleExports) {
 	return buffer;
 }
 
-export function getVirtualModuleTypes(
-	module: VirtualModule,
+export function getModuleObjectTypes(
+	module: ResolvedModuleObject | VirtualModule,
 	create: ({ name, path, type }: { name: string; path: string; type: string }) => string,
 ) {
 	let buffer = "";
