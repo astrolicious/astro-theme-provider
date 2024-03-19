@@ -51,13 +51,13 @@ export function validatePattern(newPattern: string, oldPattern: string) {
 	return normalizePattern(newPattern) === normalizePattern(oldPattern);
 }
 
-export function stringToDirectory(base: string, path: string, safe = true): string {
+export function resolveDirectory(base: string, path: string, safe = true): string {
 	if (path.startsWith("file:/")) {
 		path = fileURLToPath(path);
 	}
 
 	if (!isAbsolute(path)) {
-		path = resolve(stringToDirectory("./", base), path);
+		path = resolve(resolveDirectory("./", base), path);
 	}
 
 	if (extname(path)) {
@@ -71,13 +71,13 @@ export function stringToDirectory(base: string, path: string, safe = true): stri
 	return path;
 }
 
-export function stringToFilepath(base: string, path: string, safe = true): string {
+export function resolveFilepath(base: string, path: string, safe = true): string {
 	if (path.startsWith("file:/")) {
 		path = fileURLToPath(path);
 	}
 
 	if (!isAbsolute(path)) {
-		path = resolve(stringToDirectory("./", base), path);
+		path = resolve(resolveDirectory("./", base), path);
 	}
 
 	if (safe) {

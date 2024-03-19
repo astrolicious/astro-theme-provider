@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import type { HookParameters } from "astro";
 import { AstroError } from "astro/errors";
 import type { PackageJSONOptions } from "../types";
-import { stringToFilepath } from "./path";
+import { resolveFilepath } from "./path";
 
 export class PackageJSON {
 	path: string;
@@ -10,9 +10,9 @@ export class PackageJSON {
 
 	constructor(path: string) {
 		if (path.endsWith("package.json")) {
-			this.path = stringToFilepath("./", path);
+			this.path = resolveFilepath("./", path);
 		} else {
-			this.path = stringToFilepath(path, "package.json");
+			this.path = resolveFilepath(path, "package.json");
 		}
 		this.read();
 	}
@@ -77,7 +77,7 @@ export function warnThemePackage(pkg: PackageJSON, logger: HookParameters<"astro
 		}
 
 		// Warn theme author if package does not have a README
-		if (!existsSync(stringToFilepath(pkg.path, "README.md"))) {
+		if (!existsSync(resolveFilepath(pkg.path, "README.md"))) {
 			logger.warn(
 				`Add a 'README.md' to the root of your theme's package!\tNPM uses this file to populate the package page https://www.npmjs.com/package/${pkg.json.name}\n`,
 			);
