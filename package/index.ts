@@ -107,10 +107,9 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 		pages: userPages = {},
 		overrides: userOverrides = {},
 	}: UserOptions<Schema>): AstroIntegration | AstroDbIntegration => {
-
 		// Parse/validate config passed by user, throw formatted error if it is invalid
 		const parsed = authorOptions.schema.safeParse(userConfigUnparsed, { errorMap });
-		
+
 		if (!parsed.success) {
 			throw new AstroError(
 				`Invalid configuration passed to '${themeName}' integration\n`,
@@ -244,7 +243,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						if (override) {
 							const moduleOverride = resolveModuleObject(convertToModuleObject(override));
 							if (!isEmptyModuleObject(moduleOverride)) {
-
 								const altModuleName = moduleName.replace(/\//, ":");
 								const moduleOverrideTypes = generateModuleObjectTypes(
 									moduleOverride,
