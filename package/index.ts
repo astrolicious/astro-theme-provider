@@ -202,7 +202,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						if (!option) continue;
 
 						if (["config", "pages", "public", "content", "db"].includes(name)) {
-							logger.warn(`Export name '${name}' is reserved for the built in virtual import '${themeName}/${name}'`);
+							logger.warn(`Module name '${name}' is reserved for the built in virtual import '${themeName}/${name}'`);
 							continue;
 						}
 
