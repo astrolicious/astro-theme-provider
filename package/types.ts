@@ -1,5 +1,7 @@
 import type { Option as PageDirOption } from "astro-pages/types";
+import type { Option as StaticDirOption } from "astro-public/types";
 import type { z } from "astro/zod";
+import type { ModuleExports, ModuleImports, ModuleObject } from "./utils/virtual";
 
 export type ValueOrArray<T> = T | ValueOrArray<T>[];
 
@@ -7,11 +9,7 @@ export type NestedStringArray = ValueOrArray<string>;
 
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
-export type ConfigDefault = Record<string, unknown>;
-
-export type ModuleOptions = Record<string, undefined | null | false | string | string[] | Record<string, string>>;
-
-export interface PackageJSON {
+export interface PackageJSONOptions {
 	private?: boolean;
 	name?: string;
 	description?: string;
@@ -26,22 +24,18 @@ export interface PackageJSON {
 		  };
 }
 
-export interface PublicDirOption {
-	dir?: string | null | undefined;
-	copy?: "before" | "after";
-}
-
-export type AuthorOptions<Config extends ConfigDefault> = Prettify<{
-	entrypoint?: string;
+export type AuthorOptions<Schema extends z.ZodTypeAny> = Prettify<{
 	name?: ThemeName;
-	pages?: string | PageDirOption | undefined;
-	public?: string | PublicDirOption | undefined;
-	schema: z.ZodSchema<Config>;
-	modules?: ModuleOptions | undefined;
+	entrypoint?: string;
+	srcDir?: string;
+	publicDir?: string | StaticDirOption;
+	pageDir?: string | PageDirOption;
+	schema?: Schema;
+	modules?: Record<string, string | ModuleImports | ModuleExports | ModuleObject>;
 }>;
 
-export type UserOptions<Config extends ConfigDefault> = Prettify<{
-	config: Config;
-	pages?: AstroThemePagesOptions<ThemeName> | undefined;
-	overrides?: AstroThemeModulesOptions<ThemeName> | undefined;
+export type UserOptions<Schema extends z.ZodTypeAny> = Prettify<{
+	config: z.infer<Schema>;
+	pages?: AstroThemePagesOverridesOptions<ThemeName> | undefined;
+	overrides?: AstroThemeExportOverrideOptions<ThemeName> | undefined;
 }>;

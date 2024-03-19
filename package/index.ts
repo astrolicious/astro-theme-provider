@@ -1,106 +1,95 @@
-import { cpSync, createReadStream, existsSync, readFileSync } from "node:fs";
-import { dirname, extname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { existsSync } from "node:fs";
+import { join, resolve } from "node:path";
+import type { AstroDbIntegration } from "@astrojs/db/types";
 import type { AstroIntegration } from "astro";
-import { addDts, addVirtualImports, watchIntegration } from "astro-integration-kit/utilities";
+import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit/utilities";
 import { addPageDir } from "astro-pages";
-import type { IntegrationOption as PageIntegrationOption } from "astro-pages/types";
+import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOption } from "astro-pages/types";
+import staticDir from "astro-public";
+import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
+import { z } from "astro/zod";
 import callsites from "callsites";
 // @ts-ignore
 import validatePackageName from "validate-npm-package-name";
-import type { AuthorOptions, ConfigDefault, ModuleOptions, PackageJSON, PublicDirOption, UserOptions } from "./types";
+import type { AuthorOptions, UserOptions } from "./types";
+import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./utils/consts.ts";
+import { errorMap } from "./utils/error-map.ts";
+import { mergeOptions } from "./utils/options.ts";
+import { PackageJSON, warnThemePackage } from "./utils/package.ts";
 import {
-	GLOB_ASTRO,
-	GLOB_COMPONENTS,
-	GLOB_CSS,
-	GLOB_IMAGES,
-	LineBuffer,
-	camelCase,
-	createDtsBuffer,
-	createResolver,
-	errorMap,
-	globToModule,
-	isAbsoluteFile,
-	isCSSFile,
-	isImageFile,
+	addLeadingSlash,
+	normalizePath,
+	removeTrailingSlash,
+	resolveDirectory,
+	resolveFilepath,
 	validatePattern,
-	wrapWithBrackets,
-} from "./utils";
+} from "./utils/path.ts";
+import {
+	convertToModuleObject,
+	createVirtualModule,
+	generateModuleObjectTypes,
+	globToModuleObject,
+	isEmptyModuleObject,
+	mergeIntoModuleObject,
+	resolveModuleObject,
+} from "./utils/virtual.ts";
 
-const thisFile = fileURLToPath(import.meta.url);
+const thisFile = resolveFilepath("./", import.meta.url);
+const thisRoot = resolveDirectory("./", thisFile);
 
-export default function <Config extends ConfigDefault>(authorOptions: AuthorOptions<Config>) {
-	if (!authorOptions.entrypoint) {
-		// Loop over reversed stack traces
-		// Get file path of trace
-		// Assign first non Vite `file://` path as entrypoint (assume it is a theme's `index.ts`)
-		for (const callsite of callsites().reverse()) {
-			const file = (callsite as NodeJS.CallSite).getScriptNameOrSourceURL();
-			if (file && isAbsoluteFile(file) && file !== thisFile) {
-				authorOptions.entrypoint = file;
-				break;
-			}
-		}
+export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: AuthorOptions<Schema>) {
+	// Theme package entrypoint (/package/index.ts)
+	const themeEntrypoint = callsites()
+		.reverse()
+		.map((callsite) => (callsite as NodeJS.CallSite).getScriptNameOrSourceURL())
+		// Assume the first path before `file://` path is the entrypoint
+		.find((path) => path && !path.startsWith("file://") && path !== thisFile)!;
+
+	// Theme package root (/package)
+	const themeRoot = resolveDirectory("./", themeEntrypoint);
+
+	// Default options
+	let authorOptions = {
+		name: "my-theme",
+		entrypoint: themeEntrypoint,
+		srcDir: "src",
+		pageDir: "pages",
+		publicDir: "public",
+		schema: z.record(z.any()),
+		modules: {
+			css: GLOB_CSS,
+			assets: GLOB_IMAGES,
+			layouts: GLOB_ASTRO,
+			components: GLOB_COMPONENTS,
+		},
+	} as Required<AuthorOptions<z.ZodRecord>>;
+
+	if (typeof authorOptions.pageDir === "string") {
+		authorOptions.pageDir = { dir: authorOptions.pageDir } as PageDirOption;
 	}
 
-	// Will be assigned value when 'astro:config:setup' hook runs
-	let srcDir: string;
-	let publicDir: string;
-	let outDir: string;
-
-	const { base: cwd, toAbsolute, toAbsoluteDir, toAbsoluteFileSafe } = createResolver(authorOptions.entrypoint);
-
-	// Theme's `index.ts`
-	const entrypoint = toAbsoluteFileSafe(authorOptions.entrypoint);
-
-	// Defaults for 'public' folder
-	const publicOptions: PublicDirOption = {
-		copy: "before",
-	};
-
-	// If public option is string, turn it into object
-	if (!authorOptions.public || typeof authorOptions.public === "string") {
-		authorOptions.public = {
-			dir: authorOptions.public,
-		};
+	if (typeof authorOptions.publicDir === "string") {
+		authorOptions.publicDir = { dir: authorOptions.publicDir } as PublicDirOption;
 	}
 
-	// Override defaults with author options
-	Object.assign(publicOptions, authorOptions.public);
+	// Merge author options with default options
+	authorOptions = mergeOptions(authorOptions, partialAuthorOptions) as Required<AuthorOptions<z.ZodRecord>>;
 
-	// Get public directory
+	// Theme source dir (/package/src)
+	const themeSrc = resolveDirectory(themeRoot, authorOptions.srcDir);
 
-	const staticDir = toAbsoluteDir(publicOptions.dir || "public");
+	// Force options
+	authorOptions = mergeOptions(authorOptions, {
+		pageDir: { cwd: themeSrc },
+		publicDir: { cwd: themeSrc },
+	}) as Required<AuthorOptions<z.ZodRecord>>;
 
-	const staticDirExists = (staticDir && existsSync(staticDir)) || false;
+	// Theme `package.json`
+	const themePackage = new PackageJSON(themeRoot);
 
-	// Default virtual modules
-	const moduleOptions: ModuleOptions = {
-		css: GLOB_CSS,
-		assets: GLOB_IMAGES,
-		layouts: GLOB_ASTRO,
-		components: GLOB_COMPONENTS,
-	};
-
-	// Override default module options with author options
-	Object.assign(moduleOptions, authorOptions.modules);
-
-	// Theme's `package.json`
-	const pkgJSON: PackageJSON = {};
-
-	try {
-		// Safely read theme's `package.json` file, parse into Object, assign keys/values to `pkgJSON`
-		Object.assign(pkgJSON, JSON.parse(readFileSync(toAbsoluteFileSafe("package.json"), "utf-8")));
-	} catch (error) {}
-
-	// Assign name from `package.json` as theme name
-	const themeName = pkgJSON.name || authorOptions.name;
-
-	// If no name exists throw an error
-	if (!themeName) {
-		throw new AstroError(`Could not find name for theme! Add a name in your 'package.json' or to your author config`);
-	}
+	// Assign theme name
+	const themeName = themePackage.json.name || authorOptions.name;
 
 	// Validate that the theme name is a valid package name
 	const isValidName = validatePackageName(themeName);
@@ -112,8 +101,14 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 		);
 	}
 
-	return (options: UserOptions<Config>): AstroIntegration => {
-		const parsed = authorOptions.schema.safeParse(options.config, { errorMap });
+	// Return theme integration
+	return ({
+		config: userConfigUnparsed,
+		pages: userPages = {},
+		overrides: userOverrides = {},
+	}: UserOptions<Schema>): AstroIntegration | AstroDbIntegration => {
+		// Parse/validate config passed by user, throw formatted error if it is invalid
+		const parsed = authorOptions.schema.safeParse(userConfigUnparsed, { errorMap });
 
 		if (!parsed.success) {
 			throw new AstroError(
@@ -127,83 +122,67 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 		return {
 			name: themeName,
 			hooks: {
+				// Support `@astrojs/db` (Astro Studio)
 				"astro:db:setup": ({ extendDb }) => {
-					const configEntrypoint = resolve(cwd, "db/cofig.ts");
-					const seedEntrypoint = resolve(cwd, "db/seed.ts");
+					const configEntrypoint = resolve(themeRoot, "db/cofig.ts");
+					const seedEntrypoint = resolve(themeRoot, "db/seed.ts");
 					if (existsSync(configEntrypoint)) extendDb({ configEntrypoint });
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
 				"astro:config:setup": ({ command, config, logger, updateConfig, addWatchFile, injectRoute }) => {
-					srcDir = fileURLToPath(config.srcDir.toString());
-					publicDir = fileURLToPath(config.publicDir.toString());
-					outDir = fileURLToPath(config.outDir.toString());
+					// Record of virtual imports and their content
+					const virtualImports: Record<string, string> = {
+						[`${themeName}/config`]: `export default ${JSON.stringify(userConfig)}`,
+					};
 
-					const virtualImports: Record<string, string> = {};
+					// Module type buffers
+					const moduleBuffers: Record<string, string> = {
+						[`${themeName}/config`]: "\nconst config: ThemeConfig;\nexport default config;",
+					};
 
-					const { addLinesToDts, addLinesToDtsInterface, addLinesToDtsModule, compileDtsBuffer } = createDtsBuffer();
+					// Interface type buffers
+					const interfaceBuffers = {
+						AstroThemeExports: "",
+						AstroThemeExportOverrides: "",
+						AstroThemeExportsResolved: "",
+						AstroThemePagesAuthored: "",
+						AstroThemePagesOverrides: "",
+					};
 
-					const resolveAuthorImport = (id: string, base = "./") =>
-						JSON.stringify(id.startsWith(".") ? toAbsolute(join(base, id)) : id);
+					let themeTypesBuffer = `
+						type Prettify<T> = { [K in keyof T]: T[K]; } & {};
 
-					const resolveUserImport = (id: string) => (id.startsWith(".") ? resolve(srcDir, id) : id);
+						type ThemeName = "${themeName}";
+						type ThemeConfig = NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]
 
-					const moduleEntriesToTypes =
-						(moduleName: string) =>
-						([name, path]: [string, string]) => {
-							if (isCSSFile(path)) return ``;
-							if (isImageFile(path)) return `${camelCase(name)}: import("astro").ImageMetadata;`;
-							return `${camelCase(name)}: typeof import(${resolveAuthorImport(path, moduleName)}).default;`;
-						};
+						declare type AstroThemes = keyof AstroThemeConfigs;
 
-					// If package is not private, warn theme author about issues with package
-					if (!pkgJSON.private) {
-						// Warn theme author if `astro-integration` keyword does not exist inside 'package.json'
-						if (!pkgJSON?.keywords?.includes("astro-integration")) {
-							logger.warn(
-								`Add the 'astro-integration' keyword to your theme's 'package.json'!\tAstro uses this value to support the command 'astro add ${themeName}'\n\n\t"keywords": [ "astro-integration" ],\n`,
-							);
+						declare type AstroThemeConfigs = {
+							"${themeName}": ThemeConfig
 						}
 
-						// Warn theme author if no 'description' property exists inside 'package.json'
-						if (!pkgJSON?.description) {
-							logger.warn(
-								`Add a 'description' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"description": "My awesome Astro theme!",\n`,
-							);
-						}
+						declare type GetAstroThemeExports<Name extends keyof AstroThemeConfigs> = AstroThemeExports[Name]
 
-						// Warn theme author if no 'homepage' property exists inside 'package.json'
-						if (!pkgJSON?.homepage) {
-							logger.warn(
-								`Add a 'homepage' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"homepage": "https://github.com/UserName/my-theme",\n`,
-							);
-						}
+						declare type AstroThemeExportOverrideOptions<Name extends keyof AstroThemeConfigs, Imports = GetAstroThemeExports<Name>> = {
+							[Module in keyof Imports]?:
+								Imports[Module] extends Record<string, any>
+									? Imports[Module] extends string[]
+										?	Imports[Module]
+										: { [Export in keyof Imports[Module]]?: string }
+									: never
+						} & {}
+						
+						declare type AstroThemePagesOverridesOptions<Name extends keyof AstroThemePagesAuthored> = Prettify<Partial<Record<keyof AstroThemePagesAuthored[Name], string | boolean>>>
 
-						// Warn theme author if no 'repository' property exists inside 'package.json'
-						if (!pkgJSON?.repository) {
-							logger.warn(
-								`Add a 'repository' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"repository": ${JSON.stringify(
-									{
-										type: "git",
-										url: "https://github.com/UserName/my-theme",
-										directory: "package",
-									},
-									null,
-									4,
-								).replace(/\n/g, "\n\t")},\n`,
-							);
-						}
+						declare type AstroThemePagesInjected = AstroThemePagesOverrides & AstroThemePagesAuthored
+					`;
 
-						// Warn theme author if package does not have a README
-						if (!existsSync(resolve(cwd, "README.md"))) {
-							logger.warn(
-								`Add a 'README.md' to the root of your theme's package!\tNPM uses this file to populate the package page https://www.npmjs.com/package/${themeName}\n`,
-							);
-						}
-					}
+					// Warn about issues with theme's `package.json`
+					warnThemePackage(themePackage, logger);
 
-					// HMR for `astro-theme-provider` package
+					//HMR for `astro-theme-provider` package
 					watchIntegration({
-						dir: dirname(thisFile),
+						dir: thisRoot,
 						command,
 						updateConfig,
 						addWatchFile,
@@ -211,220 +190,127 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 
 					// HMR for theme author's package
 					watchIntegration({
-						dir: cwd,
+						dir: themeRoot,
 						command,
 						updateConfig,
 						addWatchFile,
 					});
 
-					// Create virtual module for config (`my-theme/config`)
-					virtualImports[themeName + "/config"] = `export default ${JSON.stringify(userConfig)}`;
+					// Add `astro-public` integration to handle `/public` folder logic
+					addIntegration({
+						integration: staticDir(authorOptions.publicDir!),
+						config,
+						logger,
+						updateConfig,
+					});
 
-					// Generate types for virtual module (`my-theme/config`)
-					addLinesToDtsModule(themeName + "/config", [`const config: ThemeConfig`, `export default config`]);
-
-					// Generate Modules
-
-					// Utility types
-					addLinesToDts(`
-            type Prettify<T> = { [K in keyof T]: T[K]; } & {};
-  
-            type ThemeName = "${themeName}";
-            type ThemeConfig = NonNullable<Parameters<typeof import("${entrypoint}").default>[0]>["config"]
-  
-            declare type AstroThemes = keyof AstroThemeConfigs;
-
-            declare type AstroThemeConfigs = {
-              "${themeName}": ThemeConfig
-            }
-  
-            declare type AstroThemeModulesGet<Name extends keyof AstroThemeModulesAuthored> = AstroThemeModulesAuthored[Name]
-  
-            declare type AstroThemeModulesOptions<Name extends keyof AstroThemeModulesAuthored> = {
-              [Module in keyof AstroThemeModulesGet<Name>]?:
-                AstroThemeModulesGet<Name>[Module] extends Record<string, any>
-                  ? AstroThemeModulesGet<Name>[Module] extends string[]
-                    ?	AstroThemeModulesGet<Name>[Module]
-                    : { [Export in keyof AstroThemeModulesGet<Name>[Module]]?: string }
-                  : never
-            } & {}
-            
-            declare type AstroThemePagesOptions<Name extends keyof AstroThemePagesAuthored> = Prettify<Partial<Record<keyof AstroThemePagesAuthored[Name], string | boolean>>>`);
-
-					// Buffers for modules types defined in AstroThemeModules interfaces, added to main addDts buffer after all virtual modules have been created
-					const modulesAuthoredBuffer = new LineBuffer(undefined, -1);
-					const modulesOverridesBuffer = new LineBuffer(undefined, -1);
-					const modulesExportsBuffer = new LineBuffer(undefined, -1);
-
-					function arrayToVirtualModule(moduleName: string, array: string[]) {
-						if (array.length < 1) return; // Skip empty arrays
-
-						modulesAuthoredBuffer.add([`${moduleName}: string[]`]);
-
-						const overrides = options?.overrides?.[moduleName as keyof AstroThemeModulesOptions<ThemeName>];
-
-						// Append user's "overrides" to array module
-						if (overrides && Array.isArray(overrides)) {
-							modulesOverridesBuffer.add([`${moduleName}: string[]`]);
-							array = [...array, ...overrides.map((path) => resolveUserImport(path))];
-						}
-
-						// Add "import only" virtual module from array of entrypoints (mostly used for CSS)
-						virtualImports[themeName + "/" + moduleName] = array
-							.map((path) => `import ${resolveAuthorImport(path)};`)
-							.join("");
-
-						modulesExportsBuffer.add([`${moduleName}: string[]`]);
-
-						addLinesToDtsModule(themeName + "/" + moduleName, "");
-					}
-
-					function objToVirtualModule(moduleName: string, exports: Record<string, string>) {
-						// Generate types for exports
-						let exportedTypes = Object.entries(exports).map(moduleEntriesToTypes(moduleName));
-
-						if (exportedTypes.length < 1) return; // Skip empty objects
-
-						// Add exportedTypes to buffer for AstroThemeModulesAuthored interface
-						modulesAuthoredBuffer.add(wrapWithBrackets(exportedTypes, `${moduleName}: `));
-
-						// Override exports with user's overrides
-						const overrides =
-							(options?.overrides?.[moduleName as keyof AstroThemeModulesOptions<ThemeName>] as Record<
-								string,
-								string
-							>) || {};
-
-						if (Object.keys(overrides).length > 0) {
-							// Create User module for overrding component inside author module, does not include user overrides ex:"my-theme:components" to prevent circular imports
-							virtualImports[themeName + ":" + moduleName] = Object.entries(exports)
-								.map(
-									([name, path]) =>
-										`export { default as ${camelCase(name)} } from ${resolveAuthorImport(path, moduleName)};`,
-								)
-								.join("");
-
-							// Add types for virtual module
-							addLinesToDtsModule(
-								themeName + ":" + moduleName,
-								exportedTypes.map((line) => `export const ` + line),
-							);
-
-							// Resolve relative paths from user
-							for (const name in overrides) {
-								overrides[name] = resolveUserImport(overrides[name]!);
-							}
-
-							// Override
-							Object.assign(exports, overrides);
-
-							// Add overrides to buffer for AstroThemeModulesOverrides interface
-							modulesOverridesBuffer.add(
-								wrapWithBrackets(Object.entries(overrides).map(moduleEntriesToTypes(moduleName)), `${moduleName}: `),
-							);
-						}
-
-						// Recalculate exportedTypes to include overrides
-						exportedTypes = Object.entries(exports).map(moduleEntriesToTypes(moduleName));
-
-						// Create main author module with user's overrides
-						virtualImports[themeName + "/" + moduleName] = Object.entries(exports)
-							.map(
-								([name, path]) =>
-									`export { default as ${camelCase(name)} } from ${resolveAuthorImport(path, moduleName)};`,
-							)
-							.join("");
-
-						// Add export types for virtual module
-						addLinesToDtsModule(
-							themeName + "/" + moduleName,
-							exportedTypes.map((line) => line && `export const ` + line),
-						);
-
-						// Add exportedTypes with overrides to buffer for AstroThemeModulesInjected interface
-						modulesExportsBuffer.add(wrapWithBrackets(exportedTypes, `${moduleName}: `));
-					}
-
-					// Dynamically create virtual modules using globs and/or export objects defined by theme author or user
-					for (let [moduleName, option] of Object.entries(moduleOptions)) {
+					// Dynamically create virtual modules using globs, imports, or exports
+					for (let [name, option] of Object.entries(authorOptions.modules)) {
 						if (!option) continue;
 
-						if (moduleName === "config") {
-							logger.warn(`Export name 'config' is reserved for the config module '${themeName}/config'`);
+						// Reserved module/import names
+						if (["config", "pages", "public", "content", "db"].includes(name)) {
+							logger.warn(`Module name '${name}' is reserved for the built in virtual import '${themeName}/${name}'`);
 							continue;
 						}
 
-						moduleName = camelCase(moduleName);
+						const moduleName = normalizePath(join(themeName, name));
+						const moduleRoot = normalizePath(resolve(themeSrc, name));
 
+						// Turn a glob string into a module object
 						if (typeof option === "string") {
-							option = globToModule(option, moduleName, cwd);
+							option = globToModuleObject(moduleRoot, option);
 						}
 
-						if (typeof option === "object") {
-							if (Array.isArray(option)) {
-								if (option.length > 0) {
-									arrayToVirtualModule(moduleName, option);
+						// Create virtual module object
+						let virtualModule = createVirtualModule(moduleName, convertToModuleObject(option));
+
+						// Generate types/content for virtual module
+						let typesObjectContent = generateModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
+						let typesModuleContent = generateModuleObjectTypes(
+							virtualModule,
+							({ name, type }) => `\nexport const ${name}: ${type}`,
+						);
+
+						// Add generated types to interface buffer
+						interfaceBuffers["AstroThemeExports"] += `
+							"${name}": ${typesObjectContent ? `{\n${typesObjectContent}\n}` : "string[]"},
+						`;
+
+						const override = userOverrides[name as keyof GetAstroThemeExports<ThemeName>];
+
+						// Check if module exists and contains overrides
+						if (override) {
+							const moduleOverride = resolveModuleObject(convertToModuleObject(override));
+							if (!isEmptyModuleObject(moduleOverride)) {
+								const altModuleName = moduleName.replace(/\//, ":");
+								const moduleOverrideTypes = generateModuleObjectTypes(
+									moduleOverride,
+									({ name, type }) => `\n${name}: ${type}`,
+								);
+
+								// Add virtual module to import buffer
+								virtualImports[altModuleName] = virtualModule.content;
+
+								// Add generated types to module buffer
+								moduleBuffers[altModuleName] = typesModuleContent;
+
+								// Add generated types to interface buffer
+								if (moduleOverrideTypes) {
+									interfaceBuffers["AstroThemeExportOverrides"] += `
+										"${name}": {
+											${moduleOverrideTypes}
+										},
+									`;
 								}
-								continue;
+
+								// Merge module override into virtual module
+								virtualModule = mergeIntoModuleObject(virtualModule, moduleOverride);
 							}
-							objToVirtualModule(moduleName, option);
 						}
+
+						// Re-generate virtual module types/content to include user overrides
+						typesObjectContent = generateModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
+						typesModuleContent = generateModuleObjectTypes(
+							virtualModule,
+							({ name, type }) => `\nexport const ${name}: ${type}`,
+						);
+
+						// Add virtual module to import buffer
+						virtualImports[moduleName] = virtualModule.content;
+
+						// Add generated types to module buffer
+						moduleBuffers[moduleName] = typesModuleContent;
+
+						// Add generated types to interface buffer
+						interfaceBuffers["AstroThemeExportsResolved"] += `
+							"${name}": ${typesObjectContent ? `{\n${typesObjectContent}\n}` : "string[]"},
+						`;
 					}
 
-					// Add module interface buffers to main buffer
-
-					addLinesToDtsInterface(
-						`AstroThemeModulesAuthored`,
-						wrapWithBrackets(modulesAuthoredBuffer.lines, `"${themeName}": `),
-					);
-
-					addLinesToDtsInterface(
-						`AstroThemeModulesOverrides`,
-						wrapWithBrackets(modulesOverridesBuffer.lines, `"${themeName}": `),
-					);
-
-					addLinesToDtsInterface(
-						`AstroThemeModulesInjected`,
-						wrapWithBrackets(modulesExportsBuffer.lines, `"${themeName}": `),
-					);
-
-					// Page injection
-
-					// Handle 'authorOptions.pages' default
-					if (!authorOptions.pages || typeof authorOptions.pages === "string") {
-						authorOptions.pages = {
-							dir: authorOptions.pages || "pages",
-						};
-					}
-
-					// Overwrite/force cwd for finding routes
-					Object.assign(authorOptions.pages, { cwd, config, logger });
+					const pageDirOption = {
+						...(authorOptions.pageDir as PageDirOption),
+						config,
+						logger,
+					} as PageDirIntegrationOption;
 
 					// Initialize route injection
-					const { pages, injectPages } = addPageDir(authorOptions.pages as PageIntegrationOption);
-
-					options.pages ??= {} as NonNullable<typeof options.pages>;
+					const { pages, injectPages } = addPageDir(pageDirOption);
 
 					// Generate types for possibly injected routes
-					addLinesToDtsInterface(
-						"AstroThemePagesAuthored",
-						wrapWithBrackets(
-							Object.entries(pages).map(
-								([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`,
-							),
-							`"${themeName}": `,
-						),
-					);
+					interfaceBuffers["AstroThemePagesAuthored"] += Object.entries(pages)
+						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
+						.join("");
 
 					// Buffer for AstroThemePagesOverrides interface
-					const pageOverrideBuffer = new LineBuffer();
+					let pageOverrideBuffer = "";
 
 					// Filter out routes the theme user toggled off
-					for (const oldPattern of Object.keys(options.pages)) {
+					for (const oldPattern of Object.keys(userPages)) {
 						// Skip pages that are not defined by author
 						if (!pages?.[oldPattern!]) continue;
 
-						const newPattern = options.pages[oldPattern as keyof typeof options.pages];
+						let newPattern = userPages[oldPattern as keyof typeof userPages];
 
 						// If user passes falsy value remove the route
 						if (!newPattern) {
@@ -434,12 +320,7 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 
 						// If user defines a string, override route pattern
 						if (typeof newPattern === "string") {
-							if (!newPattern.startsWith("/")) {
-								throw new AstroError(
-									`Invalid page override, pattern must start with a forward slash '/'`,
-									`New: ${newPattern}\nOld: ${oldPattern}`,
-								);
-							}
+							newPattern = addLeadingSlash(removeTrailingSlash(newPattern));
 							if (!validatePattern(newPattern, oldPattern)) {
 								throw new AstroError(
 									`Invalid page override, pattern must contain the same params in the same location`,
@@ -448,32 +329,17 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 							}
 							// Add new pattern
 							pages[newPattern] = pages[oldPattern]!;
-							// Add page type to buffer
-							pageOverrideBuffer.add(`"${oldPattern}": "${newPattern}";`);
 							// Remove old pattern
 							delete pages[oldPattern];
+							// Add types to buffer
+							pageOverrideBuffer += `\n"${oldPattern}": "${newPattern}";`;
+
 							continue;
 						}
 					}
 
-					//  Generate types for author pages overriden by a user
-					if (pageOverrideBuffer.lines.length > 0) {
-						addLinesToDtsInterface(
-							"AstroThemePagesOverrides",
-							wrapWithBrackets(pageOverrideBuffer.lines, `"${themeName}": `),
-						);
-					}
-
-					// Generate types for injected routes
-					addLinesToDtsInterface(
-						"AstroThemePagesInjected",
-						wrapWithBrackets(
-							Object.entries(pages).map(
-								([pattern, entrypoint]) => `"${pattern}": typeof import("${entrypoint}").default;`,
-							),
-							`"${themeName}": `,
-						),
-					);
+					// Add generated types to interface buffer
+					interfaceBuffers["AstroThemePagesOverrides"] += pageOverrideBuffer;
 
 					// Inject routes/pages
 					injectPages(injectRoute);
@@ -481,77 +347,43 @@ export default function <Config extends ConfigDefault>(authorOptions: AuthorOpti
 					// Add virtual modules
 					addVirtualImports({
 						name: themeName,
+						config,
 						updateConfig,
 						imports: virtualImports,
 					});
 
-					// Write generated types to .d.ts file
+					// Add interfaces to global type buffer
+					for (const [name, buffer] of Object.entries(interfaceBuffers)) {
+						if (!buffer) continue;
+						themeTypesBuffer += `
+							declare interface ${name} {
+								"${themeName}": {
+									${buffer}
+								}
+							}
+						`;
+					}
+
+					// Add modules to global type buffer
+					for (const [name, buffer] of Object.entries(moduleBuffers)) {
+						if (!buffer) continue;
+						themeTypesBuffer += `
+							declare module "${name}" {
+								${buffer}
+							}
+						`;
+					}
+
+					// Write compiled types to .d.ts file
 					addDts({
 						name: themeName,
-						content: compileDtsBuffer(),
+						content: themeTypesBuffer,
 						root: config.root,
 						srcDir: config.srcDir,
 						logger,
 					});
 				},
-				"astro:server:setup": ({ logger, server }) => {
-					if (!staticDirExists) return;
-					// Handle static assets in public during dev
-					server.middlewares.use("/", (req, res, next) => {
-						// Trim query params from path
-						const path = req.url?.replace(/\?.*$/, "");
-						// Check if url is a file/asset path
-						if (path && extname(path) && !path.startsWith("/@")) {
-							// Create path relative to custom public dir
-							const asset = resolve(staticDir!, `.${path!}`);
-							if (existsSync(asset)) {
-								// Skip asset if it will be overwrriten by asset in real public dir
-								if (publicOptions.copy === "before" && existsSync(resolve(publicDir, `.${path!}`))) {
-									next();
-								}
-
-								// Return asset from theme's public folder
-								try {
-									createReadStream(asset).pipe(res);
-								} catch {
-									logger.warn(`Failed to serve theme asset:\t${path}\t${asset}`);
-									next();
-								}
-							} else next();
-						} else next();
-					});
-				},
-				"astro:build:setup": ({ logger }) => {
-					if (publicOptions.copy !== "before" || !staticDirExists) return;
-					try {
-						// Copy theme's public dir into build output, assets will be overwritten by assets in theme users public dir
-						cpSync(staticDir!, outDir, { recursive: true });
-					} catch {
-						logger.warn("Failed to copy public dir into output: " + staticDir);
-					}
-				},
-				"astro:build:done": ({ logger }) => {
-					if (publicOptions.copy !== "after" || !staticDirExists) return;
-					try {
-						// Copy custom public dir into build output, assets will overwrite assets in theme users public dir
-						cpSync(staticDir!, outDir, { recursive: true });
-					} catch {
-						logger.warn("Failed to copy public dir into output: " + staticDir);
-					}
-				},
 			},
 		};
 	};
 }
-
-export {
-	GLOB_CSS,
-	GLOB_API,
-	GLOB_DATA,
-	GLOB_ASTRO,
-	GLOB_IMAGES,
-	GLOB_MARKDOWN,
-	GLOB_UI_FRAMEWORK,
-	GLOB_COMPONENTS,
-	GLOB_PAGES,
-} from "./utils";
