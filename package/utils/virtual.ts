@@ -63,7 +63,7 @@ function resolveImportArray(imports: ModuleImports, store?: Set<string>): Resolv
 	return Array.from(store);
 }
 
-export function isEmptyModuleOption(option: ModuleImports | ModuleExports | ModuleObject | VirtualModule): boolean {
+export function isEmptyModuleObject(option: ModuleImports | ModuleExports | ModuleObject | VirtualModule): boolean {
 	if (Array.isArray(option)) {
 		option = { imports: option, exports: {} };
 	}

@@ -30,7 +30,7 @@ import {
 	createVirtualModule,
 	getModuleObjectTypes,
 	globToModuleObject,
-	isEmptyModuleOption,
+	isEmptyModuleObject,
 	mergeIntoModuleObject,
 	resolveModuleObject,
 } from "./utils/virtual.ts";
@@ -235,7 +235,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 								({ name, type }) => `\n${name}: ${type}`,
 							);
 
-							if (!isEmptyModuleOption(moduleOverride)) {
+							if (!isEmptyModuleObject(moduleOverride)) {
 								virtualImports[altModuleName] = virtualModule.content;
 
 								moduleBuffers[altModuleName] = typesModuleContent;
