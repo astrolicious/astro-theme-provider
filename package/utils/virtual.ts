@@ -128,7 +128,7 @@ export function createVirtualModule(name: string, module: ModuleObject): Virtual
 	const resolved = resolveModuleObject(module);
 	return {
 		name,
-		content: getModuleContent(resolved),
+		content: getModuleObjectContent(resolved),
 		...resolved,
 	};
 }
@@ -144,13 +144,13 @@ export function mergeIntoModuleObject<T extends S, S extends ModuleObject | Reso
 	target = mergeOptions(target, source) as T;
 
 	if ("content" in target) {
-		target.content = getModuleContent(target);
+		target.content = getModuleObjectContent(target);
 	}
 
 	return target;
 }
 
-export function getModuleContent({ imports, exports }: ResolvedModuleObject | VirtualModule) {
+export function getModuleObjectContent({ imports, exports }: ResolvedModuleObject | VirtualModule) {
 	return `${getModuleImportsContent(imports)}\n${getModuleExportsContent(exports)}`;
 }
 
@@ -176,9 +176,9 @@ export function getModuleExportsContent(exports: ResolvedModuleExports) {
 	return buffer;
 }
 
-export function getModuleObjectTypes(
+export function generateModuleObjectTypes(
 	module: ResolvedModuleObject | VirtualModule,
-	create: ({ name, path, type }: { name: string; path: string; type: string }) => string,
+	generate: ({ name, path, type }: { name: string; path: string; type: string }) => string,
 ) {
 	let buffer = "";
 
@@ -195,7 +195,7 @@ export function getModuleObjectTypes(
 			type = `typeof import(${JSON.stringify(path)}).default;`;
 		}
 
-		const line = create({ name, path, type });
+		const line = generate({ name, path, type });
 
 		buffer += line;
 	}

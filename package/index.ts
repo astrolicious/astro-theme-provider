@@ -28,7 +28,7 @@ import {
 import {
 	convertToModuleObject,
 	createVirtualModule,
-	getModuleObjectTypes,
+	generateModuleObjectTypes,
 	globToModuleObject,
 	isEmptyModuleObject,
 	mergeIntoModuleObject,
@@ -215,8 +215,8 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 						let virtualModule = createVirtualModule(moduleName, convertToModuleObject(option));
 
-						let typesObjectContent = getModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
-						let typesModuleContent = getModuleObjectTypes(
+						let typesObjectContent = generateModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
+						let typesModuleContent = generateModuleObjectTypes(
 							virtualModule,
 							({ name, type }) => `\nexport const ${name}: ${type}`,
 						);
@@ -230,7 +230,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						if (override) {
 							const altModuleName = moduleName.replace(/\//, ":");
 							const moduleOverride = resolveModuleObject(convertToModuleObject(override));
-							const moduleOverrideTypes = getModuleObjectTypes(
+							const moduleOverrideTypes = generateModuleObjectTypes(
 								moduleOverride,
 								({ name, type }) => `\n${name}: ${type}`,
 							);
@@ -253,8 +253,8 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						}
 
 						// Re-generate virtual module types to include user overrides
-						typesObjectContent = getModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
-						typesModuleContent = getModuleObjectTypes(
+						typesObjectContent = generateModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
+						typesModuleContent = generateModuleObjectTypes(
 							virtualModule,
 							({ name, type }) => `\nexport const ${name}: ${type}`,
 						);
