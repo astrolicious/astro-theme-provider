@@ -1,19 +1,15 @@
 ---
 title: Welcome to Astro Theme Provider
-description: Easily create theme integration packages!
+description: Easily create theme integration for Astro!
 template: splash
+banner:
+  content: Astro Theme Provider is currently a work in progress, Coming Soon!
 hero:
-  tagline: Lets author a theme integration!
-  image:
-    file: ../../assets/houston.webp
+  tagline: Lets create a Theme!
   actions:
-    - text: Introduction
-      link: /introduction
-      icon: right-arrow
+    - text: Coming Soon
+      link: /#
       variant: primary
-    - text: Author a Theme
-      link: /author/getting-started
-      icon: pencil
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
@@ -21,16 +17,33 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 ## Features
 
 <CardGrid>
-	<Card title="Author Theme Integrations" icon="pen">
-		Easily author themes as integrations you can configure from the Astro config
+	<Card title="Theme Integrations" icon="pen">
+		Author themes as integrations that can be installed with a single command
 	</Card>
-	<Card title="Configurable" icon="setting">
-		Users can configure your theme to their liking by overriding pages and components
+	<Card title="Easy to use" icon="rocket">
+		No integration code required! Author themes like a normal Astro project
 	</Card>
 	<Card title="Type safe" icon="approve-check-circle">
-		Everything inside your theme is type safe
+		Type safe for both theme authors and theme users
 	</Card>
-	<Card title="Learn More" icon="open-book">
-		Learn more about [how Astro Theme Provider works](/introduction)
+	<Card title="Customizable" icon="setting">
+		Theme users can override assets like components and layouts for complete customization
 	</Card>
 </CardGrid>
+
+<style set:html={`
+	body {
+		--sl-nav-height: 0px;
+	}
+
+	header {
+		display: none;
+	}
+
+	.hero {
+		grid-template-columns: 1fr;
+		place-content: center;
+		max-width: 75ch;
+		margin-inline: auto;
+	}
+`}></style>
