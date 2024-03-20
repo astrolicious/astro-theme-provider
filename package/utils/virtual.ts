@@ -199,9 +199,8 @@ export function generateInterfaceTypes(option: Parameters<typeof generateTypesFr
 }
 
 export function generateModuleTypes(option: Parameters<typeof generateTypesFromModule>[0]) {
-	return generateTypesFromModule(option, ({ name, type }) => name === 'default'
-		? `\nconst _default: ${type};\nexport default _default;`
-		: `\nexport const ${name}: ${type};`
+	return generateTypesFromModule(option, ({ name, type }) =>
+		name === "default" ? `\nconst _default: ${type};\nexport default _default;` : `\nexport const ${name}: ${type};`,
 	);
 }
 
