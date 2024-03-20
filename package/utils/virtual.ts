@@ -192,8 +192,6 @@ export function generateModuleExportContent(exports: ResolvedModuleExports) {
 	return buffer;
 }
 
-// Generate Types
-
 export function generateInterfaceTypes(option: Parameters<typeof generateTypesFromModule>[0]) {
 	return generateTypesFromModule(option, ({ name, type }) => `\n${name}: ${type};`);
 }
