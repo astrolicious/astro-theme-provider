@@ -1,5 +1,6 @@
 {
 	"name": "docs",
+	"private": true,
 	"type": "module",
 	"version": "0.0.1",
 	"scripts": {
@@ -10,16 +11,9 @@
 		"astro": "astro"
 	},
 	"dependencies": {
-		"@astrojs/check": "^0.5.4",
-		"@astrojs/starlight": "^0.18.1",
-		"astro": "^4.4.0",
-		"hast": "^1.0.0",
-		"hast-util-from-html": "^2.0.1",
-		"hast-util-to-string": "^3.0.0",
-		"hastscript": "^9.0.0",
-		"rehype": "^13.0.1",
-		"sharp": "^0.32.6",
-		"typescript": "^5.3.3",
-		"unist-util-visit": "^5.0.0"
+		"@astrojs/check": "^0.5.9",
+		"@astrojs/starlight": "^0.21.2",
+		"astro": "^4.5.8",
+		"sharp": "^0.32.6"
 	}
 }
