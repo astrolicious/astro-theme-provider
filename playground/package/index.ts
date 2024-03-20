@@ -6,4 +6,9 @@ export default defineTheme({
 		title: z.string(),
 		description: z.string().optional(),
 	}),
+	modules: {
+		test: {
+			default: "./src/components/Heading.astro",
+		},
+	},
 });
