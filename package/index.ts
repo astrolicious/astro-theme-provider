@@ -13,9 +13,9 @@ import { z } from "astro/zod";
 import callsites from "callsites";
 // @ts-ignore
 import validatePackageName from "validate-npm-package-name";
-import type { AuthorOptions, UserOptions } from "./src/internal/types.ts";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./src/internal/consts.ts";
 import { errorMap } from "./src/internal/error-map.ts";
+import type { AuthorOptions, UserOptions } from "./src/internal/types.ts";
 import { mergeOptions } from "./src/utils/options.ts";
 import { PackageJSON, warnThemePackage } from "./src/utils/package.ts";
 import {
@@ -26,12 +26,7 @@ import {
 	resolveFilepath,
 	validatePattern,
 } from "./src/utils/path.ts";
-import {
-	createVirtualModule,
-	globToModuleObject,
-	isEmptyModuleObject,
-	toModuleObject,
-} from "./src/utils/virtual.ts";
+import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./src/utils/virtual.ts";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 const thisRoot = resolveDirectory("./", thisFile);
