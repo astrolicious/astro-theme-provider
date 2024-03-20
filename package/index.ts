@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { AstroDbIntegration } from "@astrojs/db/types";
 import type { AstroIntegration } from "astro";
 import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit/utilities";
@@ -26,12 +27,12 @@ import {
 	validatePattern,
 } from "./utils/path.ts";
 import {
-	convertToModuleObject,
+	toModuleObject,
 	createVirtualModule,
-	generateModuleObjectTypes,
+	generateTypesFromModule,
 	globToModuleObject,
 	isEmptyModuleObject,
-	mergeIntoModuleObject,
+	mergeModuleObjects,
 	resolveModuleObject,
 } from "./utils/virtual.ts";
 
@@ -130,6 +131,8 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
 				"astro:config:setup": ({ command, config, logger, updateConfig, addWatchFile, injectRoute }) => {
+					const projectRoot = normalizePath(fileURLToPath(config.root.toString()));
+
 					// Record of virtual imports and their content
 					const virtualImports: Record<string, string> = {
 						[`${themeName}/config`]: `export default ${JSON.stringify(userConfig)}`,
@@ -223,68 +226,51 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						}
 
 						// Create virtual module object
-						let virtualModule = createVirtualModule(moduleName, convertToModuleObject(option));
+						const virtualModule = createVirtualModule(moduleName, themeRoot, toModuleObject(option));
 
-						// Generate types/content for virtual module
-						let typesObjectContent = generateModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
-						let typesModuleContent = generateModuleObjectTypes(
-							virtualModule,
-							({ name, type }) => `\nexport const ${name}: ${type}`,
-						);
+						let interfaceTypes = virtualModule.types.interface();
 
 						// Add generated types to interface buffer
 						interfaceBuffers["AstroThemeExports"] += `
-							"${name}": ${typesObjectContent ? `{\n${typesObjectContent}\n}` : "string[]"},
+							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : "string[]"},
 						`;
 
 						const override = userOverrides[name as keyof GetAstroThemeExports<ThemeName>];
 
 						// Check if module exists and contains overrides
 						if (override) {
-							const moduleOverride = resolveModuleObject(convertToModuleObject(override));
+							const altModuleName = moduleName.replace(/\//, ":");
+							const moduleOverride = createVirtualModule(altModuleName, projectRoot, toModuleObject(override));
 							if (!isEmptyModuleObject(moduleOverride)) {
-								const altModuleName = moduleName.replace(/\//, ":");
-								const moduleOverrideTypes = generateModuleObjectTypes(
-									moduleOverride,
-									({ name, type }) => `\n${name}: ${type}`,
-								);
-
 								// Add virtual module to import buffer
-								virtualImports[altModuleName] = virtualModule.content;
+								virtualImports[altModuleName] = virtualModule.content();
 
 								// Add generated types to module buffer
-								moduleBuffers[altModuleName] = typesModuleContent;
+								moduleBuffers[altModuleName] = moduleOverride.types.module();
 
 								// Add generated types to interface buffer
-								if (moduleOverrideTypes) {
-									interfaceBuffers["AstroThemeExportOverrides"] += `
-										"${name}": {
-											${moduleOverrideTypes}
-										},
-									`;
-								}
+								interfaceBuffers["AstroThemeExportOverrides"] += `
+									"${name}": {
+										${moduleOverride.types.interface()}
+									},
+								`;
 
 								// Merge module override into virtual module
-								virtualModule = mergeIntoModuleObject(virtualModule, moduleOverride);
+								virtualModule.merge(moduleOverride);
 							}
 						}
 
-						// Re-generate virtual module types/content to include user overrides
-						typesObjectContent = generateModuleObjectTypes(virtualModule, ({ name, type }) => `\n${name}: ${type}`);
-						typesModuleContent = generateModuleObjectTypes(
-							virtualModule,
-							({ name, type }) => `\nexport const ${name}: ${type}`,
-						);
-
 						// Add virtual module to import buffer
-						virtualImports[moduleName] = virtualModule.content;
+						virtualImports[moduleName] = virtualModule.content();
 
 						// Add generated types to module buffer
-						moduleBuffers[moduleName] = typesModuleContent;
+						moduleBuffers[moduleName] = virtualModule.types.module();
+
+						interfaceTypes = virtualModule.types.interface();
 
 						// Add generated types to interface buffer
 						interfaceBuffers["AstroThemeExportsResolved"] += `
-							"${name}": ${typesObjectContent ? `{\n${typesObjectContent}\n}` : "string[]"},
+							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : "string[]"},
 						`;
 					}
 
@@ -373,7 +359,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							}
 						`;
 					}
-
+					
 					// Write compiled types to .d.ts file
 					addDts({
 						name: themeName,
