@@ -1,6 +1,6 @@
 import { basename, extname, resolve } from "node:path";
 import fg from "fast-glob";
-import { GLOB_IGNORE } from "./consts.ts";
+import { GLOB_IGNORE } from "../internal/consts.ts";
 import { mergeOptions } from "./options.ts";
 import { isCSSFile, isImageFile, normalizePath } from "./path.ts";
 

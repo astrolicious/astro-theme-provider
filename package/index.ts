@@ -13,11 +13,11 @@ import { z } from "astro/zod";
 import callsites from "callsites";
 // @ts-ignore
 import validatePackageName from "validate-npm-package-name";
-import type { AuthorOptions, UserOptions } from "./types";
-import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./utils/consts.ts";
-import { errorMap } from "./utils/error-map.ts";
-import { mergeOptions } from "./utils/options.ts";
-import { PackageJSON, warnThemePackage } from "./utils/package.ts";
+import type { AuthorOptions, UserOptions } from "./src/internal/types.ts";
+import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./src/internal/consts.ts";
+import { errorMap } from "./src/internal/error-map.ts";
+import { mergeOptions } from "./src/utils/options.ts";
+import { PackageJSON, warnThemePackage } from "./src/utils/package.ts";
 import {
 	addLeadingSlash,
 	normalizePath,
@@ -25,16 +25,13 @@ import {
 	resolveDirectory,
 	resolveFilepath,
 	validatePattern,
-} from "./utils/path.ts";
+} from "./src/utils/path.ts";
 import {
 	createVirtualModule,
-	generateTypesFromModule,
 	globToModuleObject,
 	isEmptyModuleObject,
-	mergeModuleObjects,
-	resolveModuleObject,
 	toModuleObject,
-} from "./utils/virtual.ts";
+} from "./src/utils/virtual.ts";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 const thisRoot = resolveDirectory("./", thisFile);
