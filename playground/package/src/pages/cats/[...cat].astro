@@ -10,6 +10,7 @@ export async function getStaticPaths() {
 				cat: name,
 			},
 			props: {
+				// @ts-ignore
 				next: images[i >= images.length - 1 ? 0 : i <= images.length - 1 ? i + 1 : 0][0],
 				name,
 				image,

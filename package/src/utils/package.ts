@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import type { HookParameters } from "astro";
 import { AstroError } from "astro/errors";
-import type { PackageJSONOptions } from "../types";
+import type { PackageJSONOptions } from "../internal/types";
 import { resolveFilepath } from "./path";
 
 export class PackageJSON {
