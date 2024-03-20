@@ -27,13 +27,13 @@ import {
 	validatePattern,
 } from "./utils/path.ts";
 import {
-	toModuleObject,
 	createVirtualModule,
 	generateTypesFromModule,
 	globToModuleObject,
 	isEmptyModuleObject,
 	mergeModuleObjects,
 	resolveModuleObject,
+	toModuleObject,
 } from "./utils/virtual.ts";
 
 const thisFile = resolveFilepath("./", import.meta.url);
@@ -58,7 +58,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 		pageDir: "pages",
 		publicDir: "public",
 		schema: z.record(z.any()),
-		modules: {
+		imports: {
 			css: GLOB_CSS,
 			assets: GLOB_IMAGES,
 			layouts: GLOB_ASTRO,
@@ -208,7 +208,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					});
 
 					// Dynamically create virtual modules using globs, imports, or exports
-					for (let [name, option] of Object.entries(authorOptions.modules)) {
+					for (let [name, option] of Object.entries(authorOptions.imports)) {
 						if (!option) continue;
 
 						// Reserved module/import names
@@ -359,7 +359,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							}
 						`;
 					}
-					
+
 					// Write compiled types to .d.ts file
 					addDts({
 						name: themeName,

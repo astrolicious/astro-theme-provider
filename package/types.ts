@@ -31,7 +31,7 @@ export type AuthorOptions<Schema extends z.ZodTypeAny> = Prettify<{
 	publicDir?: string | StaticDirOption;
 	pageDir?: string | PageDirOption;
 	schema?: Schema;
-	modules?: Record<string, string | ModuleImports | ModuleExports | ModuleObject>;
+	imports?: Record<string, string | ModuleImports | ModuleExports | ModuleObject>;
 }>;
 
 export type UserOptions<Schema extends z.ZodTypeAny> = Prettify<{
