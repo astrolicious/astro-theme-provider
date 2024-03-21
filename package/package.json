@@ -1,6 +1,6 @@
 {
 	"name": "astro-theme-provider",
-	"version": "0.0.3",
+	"version": "0.1.1",
 	"description": "Easily create theme integrations for Astro",
 	"keywords": ["astro", "withastro", "astro-integration"],
 	"author": "Bryce Russell",
@@ -11,7 +11,7 @@
 		"directory": "packages/astro-theme-provider"
 	},
 	"bugs": "https://github.com/brycerussell/astro-theme-provider/issues",
-	"homepage": "https://github.com/brycerussell/astro-theme-provider",
+	"homepage": "https://astro-theme-provider.netlify.app/",
 	"scripts": {},
 	"type": "module",
 	"exports": {
