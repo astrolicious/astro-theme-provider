@@ -4,7 +4,7 @@
 	"description": "Easily create theme integrations for Astro",
 	"keywords": ["astro", "withastro", "astro-integration"],
 	"author": "Bryce Russell",
-	"license": "MIT",
+	"license": "Unlicense",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/brycerussell/astro-theme-provider",
@@ -15,8 +15,7 @@
 	"scripts": {},
 	"type": "module",
 	"exports": {
-		".": "./index.ts",
-		"./types": "./types.ts"
+		".": "./index.ts"
 	},
 	"peerDependencies": {
 		"@astrojs/db": ">=0.8.0",
