@@ -8,7 +8,7 @@
 	"scripts": {
 		"playground:dev": "pnpm --filter playground dev",
 		"docs:dev": "pnpm --filter docs dev",
-		"test": "pnpm --filter astro-theme-provider test",
+		"test": "vitest",
 		"changeset": "changeset",
 		"lint": "biome check .",
 		"lint:fix": "biome check --apply ."
@@ -17,6 +17,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^1.6.1",
 		"@changesets/cli": "^2.27.1",
-		"astro": "^4.5.6"
+		"astro": "^4.5.6",
+		"vitest": "^1.4.0"
 	}
 }
