@@ -7,7 +7,7 @@ import type { AstroConfig, AstroIntegrationLogger, HookParameters } from 'astro'
 vi.mock('astro-integration-kit/utilities')
 
 const thisFile = fileURLToPath(import.meta.url).toString()
-const playgroundDir = resolve(dirname(thisFile), '../../playground')
+const playgroundDir = resolve(dirname(thisFile), 'mock')
 const packageRoot = resolve(playgroundDir, 'package')
 const packageEntrypoint = resolve(packageRoot, 'index.ts')
 const projectRoot = resolve(playgroundDir, 'project')
