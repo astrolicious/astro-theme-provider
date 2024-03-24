@@ -39,9 +39,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 		// Assume the first path before `file://` path is the entrypoint
 		.find((path) => path && !path.startsWith("file://") && path !== thisFile)!;
 
-	// Theme package root (/package)
-	const themeRoot = resolveDirectory("./", themeEntrypoint);
-
 	// Default options
 	let authorOptions = {
 		name: "my-theme",
@@ -68,6 +65,9 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 	// Merge author options with default options
 	authorOptions = mergeOptions(authorOptions, partialAuthorOptions) as Required<AuthorOptions<z.ZodRecord>>;
+
+	// Theme package root (/package)
+	const themeRoot = resolveDirectory("./", authorOptions.entrypoint);
 
 	// Theme source dir (/package/src)
 	const themeSrc = resolveDirectory(themeRoot, authorOptions.srcDir);
