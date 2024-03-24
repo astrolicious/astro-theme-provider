@@ -11,8 +11,6 @@ import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
 import { z } from "astro/zod";
 import callsites from "callsites";
-// @ts-ignore
-import validatePackageName from "validate-npm-package-name";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./src/internal/consts.ts";
 import { errorMap } from "./src/internal/error-map.ts";
 import type { AuthorOptions, UserOptions } from "./src/internal/types.ts";
@@ -83,16 +81,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 	// Assign theme name
 	const themeName = authorOptions.name || themePackage.json.name;
-
-	// Validate that the theme name is a valid package name
-	const isValidName = validatePackageName(themeName);
-
-	if (!isValidName.validForNewPackages) {
-		throw new AstroError(
-			`Theme name is not a valid package name!`,
-			[...isValidName.errors, ...isValidName.warnings].join(", "),
-		);
-	}
 
 	// Return theme integration
 	return ({

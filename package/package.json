@@ -16,9 +16,9 @@
 	},
 	"bugs": "https://github.com/brycerussell/astro-theme-provider/issues",
 	"homepage": "https://astro-theme-provider.netlify.app/",
-  "scripts": {
-    "test": "vitest"
-  },
+	"scripts": {
+		"test": "vitest"
+	},
 	"type": "module",
 	"exports": {
 		".": "./index.ts"
@@ -40,7 +40,6 @@
 		"astro-pages": "^0.2.1",
 		"astro-public": "^0.0.4",
 		"callsites": "^4.1.0",
-		"fast-glob": "^3.3.2",
-		"validate-npm-package-name": "^5.0.0"
+		"fast-glob": "^3.3.2"
 	}
 }
