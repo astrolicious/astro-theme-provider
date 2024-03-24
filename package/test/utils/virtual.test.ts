@@ -12,8 +12,8 @@ const moduleObject = {
 describe('resolveModuleObject()', () => {
   const resolvedModuledObject = resolveModuleObject(import.meta.url, moduleObject)
 
-  test('has root', () => {
-    expect(resolvedModuledObject).toHaveProperty("root")
+  test('root is absolute', () => {
+    expect(isAbsolute(resolvedModuledObject.root)).toBe(true)
   })
 
   test('imports are absolute', () => {
