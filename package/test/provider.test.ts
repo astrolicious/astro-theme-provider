@@ -1,32 +1,32 @@
-import { afterEach, describe, expect, test, vi } from 'vitest'
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import _defineTheme from '../index.ts'
-import type { AstroConfig, AstroIntegrationLogger, HookParameters } from 'astro';
+import { dirname, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import type { AstroConfig, AstroIntegrationLogger, HookParameters } from "astro";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import _defineTheme from "../index.ts";
 
-vi.mock('astro-integration-kit/utilities')
+vi.mock("astro-integration-kit/utilities");
 
-const thisFile = fileURLToPath(import.meta.url).toString()
-const playgroundDir = resolve(dirname(thisFile), 'mock')
-const packageRoot = resolve(playgroundDir, 'package')
-const packageEntrypoint = resolve(packageRoot, 'index.ts')
-const projectRoot = resolve(playgroundDir, 'project')
-const projectSrc = resolve(projectRoot, 'src')
+const thisFile = fileURLToPath(import.meta.url).toString();
+const playgroundDir = resolve(dirname(thisFile), "mock");
+const packageRoot = resolve(playgroundDir, "package");
+const packageEntrypoint = resolve(packageRoot, "index.ts");
+const projectRoot = resolve(playgroundDir, "project");
+const projectSrc = resolve(projectRoot, "src");
 
 const defineTheme = (option: Parameters<typeof _defineTheme>[0]) => {
-  return _defineTheme(Object.assign(option, { entrypoint: packageEntrypoint }))
-}
+	return _defineTheme(Object.assign(option, { entrypoint: packageEntrypoint }));
+};
 
 const astroConfigSetupParamsStub = (
 	params?: HookParameters<"astro:config:setup">,
 ): HookParameters<"astro:config:setup"> => ({
 	logger: {
-    fork: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-    debug: vi.fn()
-  } as unknown as AstroIntegrationLogger,
+		fork: vi.fn(),
+		info: vi.fn(),
+		warn: vi.fn(),
+		error: vi.fn(),
+		debug: vi.fn(),
+	} as unknown as AstroIntegrationLogger,
 	addClientDirective: vi.fn(),
 	addDevToolbarApp: vi.fn(),
 	addMiddleware: vi.fn(),
@@ -39,31 +39,30 @@ const astroConfigSetupParamsStub = (
 	updateConfig: vi.fn(),
 	addDevOverlayPlugin: vi.fn(),
 	config: {
-    root: pathToFileURL(projectRoot),
-    srcDir: pathToFileURL(projectSrc)
-  } as unknown as AstroConfig,
+		root: pathToFileURL(projectRoot),
+		srcDir: pathToFileURL(projectSrc),
+	} as unknown as AstroConfig,
 	...(params || {}),
 });
 
-describe('defineTheme', () => {
-  afterEach(() => {
+describe("defineTheme", () => {
+	afterEach(() => {
 		vi.resetAllMocks();
 	});
 
-  test('should run', () => {    
-    expect(() => {      
-      defineTheme({})
-    }).not.toThrow()
-  })
-  
-  describe('execute theme integration', () => {
-    test('should run', () => {    
-      const theme = defineTheme({})()
-      const params = astroConfigSetupParamsStub()
-      expect(() => {
-        theme.hooks['astro:config:setup']?.(params)
-      }).not.toThrow()
-    })
-  })
-})
+	test("should run", () => {
+		expect(() => {
+			defineTheme({});
+		}).not.toThrow();
+	});
 
+	describe("execute theme integration", () => {
+		test("should run", () => {
+			const theme = defineTheme({})();
+			const params = astroConfigSetupParamsStub();
+			expect(() => {
+				theme.hooks["astro:config:setup"]?.(params);
+			}).not.toThrow();
+		});
+	});
+});

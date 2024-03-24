@@ -109,7 +109,7 @@ export function resolveModuleObject(
 ): ResolvedModuleObject {
 	if (RESOLVED in module) return module;
 	const { imports = [], exports = {} } = module;
-	const rootResolved = normalizePath(resolveDirectory("./", root, false))
+	const rootResolved = normalizePath(resolveDirectory("./", root, false));
 	return {
 		root: rootResolved,
 		imports: resolveImportArray(rootResolved, imports),
