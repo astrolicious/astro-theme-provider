@@ -82,7 +82,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	const themePackage = new PackageJSON(themeRoot);
 
 	// Assign theme name
-	const themeName = themePackage.json.name || authorOptions.name;
+	const themeName = authorOptions.name || themePackage.json.name;
 
 	// Validate that the theme name is a valid package name
 	const isValidName = validatePackageName(themeName);
