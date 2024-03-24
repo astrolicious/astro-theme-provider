@@ -2,7 +2,11 @@
 	"name": "astro-theme-provider",
 	"version": "0.1.1",
 	"description": "Easily create theme integrations for Astro",
-	"keywords": ["astro", "withastro", "astro-integration"],
+	"keywords": [
+		"astro",
+		"withastro",
+		"astro-integration"
+	],
 	"author": "Bryce Russell",
 	"license": "Unlicense",
 	"repository": {
@@ -12,18 +16,24 @@
 	},
 	"bugs": "https://github.com/brycerussell/astro-theme-provider/issues",
 	"homepage": "https://astro-theme-provider.netlify.app/",
-	"scripts": {},
+  "scripts": {
+    "test": "vitest"
+  },
 	"type": "module",
 	"exports": {
 		".": "./index.ts"
 	},
+	"files": [
+		"src"
+	],
 	"peerDependencies": {
 		"@astrojs/db": ">=0.8.0",
 		"astro": ">=3"
 	},
 	"devDependencies": {
 		"@astrojs/db": "^0.8.7",
-		"@types/node": "^20.11.29"
+		"@types/node": "^20.11.29",
+		"vitest": "^1.4.0"
 	},
 	"dependencies": {
 		"astro-integration-kit": "^0.6.0",

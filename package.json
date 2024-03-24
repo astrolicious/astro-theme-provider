@@ -8,6 +8,7 @@
 	"scripts": {
 		"playground:dev": "pnpm --filter playground dev",
 		"docs:dev": "pnpm --filter docs dev",
+		"test": "pnpm --filter astro-theme-provider test",
 		"changeset": "changeset",
 		"lint": "biome check .",
 		"lint:fix": "biome check --apply ."
