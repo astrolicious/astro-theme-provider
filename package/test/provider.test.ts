@@ -1,7 +1,7 @@
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import defineTheme from '../index.ts'
+import _defineTheme from '../index.ts'
 import type { AstroConfig, AstroIntegrationLogger, HookParameters } from 'astro';
 
 vi.mock('astro-integration-kit/utilities')
@@ -12,6 +12,10 @@ const packageRoot = resolve(playgroundDir, 'package')
 const packageEntrypoint = resolve(packageRoot, 'index.ts')
 const projectRoot = resolve(playgroundDir, 'project')
 const projectSrc = resolve(projectRoot, 'src')
+
+const defineTheme = (option: Parameters<typeof _defineTheme>[0]) => {
+  return _defineTheme(Object.assign(option, { entrypoint: packageEntrypoint }))
+}
 
 const astroConfigSetupParamsStub = (
 	params?: HookParameters<"astro:config:setup">,
@@ -41,24 +45,25 @@ const astroConfigSetupParamsStub = (
 	...(params || {}),
 });
 
-const authorOptions = {
-  entrypoint: packageEntrypoint,
-}
-
 describe('defineTheme', () => {
+  afterEach(() => {
+		vi.resetAllMocks();
+	});
+
   test('should run', () => {    
     expect(() => {      
-      const theme = defineTheme(authorOptions)
+      defineTheme({})
     }).not.toThrow()
+  })
+  
+  describe('execute theme integration', () => {
+    test('should run', () => {    
+      const theme = defineTheme({})()
+      const params = astroConfigSetupParamsStub()
+      expect(() => {
+        theme.hooks['astro:config:setup']?.(params)
+      }).not.toThrow()
+    })
   })
 })
 
-describe('theme integration', () => {
-  test('should run', () => {    
-    const theme = defineTheme(authorOptions)()
-    const params = astroConfigSetupParamsStub()
-    expect(() => {
-      theme.hooks['astro:config:setup']?.(params)
-    }).not.toThrow()
-  })
-})
