@@ -2,7 +2,7 @@ import { basename, extname, resolve } from "node:path";
 import fg from "fast-glob";
 import { GLOB_IGNORE } from "../internal/consts.ts";
 import { mergeOptions } from "./options.ts";
-import { isCSSFile, isImageFile, normalizePath } from "./path.ts";
+import { isCSSFile, isImageFile, normalizePath, resolveDirectory } from "./path.ts";
 
 const RESOLVED = Symbol("resolved");
 
@@ -109,10 +109,11 @@ export function resolveModuleObject(
 ): ResolvedModuleObject {
 	if (RESOLVED in module) return module;
 	const { imports = [], exports = {} } = module;
+	const rootResolved = normalizePath(resolveDirectory("./", root, false))
 	return {
-		root,
-		imports: resolveImportArray(root, imports),
-		exports: resolveExportObject(root, exports),
+		root: rootResolved,
+		imports: resolveImportArray(rootResolved, imports),
+		exports: resolveExportObject(rootResolved, exports),
 		[RESOLVED]: true,
 	};
 }
