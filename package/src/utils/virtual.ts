@@ -58,7 +58,7 @@ export function isEmptyModuleObject({
 	imports = [],
 	exports = {},
 }: ModuleObject | ResolvedModuleObject | VirtualModule): boolean {
-	return !!imports?.length && !!Object.keys(exports || {}).length;
+	return !imports.length && !Object.keys(exports).length;
 }
 
 export function mergeModuleObjects<T extends S, S extends ModuleObject | ResolvedModuleObject | VirtualModule>(
