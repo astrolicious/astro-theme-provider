@@ -35,7 +35,7 @@ export type AuthorOptions<Schema extends z.ZodTypeAny> = Prettify<{
 }>;
 
 export type UserOptions<Schema extends z.ZodTypeAny> = Prettify<{
-	config: z.infer<Schema>;
+	config?: z.infer<Schema>;
 	pages?: AstroThemePagesOverridesOptions<ThemeName> | undefined;
 	overrides?: AstroThemeExportOverrideOptions<ThemeName> | undefined;
 }>;
