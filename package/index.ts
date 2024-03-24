@@ -83,11 +83,14 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	const themeName = authorOptions.name || themePackage.json.name;
 
 	// Return theme integration
-	return ({
-		config: userConfigUnparsed,
-		pages: userPages = {},
-		overrides: userOverrides = {},
-	}: UserOptions<Schema>): AstroIntegration | AstroDbIntegration => {
+	return (userOptions:  UserOptions<Schema> = {}): AstroIntegration | AstroDbIntegration => {
+
+		const {
+			config: userConfigUnparsed = {},
+			pages: userPages = {},
+			overrides: userOverrides = {}
+		} = userOptions
+		
 		// Parse/validate config passed by user, throw formatted error if it is invalid
 		const parsed = authorOptions.schema.safeParse(userConfigUnparsed, { errorMap });
 
