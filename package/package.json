@@ -24,6 +24,11 @@
 		"@astrojs/db": ">=0.8.0",
 		"astro": ">=3"
 	},
+	"peerDependenciesMeta": {
+		"@astrojs/db": {
+			"optional": true
+		}
+	},
 	"devDependencies": {
 		"@astrojs/db": "^0.8.7",
 		"@types/node": "^20.11.29",
