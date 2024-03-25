@@ -26,7 +26,7 @@
 		"@types/node": "^20.11.29"
 	},
 	"dependencies": {
-		"astro-integration-kit": "^0.6.0",
+		"astro-integration-kit": "^0.7.1",
 		"astro-pages": "^0.2.1",
 		"astro-public": "^0.0.4",
 		"callsites": "^4.1.0",
