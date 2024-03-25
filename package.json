@@ -14,7 +14,7 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"@biomejs/biome": "^1.6.1",
+		"@biomejs/biome": "^1.6.2",
 		"@changesets/cli": "^2.27.1",
 		"astro": "^4.5.6"
 	}
