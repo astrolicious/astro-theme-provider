@@ -11,11 +11,11 @@ import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
 import { z } from "astro/zod";
 import callsites from "callsites";
-import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./src/internal/consts.ts";
-import { errorMap } from "./src/internal/error-map.ts";
-import type { AuthorOptions, UserOptions } from "./src/internal/types.ts";
-import { mergeOptions } from "./src/utils/options.ts";
-import { PackageJSON, warnThemePackage } from "./src/utils/package.ts";
+import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./src/internal/consts.js";
+import { errorMap } from "./src/internal/error-map.js";
+import type { AuthorOptions, UserOptions } from "./src/internal/types.js";
+import { mergeOptions } from "./src/utils/options.js";
+import { PackageJSON, warnThemePackage } from "./src/utils/package.js";
 import {
 	addLeadingSlash,
 	normalizePath,
@@ -23,8 +23,8 @@ import {
 	resolveDirectory,
 	resolveFilepath,
 	validatePattern,
-} from "./src/utils/path.ts";
-import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./src/utils/virtual.ts";
+} from "./src/utils/path.js";
+import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./src/utils/virtual.js";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 const thisRoot = resolveDirectory("./", thisFile);
@@ -213,7 +213,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : "string[]"},
 						`;
 
-						const override = userOverrides[name as keyof GetAstroThemeExports<ThemeName>];
+						const override = userOverrides[name as unknown as string];
 
 						// Check if module exists and contains overrides
 						if (override) {
