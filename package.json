@@ -6,8 +6,12 @@
 		"node": ">=18.19.0"
 	},
 	"scripts": {
+		"package:dev": "pnpm --filter astro-theme-provider dev",
+		"package:build": "pnpm --filter astro-theme-provider build",
 		"playground:dev": "pnpm --filter playground dev",
+		"playground:build": "pnpm --filter playground build",
 		"docs:dev": "pnpm --filter docs dev",
+		"docs:build": "pnpm --filter docs build",
 		"test": "pnpm --filter astro-theme-provider test",
 		"changeset": "changeset",
 		"lint": "biome check .",
