@@ -7,10 +7,10 @@ import { addDts, addIntegration, addVirtualImports, watchIntegration } from "ast
 import _defineTheme from "../../dist/index.js";
 
 const thisFile = fileURLToPath(import.meta.url).toString();
-const playgroundDir = resolve(dirname(thisFile), "../mock");
-const packageRoot = resolve(playgroundDir, "package");
+const mockDir = resolve(dirname(thisFile), "../mock");
+const packageRoot = resolve(mockDir, "package");
 const packageEntrypoint = resolve(packageRoot, "index.ts");
-const projectRoot = resolve(playgroundDir, "project");
+const projectRoot = resolve(mockDir, "project");
 const projectSrc = resolve(projectRoot, "src");
 
 const defineTheme = (option) => {
@@ -37,8 +37,8 @@ const astroConfigSetupParamsStub = (params) => ({
 	updateConfig: mock.fn(),
 	addDevOverlayPlugin: mock.fn(),
 	config: {
-		root: pathToFileURL(projectRoot),
-		srcDir: pathToFileURL(projectSrc),
+		root: pathToFileURL(projectRoot + "/"),
+		srcDir: pathToFileURL(projectSrc + "/"),
 	},
 	...(params || {}),
 });
