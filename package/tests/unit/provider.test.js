@@ -2,8 +2,6 @@ import * as assert from "node:assert/strict";
 import { dirname, resolve } from "node:path";
 import { afterEach, describe, it, mock } from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
-// Mock imports
-import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit";
 import _defineTheme from "../../dist/index.js";
 
 const thisFile = fileURLToPath(import.meta.url).toString();
@@ -44,12 +42,6 @@ const astroConfigSetupParamsStub = (params) => ({
 });
 
 describe("defineTheme", () => {
-	mock.fn(addDts, () => {});
-	mock.fn(addIntegration, () => {});
-	mock.fn(addVirtualImports, () => {});
-	mock.fn(watchIntegration, () => {});
-	mock.fn(watchIntegration, () => {});
-
 	afterEach(() => {
 		mock.reset();
 	});
