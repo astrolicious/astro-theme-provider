@@ -2,20 +2,20 @@ import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AstroDbIntegration } from "@astrojs/db/types";
-import type { AstroIntegration } from "astro";
-import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit/utilities";
-import { addPageDir } from "astro-pages";
+import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit";
+import "astro-integration-kit/types/db";
 import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOption } from "astro-pages/types";
+import { addPageDir } from "astro-pages";
 import staticDir from "astro-public";
 import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
 import { z } from "astro/zod";
 import callsites from "callsites";
-import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./src/internal/consts.js";
-import { errorMap } from "./src/internal/error-map.js";
-import type { AuthorOptions, UserOptions } from "./src/internal/types.js";
-import { mergeOptions } from "./src/utils/options.js";
-import { PackageJSON, warnThemePackage } from "./src/utils/package.js";
+import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./internal/consts.js";
+import { errorMap } from "./internal/error-map.js";
+import type { AuthorOptions, UserOptions } from "./internal/types.js";
+import { mergeOptions } from "./utils/options.js";
+import { PackageJSON, warnThemePackage } from "./utils/package.js";
 import {
 	addLeadingSlash,
 	normalizePath,
@@ -23,8 +23,8 @@ import {
 	resolveDirectory,
 	resolveFilepath,
 	validatePattern,
-} from "./src/utils/path.js";
-import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./src/utils/virtual.js";
+} from "./utils/path.js";
+import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./utils/virtual.js";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 const thisRoot = resolveDirectory("./", thisFile);
@@ -83,7 +83,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	const themeName = authorOptions.name || themePackage.json.name;
 
 	// Return theme integration
-	return (userOptions: UserOptions<Schema> = {}): AstroIntegration | AstroDbIntegration => {
+	return (userOptions: UserOptions<Schema> = {}): AstroDbIntegration => {
 		const { config: userConfigUnparsed = {}, pages: userPages = {}, overrides: userOverrides = {} } = userOptions;
 
 		// Parse/validate config passed by user, throw formatted error if it is invalid
@@ -108,7 +108,9 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					if (existsSync(configEntrypoint)) extendDb({ configEntrypoint });
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
-				"astro:config:setup": ({ command, config, logger, updateConfig, addWatchFile, injectRoute }) => {
+				"astro:config:setup": (params) => {
+					const { config, logger, injectRoute } = params;
+
 					const projectRoot = normalizePath(fileURLToPath(config.root.toString()));
 
 					// Record of virtual imports and their content
@@ -162,27 +164,14 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					warnThemePackage(themePackage, logger);
 
 					//HMR for `astro-theme-provider` package
-					watchIntegration({
-						dir: thisRoot,
-						command,
-						updateConfig,
-						addWatchFile,
-					});
+					watchIntegration(params, thisRoot);
 
 					// HMR for theme author's package
-					watchIntegration({
-						dir: themeRoot,
-						command,
-						updateConfig,
-						addWatchFile,
-					});
+					watchIntegration(params, themeRoot);
 
 					// Add `astro-public` integration to handle `/public` folder logic
-					addIntegration({
+					addIntegration(params, {
 						integration: staticDir(authorOptions.publicDir!),
-						config,
-						logger,
-						updateConfig,
 					});
 
 					// Dynamically create virtual modules using globs, imports, or exports
@@ -213,7 +202,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : "string[]"},
 						`;
 
-						const override = userOverrides[name as unknown as string];
+						const override = userOverrides[name];
 
 						// Check if module exists and contains overrides
 						if (override) {
@@ -309,10 +298,8 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					injectPages(injectRoute);
 
 					// Add virtual modules
-					addVirtualImports({
+					addVirtualImports(params, {
 						name: themeName,
-						config,
-						updateConfig,
 						imports: virtualImports,
 					});
 
@@ -339,12 +326,9 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					}
 
 					// Write compiled types to .d.ts file
-					addDts({
+					addDts(params, {
 						name: themeName,
 						content: themeTypesBuffer,
-						root: config.root,
-						srcDir: config.srcDir,
-						logger,
 					});
 				},
 			},

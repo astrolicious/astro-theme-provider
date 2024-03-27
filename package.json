@@ -12,15 +12,15 @@
 		"playground:build": "pnpm --filter playground build",
 		"docs:dev": "pnpm --filter docs dev",
 		"docs:build": "pnpm --filter docs build",
-		"test": "pnpm --filter astro-theme-provider test",
+		"test": "node --test",
 		"changeset": "changeset",
 		"lint": "biome check .",
 		"lint:fix": "biome check --apply ."
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"@biomejs/biome": "^1.6.1",
+		"@biomejs/biome": "^1.6.3",
 		"@changesets/cli": "^2.27.1",
-		"astro": "^4.5.6"
+		"astro": "^4.5.10"
 	}
 }

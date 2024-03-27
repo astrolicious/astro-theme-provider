@@ -1,8 +1,8 @@
 import { basename, extname, resolve } from "node:path";
 import fg from "fast-glob";
-import { GLOB_IGNORE } from "../internal/consts.ts";
-import { mergeOptions } from "./options.ts";
-import { isCSSFile, isImageFile, normalizePath, resolveDirectory } from "./path.ts";
+import { GLOB_IGNORE } from "../internal/consts.js";
+import { mergeOptions } from "./options.js";
+import { isCSSFile, isImageFile, normalizePath, resolveDirectory } from "./path.js";
 
 const RESOLVED = Symbol("resolved");
 
