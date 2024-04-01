@@ -9,11 +9,13 @@
 		"url": "https://github.com/UserName/my-theme",
 		"directory": "package"
 	},
-	"keywords": ["astro-integration"],
+	"keywords": [
+		"astro-integration"
+	],
 	"scripts": {},
 	"devDependencies": {
-		"@types/node": "^20.11.20",
-		"astro": "^4.4.4"
+		"@types/node": "^20.12.2",
+		"astro": "^4.5.12"
 	},
 	"dependencies": {
 		"astro-theme-provider": "workspace:^"
