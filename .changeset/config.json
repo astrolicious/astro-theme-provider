@@ -7,5 +7,5 @@
 	"access": "public",
 	"baseBranch": "main",
 	"updateInternalDependencies": "patch",
-	"ignore": ["test-theme", "my-theme", "playground", "docs"]
+	"ignore": ["playground", "docs", "my-theme", "test-e2e-ssg", "mock-theme"]
 }
