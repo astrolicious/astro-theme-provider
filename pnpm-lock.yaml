@@ -70,7 +70,7 @@ importers:
         specifier: workspace:^
         version: link:../tests/themes/theme-playground
 
-  tests/e2e/SSG:
+  tests/e2e/ssg:
     dependencies:
       '@astrojs/check':
         specifier: ^0.5.10
