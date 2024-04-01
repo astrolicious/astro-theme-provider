@@ -2,10 +2,10 @@ import * as assert from "node:assert/strict";
 import { dirname, resolve } from "node:path";
 import { afterEach, describe, it, mock } from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import _defineTheme from "../../dist/index.js";
+import _defineTheme from "../dist/index.js";
 
 const thisFile = fileURLToPath(import.meta.url).toString();
-const mockDir = resolve(dirname(thisFile), "../mock");
+const mockDir = resolve(dirname(thisFile), "./mock");
 const packageRoot = resolve(mockDir, "package");
 const packageEntrypoint = resolve(packageRoot, "index.ts");
 const projectRoot = resolve(mockDir, "project");
