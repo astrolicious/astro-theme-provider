@@ -41,6 +41,6 @@ export type UserOptions<Schema extends z.ZodTypeAny> = Prettify<{
 }>;
 
 // Temporary until refactor on type-gen
-declare type ThemeName = "my-theme";
+declare type ThemeName = "";
 declare type AstroThemePagesOverridesOptions<T extends ThemeName> = Record<string, string | boolean>;
 declare type AstroThemeExportOverrideOptions<T extends ThemeName> = Record<string, string[] | Record<string, string>>;

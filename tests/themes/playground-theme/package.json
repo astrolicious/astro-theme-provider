@@ -1,15 +1,17 @@
 {
-	"name": "my-theme",
+	"name": "theme-playground",
 	"private": true,
 	"description": "My awesome theme!",
 	"license": "MIT",
-	"homepage": "https://github.com/UserName/my-theme",
+	"homepage": "https://github.com/UserName/theme-playground",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/UserName/my-theme",
+		"url": "https://github.com/UserName/theme-playground",
 		"directory": "package"
 	},
-	"keywords": ["astro-integration"],
+	"keywords": [
+		"astro-integration"
+	],
 	"scripts": {},
 	"devDependencies": {
 		"@types/node": "^20.12.2",

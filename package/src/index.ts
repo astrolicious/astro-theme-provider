@@ -39,7 +39,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 	// Default options
 	let authorOptions = {
-		name: "my-theme",
+		name: "",
 		entrypoint: themeEntrypoint,
 		srcDir: "src",
 		pageDir: "pages",
@@ -80,7 +80,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	const themePackage = new PackageJSON(themeRoot);
 
 	// Assign theme name
-	const themeName = authorOptions.name || themePackage.json.name;
+	const themeName = authorOptions.name || themePackage.json.name || "theme-integration";
 
 	// Return theme integration
 	return (userOptions: UserOptions<Schema> = {}): AstroDbIntegration => {

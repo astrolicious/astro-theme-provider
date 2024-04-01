@@ -1,13 +1,12 @@
 import { defineConfig } from "astro/config";
-import myTheme from "my-theme";
+import Theme from "theme-playground";
 
-// https://astro.build/config
 export default defineConfig({
 	integrations: [
-		myTheme({
+		Theme({
 			config: {
 				title: "Hello!",
-				description: "welcome",
+				description: "Welcome",
 			},
 		}),
 	],

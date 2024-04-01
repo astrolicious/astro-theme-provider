@@ -1,5 +1,5 @@
 import { defineConfig } from "astro/config";
-import MyTheme from "my-theme";
+import MyTheme from "theme-playground";
 
 export default defineConfig({
 	integrations: [

@@ -63,12 +63,12 @@ importers:
       astro:
         specifier: ^4.5.12
         version: 4.5.12(@types/node@20.12.2)(typescript@5.4.3)
-      my-theme:
-        specifier: workspace:^
-        version: link:../tests/themes/my-theme
       sharp:
         specifier: ^0.33.3
         version: 0.33.3
+      theme-playground:
+        specifier: workspace:^
+        version: link:../tests/themes/playground-theme
 
   tests/e2e/SSG:
     dependencies:
@@ -78,9 +78,9 @@ importers:
       astro:
         specifier: ^4.5.12
         version: 4.5.12(@types/node@20.12.2)(typescript@5.4.3)
-      my-theme:
+      theme-playground:
         specifier: workspace:^
-        version: link:../../themes/my-theme
+        version: link:../../themes/playground-theme
       typescript:
         specifier: ^5.4.3
         version: 5.4.3
@@ -92,7 +92,7 @@ importers:
         specifier: ^20.12.2
         version: 20.12.2
 
-  tests/themes/my-theme:
+  tests/themes/playground-theme:
     dependencies:
       astro-theme-provider:
         specifier: workspace:^

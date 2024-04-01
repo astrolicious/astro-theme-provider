@@ -57,7 +57,7 @@ export function warnThemePackage(pkg: PackageJSON, logger: HookParameters<"astro
 		// Warn theme author if no 'homepage' property exists inside 'package.json'
 		if (!json?.homepage) {
 			logger.warn(
-				`Add a 'homepage' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"homepage": "https://github.com/UserName/my-theme",\n`,
+				`Add a 'homepage' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"homepage": "https://github.com/UserName/theme-playground",\n`,
 			);
 		}
 

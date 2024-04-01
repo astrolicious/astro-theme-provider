@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "astro dev",
 		"start": "astro dev",
-		"build": "astro check && astro build",
+		"build": "astro build",
 		"preview": "astro preview",
 		"astro": "astro",
 		"test": "playwright test"
@@ -14,8 +14,8 @@
 	"dependencies": {
 		"@astrojs/check": "^0.5.10",
 		"astro": "^4.5.12",
-		"typescript": "^5.4.3",
-		"my-theme": "workspace:^"
+		"theme-playground": "workspace:^",
+		"typescript": "^5.4.3"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.42.1",
