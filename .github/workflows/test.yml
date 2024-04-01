@@ -15,6 +15,8 @@ jobs:
         node-version: lts/*
     - name: Install dependencies
       run: npm install -g pnpm && pnpm install
+    - name: Install Browsers
+      run: pnpm exec playwright install
     - name: Build Package
       run: pnpm package:build
     - name: Run Unit Tests
