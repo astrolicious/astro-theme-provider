@@ -5,10 +5,5 @@ export default defineTheme({
 	schema: z.object({
 		title: z.string(),
 		description: z.string().optional(),
-	}),
-	imports: {
-		test: {
-			default: "./src/components/Heading.astro",
-		},
-	},
+	})
 });
