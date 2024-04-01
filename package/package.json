@@ -1,57 +1,51 @@
 {
-  "name": "astro-theme-provider",
-  "version": "0.1.1",
-  "description": "Easily create theme integrations for Astro",
-  "keywords": [
-    "astro",
-    "withastro",
-    "astro-integration"
-  ],
-  "author": "Bryce Russell",
-  "license": "Unlicense",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/brycerussell/astro-theme-provider",
-    "directory": "packages/astro-theme-provider"
-  },
-  "bugs": "https://github.com/brycerussell/astro-theme-provider/issues",
-  "homepage": "https://astro-theme-provider.netlify.app/",
-  "scripts": {
-    "test": "node --test",
-    "dev": "tsup --watch",
-    "build": "tsup"
-  },
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
-  "peerDependencies": {
-    "@astrojs/db": ">=0.8.0",
-    "astro": ">=3"
-  },
-  "peerDependenciesMeta": {
-    "@astrojs/db": {
-      "optional": true
-    }
-  },
-  "devDependencies": {
-    "@astrojs/db": "^0.9.8",
-    "@types/node": "^20.12.2",
-    "playwright": "^1.42.1",
-    "tsup": "^8.0.2",
-    "typescript": "^5.4.3"
-  },
-  "dependencies": {
-    "astro-integration-kit": "^0.8.0",
-    "astro-pages": "^0.2.1",
-    "astro-public": "^0.0.4",
-    "callsites": "^4.1.0",
-    "fast-glob": "^3.3.2"
-  }
+	"name": "astro-theme-provider",
+	"version": "0.1.1",
+	"description": "Easily create theme integrations for Astro",
+	"keywords": ["astro", "withastro", "astro-integration"],
+	"author": "Bryce Russell",
+	"license": "Unlicense",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/brycerussell/astro-theme-provider",
+		"directory": "packages/astro-theme-provider"
+	},
+	"bugs": "https://github.com/brycerussell/astro-theme-provider/issues",
+	"homepage": "https://astro-theme-provider.netlify.app/",
+	"scripts": {
+		"test": "node --test",
+		"dev": "tsup --watch",
+		"build": "tsup"
+	},
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": ["dist"],
+	"peerDependencies": {
+		"@astrojs/db": ">=0.8.0",
+		"astro": ">=3"
+	},
+	"peerDependenciesMeta": {
+		"@astrojs/db": {
+			"optional": true
+		}
+	},
+	"devDependencies": {
+		"@astrojs/db": "^0.9.8",
+		"@types/node": "^20.12.2",
+		"playwright": "^1.42.1",
+		"tsup": "^8.0.2",
+		"typescript": "^5.4.3"
+	},
+	"dependencies": {
+		"astro-integration-kit": "^0.8.0",
+		"astro-pages": "^0.2.1",
+		"astro-public": "^0.0.4",
+		"callsites": "^4.1.0",
+		"fast-glob": "^3.3.2"
+	}
 }

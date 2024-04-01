@@ -1,24 +1,24 @@
 {
-  "name": "test-e2e-ssg",
-  "private": true,
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview",
-    "astro": "astro",
-    "test": "playwright test"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.5.10",
-    "astro": "^4.5.12",
-    "typescript": "^5.4.3",
-    "my-theme": "workspace:^"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.42.1",
-    "@types/node": "^20.12.2"
-  }
+	"name": "test-e2e-ssg",
+	"private": true,
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"build": "astro check && astro build",
+		"preview": "astro preview",
+		"astro": "astro",
+		"test": "playwright test"
+	},
+	"dependencies": {
+		"@astrojs/check": "^0.5.10",
+		"astro": "^4.5.12",
+		"typescript": "^5.4.3",
+		"my-theme": "workspace:^"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.42.1",
+		"@types/node": "^20.12.2"
+	}
 }
