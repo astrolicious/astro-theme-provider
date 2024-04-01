@@ -23,6 +23,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^1.6.3",
 		"@changesets/cli": "^2.27.1",
+		"@playwright/test": "^1.42.1",
 		"astro": "^4.5.12"
 	}
 }
