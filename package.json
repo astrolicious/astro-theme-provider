@@ -12,7 +12,7 @@
 		"playground:build": "pnpm --filter playground build",
 		"docs:dev": "pnpm --filter docs dev",
 		"docs:build": "pnpm --filter docs build",
-		"test": "pnpm --filter astro-theme-provider test",
+		"test": "node --test && pnpm --filter \"./tests/e2e/**\" test",
 		"changeset": "changeset",
 		"lint": "biome check .",
 		"lint:fix": "biome check --apply ."

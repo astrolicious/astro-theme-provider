@@ -17,7 +17,7 @@
   "bugs": "https://github.com/brycerussell/astro-theme-provider/issues",
   "homepage": "https://astro-theme-provider.netlify.app/",
   "scripts": {
-    "test": "node --test && playwright test",
+    "test": "node --test",
     "dev": "tsup --watch",
     "build": "tsup"
   },
@@ -42,7 +42,6 @@
   },
   "devDependencies": {
     "@astrojs/db": "^0.9.5",
-    "@playwright/test": "^1.42.1",
     "@types/node": "^20.11.30",
     "playwright": "^1.42.1",
     "tsup": "^8.0.2",
