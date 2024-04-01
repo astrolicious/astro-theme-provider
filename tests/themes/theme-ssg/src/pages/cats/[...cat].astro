@@ -1,0 +1,37 @@
+---
+import { Image } from "astro:assets";
+import { Layout } from "theme-ssg/layouts";
+
+export async function getStaticPaths() {
+	const images = Object.entries(await import("theme-ssg/assets"));
+	return images.map(([name, image], i) => {
+		return {
+			params: {
+				cat: name,
+			},
+			props: {
+				// @ts-ignore
+				next: images[i >= images.length - 1 ? 0 : i <= images.length - 1 ? i + 1 : 0][0],
+				name,
+				image,
+			},
+		};
+	});
+}
+
+interface Props {
+	next: string;
+	name: string;
+	image: ImageMetadata;
+}
+
+const { next, name, image } = Astro.props;
+---
+
+<Layout>
+  <Image src={image} alt="Levi sitting" />
+  <h2>Hey I'm "{name}" Levi</h2>
+  <ul>
+    <li><a href={`/cats/${next}`}>Next Cat</a></li>
+  </ul>
+</Layout>

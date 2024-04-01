@@ -68,7 +68,7 @@ importers:
         version: 0.33.3
       theme-playground:
         specifier: workspace:^
-        version: link:../tests/themes/playground-theme
+        version: link:../tests/themes/theme-playground
 
   tests/e2e/SSG:
     dependencies:
@@ -78,9 +78,9 @@ importers:
       astro:
         specifier: ^4.5.12
         version: 4.5.12(@types/node@20.12.2)(typescript@5.4.3)
-      theme-playground:
+      theme-ssg:
         specifier: workspace:^
-        version: link:../../themes/playground-theme
+        version: link:../../themes/theme-ssg
       typescript:
         specifier: ^5.4.3
         version: 5.4.3
@@ -92,7 +92,20 @@ importers:
         specifier: ^20.12.2
         version: 20.12.2
 
-  tests/themes/playground-theme:
+  tests/themes/theme-playground:
+    dependencies:
+      astro-theme-provider:
+        specifier: workspace:^
+        version: link:../../../package
+    devDependencies:
+      '@types/node':
+        specifier: ^20.12.2
+        version: 20.12.2
+      astro:
+        specifier: ^4.5.12
+        version: 4.5.12(@types/node@20.12.2)(typescript@5.4.3)
+
+  tests/themes/theme-ssg:
     dependencies:
       astro-theme-provider:
         specifier: workspace:^

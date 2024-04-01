@@ -1,0 +1,23 @@
+---
+import { Heading } from "theme-ssg/components";
+import config from "theme-ssg/config";
+import { Layout } from "theme-ssg/layouts";
+---
+
+<Layout>
+  <Heading></Heading>
+  <h2>{config.description}</h2>
+  <p><code>astro-theme-provider</code><img src="/favicon.svg" alt="rocket" /></p>
+  <h3>Explore</h3>
+  <ul>
+    <li><a href="/cats">Cats - Dynamic routing and images</a></li>
+  </ul>
+</Layout>
+
+<style>
+  p {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+</style>

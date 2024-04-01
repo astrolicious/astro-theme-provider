@@ -1,0 +1,23 @@
+{
+	"name": "theme-ssg",
+	"private": true,
+	"description": "My awesome theme!",
+	"license": "MIT",
+	"homepage": "https://github.com/UserName/theme-ssg",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/UserName/theme-ssg",
+		"directory": "package"
+	},
+	"keywords": [
+		"astro-integration"
+	],
+	"scripts": {},
+	"devDependencies": {
+		"@types/node": "^20.12.2",
+		"astro": "^4.5.12"
+	},
+	"dependencies": {
+		"astro-theme-provider": "workspace:^"
+	}
+}
