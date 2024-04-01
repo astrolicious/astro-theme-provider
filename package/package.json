@@ -22,7 +22,7 @@
 		"astro": ">=3"
 	},
 	"devDependencies": {
-		"@astrojs/db": "^0.8.7",
+		"@astrojs/db": "^0.9.8",
 		"@types/node": "^20.11.29"
 	},
 	"dependencies": {
