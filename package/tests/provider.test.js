@@ -68,12 +68,13 @@ describe("defineTheme", () => {
 		it("should inject pages", () => {
 			const theme = defineTheme({})();
 			const params = astroConfigSetupParamsStub();
+			const entrypoint = normalizePath(resolve(packagePages, "index.astro"));
 
 			theme.hooks["astro:config:setup"]?.(params);
 
 			assert.deepEqual(params.injectRoute.mock.calls[0].arguments[0], {
-				entryPoint: normalizePath(resolve(packagePages, "index.astro")),
-				entrypoint: normalizePath(resolve(packagePages, "index.astro")),
+				entryPoint: entrypoint,
+				entrypoint,
 				pattern: "/",
 			});
 		});
@@ -105,9 +106,6 @@ describe("defineTheme", () => {
 
 			theme.hooks["astro:config:setup"]?.(params);
 
-			// Vite plugin for resolving virtual modules
-			const plugin = params.updateConfig.mock.calls.at(-1).arguments[0].vite.plugins[0];
-
 			assert.equal(
 				readFileSync(resolve(projectSrc, "env.d.ts"), "utf-8").includes(
 					`/// <reference types="../.astro/${packageName}.d.ts" />`,
@@ -117,6 +115,5 @@ describe("defineTheme", () => {
 
 			assert.equal(existsSync(resolve(projectRoot, `.astro/${packageName}.d.ts`)), true);
 		});
-		// /// <reference types="../.astro/theme-mock.d.ts" />
 	});
 });
