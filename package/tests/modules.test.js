@@ -1,36 +1,34 @@
 import * as assert from "node:assert/strict";
 import { isAbsolute } from "node:path";
 import { describe, it } from "node:test";
-import { toModuleObject, resolveModuleObject } from "../dist/utils/virtual.js";
+import { resolveModuleObject, toModuleObject } from "../dist/utils/virtual.js";
 
 describe("toModuleObject()", () => {
-	const imports = [
-		"./styles.css"
-	]
+	const imports = ["./styles.css"];
 
 	const exports = {
-		Layout: "./Layout.astro"
-	}
+		Layout: "./Layout.astro",
+	};
 
 	it("should convert an import array", () => {
-		assert.deepEqual(toModuleObject(imports), { imports, exports: {} })
-	})
+		assert.deepEqual(toModuleObject(imports), { imports, exports: {} });
+	});
 
 	it("should convert an export object", () => {
-		assert.deepEqual(toModuleObject(exports), { imports: [], exports })
-	})
+		assert.deepEqual(toModuleObject(exports), { imports: [], exports });
+	});
 
 	it("should convert an export object with imports", () => {
-		assert.deepEqual(toModuleObject({ imports, ...exports }), { imports, exports })
-	})
+		assert.deepEqual(toModuleObject({ imports, ...exports }), { imports, exports });
+	});
 
 	it("should not change module object", () => {
-		const moduleObject = { imports, exports }
-		assert.deepEqual(toModuleObject(moduleObject), moduleObject)
-	})
-})
+		const moduleObject = { imports, exports };
+		assert.deepEqual(toModuleObject(moduleObject), moduleObject);
+	});
+});
 
-describe("resolveModuleObject()", () => {	
+describe("resolveModuleObject()", () => {
 	it("should have absolute root", () => {
 		const resolvedModuledObject = resolveModuleObject(import.meta.url, {});
 
@@ -55,7 +53,7 @@ describe("resolveModuleObject()", () => {
 
 	it("should not have absolute imports", () => {
 		const resolvedModuledObject = resolveModuleObject(import.meta.url, { imports: ["package"] });
-		
+
 		assert.equal(resolvedModuledObject.imports.every(isAbsolute), false);
 	});
 
@@ -65,7 +63,7 @@ describe("resolveModuleObject()", () => {
 				default: "package",
 			},
 		});
-		
+
 		assert.equal(Object.values(resolvedModuledObject.exports).every(isAbsolute), false);
 	});
 });

@@ -12,12 +12,10 @@ export type ModuleImports = (ImportOption | ModuleImports)[];
 
 export type ResolvedModuleImports = string[];
 
-export type ModuleExports = 
-	{ 
-		imports?: ModuleImports; 
-		default?: ImportOption;
-	} & 
-	{ [name: string]: ImportOption; }
+export type ModuleExports = {
+	imports?: ModuleImports;
+	default?: ImportOption;
+} & { [name: string]: ImportOption };
 
 export interface ResolvedModuleExports {
 	[id: string]: string;
@@ -78,7 +76,7 @@ export function toModuleObject(option: ModuleImports | ModuleExports | ModuleObj
 
 	const { imports = [], exports = option as ModuleExports } = option as ModuleObject;
 
-	delete exports.imports
+	delete exports.imports;
 
 	return { imports, exports };
 }
