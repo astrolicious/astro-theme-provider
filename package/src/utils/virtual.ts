@@ -44,7 +44,7 @@ export interface VirtualModule extends ResolvedModuleObject {
 }
 
 export function camelCase(str: string) {
-	return str.replace(/(-|<|>|:|"|\/|\\|\||\?|\*|\s)./g, (x) => x[1]?.toUpperCase());
+	return str.replace(/(-|<|>|:|"|\/|\\|\||\?|\*|\s)./g, (x) => x[1]!.toUpperCase());
 }
 
 export function resolveId(root: string, id: string) {
@@ -76,7 +76,7 @@ export function toModuleObject(option: ModuleImports | ModuleExports | ModuleObj
 
 	const { imports = [], exports = option as ModuleExports } = option as ModuleObject;
 
-	exports.imports = undefined;
+	delete exports.imports;
 
 	return { imports, exports };
 }
