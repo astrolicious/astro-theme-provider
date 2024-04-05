@@ -44,7 +44,7 @@
 	"dependencies": {
 		"astro-integration-kit": "^0.8.0",
 		"astro-pages": "^0.2.1",
-		"astro-public": "^0.0.4",
+		"astro-public": "^0.1.0",
 		"callsites": "^4.1.0",
 		"fast-glob": "^3.3.2"
 	}

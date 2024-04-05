@@ -33,8 +33,8 @@ importers:
         specifier: ^0.2.1
         version: 0.2.1(astro-integration-kit@0.8.0)(astro@4.5.16)
       astro-public:
-        specifier: ^0.0.4
-        version: 0.0.4(astro@4.5.16)
+        specifier: ^0.1.0
+        version: 0.1.0(astro@4.5.16)
       callsites:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1964,8 +1964,8 @@ packages:
       fast-glob: 3.3.2
     dev: false
 
-  /astro-public@0.0.4(astro@4.5.16):
-    resolution: {integrity: sha512-8lm3Oivqk00guR1mjguefHlKLXrkmDo/nnAGbv5SqW/Rgt7pyGv5rI14rR4UbeHK77y70InRX+yatpzoCausaw==}
+  /astro-public@0.1.0(astro@4.5.16):
+    resolution: {integrity: sha512-e+vIfUohHYIOwUmlKyYOOMvlClHKuTT9AMzZcPCFAJeVEL8EQWyXVc+WCtS3IH16gN56UjnymQ2V2hjuQwPrOg==}
     peerDependencies:
       astro: ^4.4.0
     dependencies:
