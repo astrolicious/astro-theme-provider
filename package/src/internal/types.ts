@@ -1,7 +1,7 @@
 import type { Option as PageDirOption } from "astro-pages/types";
 import type { Option as StaticDirOption } from "astro-public/types";
 import type { z } from "astro/zod";
-import type { ModuleExports, ModuleImports, ModuleObject } from "../utils/virtual";
+import type { ModuleExports, ModuleImports, ModuleObject } from "../utils/virtual.js";
 
 export type ValueOrArray<T> = T | ValueOrArray<T>[];
 
@@ -35,7 +35,12 @@ export type AuthorOptions<Schema extends z.ZodTypeAny> = Prettify<{
 }>;
 
 export type UserOptions<Schema extends z.ZodTypeAny> = Prettify<{
-	config: z.infer<Schema>;
+	config?: z.infer<Schema>;
 	pages?: AstroThemePagesOverridesOptions<ThemeName> | undefined;
 	overrides?: AstroThemeExportOverrideOptions<ThemeName> | undefined;
 }>;
+
+// Temporary until refactor on type-gen
+declare type ThemeName = "";
+declare type AstroThemePagesOverridesOptions<T extends ThemeName> = Record<string, string | boolean>;
+declare type AstroThemeExportOverrideOptions<T extends ThemeName> = Record<string, string[] | Record<string, string>>;

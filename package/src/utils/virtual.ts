@@ -1,8 +1,8 @@
 import { basename, extname, resolve } from "node:path";
 import fg from "fast-glob";
-import { GLOB_IGNORE } from "../internal/consts.ts";
-import { mergeOptions } from "./options.ts";
-import { isCSSFile, isImageFile, normalizePath } from "./path.ts";
+import { GLOB_IGNORE } from "../internal/consts.js";
+import { mergeOptions } from "./options.js";
+import { isCSSFile, isImageFile, normalizePath, resolveDirectory } from "./path.js";
 
 const RESOLVED = Symbol("resolved");
 
@@ -12,9 +12,10 @@ export type ModuleImports = (ImportOption | ModuleImports)[];
 
 export type ResolvedModuleImports = string[];
 
-export interface ModuleExports {
-	[id: string]: ImportOption;
-}
+export type ModuleExports = {
+	imports?: ModuleImports;
+	default?: ImportOption;
+} & { [name: string]: ImportOption };
 
 export interface ResolvedModuleExports {
 	[id: string]: string;
@@ -58,7 +59,7 @@ export function isEmptyModuleObject({
 	imports = [],
 	exports = {},
 }: ModuleObject | ResolvedModuleObject | VirtualModule): boolean {
-	return !!imports?.length && !!Object.keys(exports || {}).length;
+	return !imports.length && !Object.keys(exports).length;
 }
 
 export function mergeModuleObjects<T extends S, S extends ModuleObject | ResolvedModuleObject | VirtualModule>(
@@ -74,6 +75,8 @@ export function toModuleObject(option: ModuleImports | ModuleExports | ModuleObj
 	}
 
 	const { imports = [], exports = option as ModuleExports } = option as ModuleObject;
+
+	delete exports.imports;
 
 	return { imports, exports };
 }
@@ -109,10 +112,11 @@ export function resolveModuleObject(
 ): ResolvedModuleObject {
 	if (RESOLVED in module) return module;
 	const { imports = [], exports = {} } = module;
+	const resolvedRoot = normalizePath(resolveDirectory("./", root, false));
 	return {
-		root,
-		imports: resolveImportArray(root, imports),
-		exports: resolveExportObject(root, exports),
+		root: resolvedRoot,
+		imports: resolveImportArray(resolvedRoot, imports),
+		exports: resolveExportObject(resolvedRoot, exports),
 		[RESOLVED]: true,
 	};
 }
@@ -208,9 +212,9 @@ export function generateTypesFromModule(
 ) {
 	let buffer = "";
 
-	const { exports } = module;
+	const { exports = {} } = module;
 
-	for (const [name, path] of Object.entries(exports || {})) {
+	for (const [name, path] of Object.entries(exports)) {
 		if (!path || isSideEffectImport(path)) continue;
 
 		let type;

@@ -1,21 +1,29 @@
 {
-	"name": "theme-provider-root",
+	"name": "root",
 	"private": true,
 	"packageManager": "pnpm@8.15.2",
 	"engines": {
 		"node": ">=18.19.0"
 	},
 	"scripts": {
+		"test": "node --test && pnpm --filter \"./tests/e2e/**\" test",
+		"test:e2e": "pnpm --filter \"./tests/e2e/**\" test",
+		"test:unit": "node --test",
+		"package:dev": "pnpm --filter astro-theme-provider dev",
+		"package:build": "pnpm --filter astro-theme-provider build",
 		"playground:dev": "pnpm --filter playground dev",
+		"playground:build": "pnpm --filter playground build",
 		"docs:dev": "pnpm --filter docs dev",
+		"docs:build": "pnpm --filter docs build",
 		"changeset": "changeset",
 		"lint": "biome check .",
 		"lint:fix": "biome check --apply ."
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"@biomejs/biome": "^1.6.1",
+		"@biomejs/biome": "^1.6.4",
 		"@changesets/cli": "^2.27.1",
-		"astro": "^4.5.6"
+		"@playwright/test": "^1.43.0",
+		"astro": "^4.5.16"
 	}
 }

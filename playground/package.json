@@ -1,8 +1,6 @@
 {
-	"name": "docs",
+	"name": "playground",
 	"private": true,
-	"type": "module",
-	"version": "0.0.1",
 	"scripts": {
 		"dev": "astro dev",
 		"start": "astro dev",
@@ -11,9 +9,8 @@
 		"astro": "astro"
 	},
 	"dependencies": {
-		"@astrojs/check": "^0.5.10",
-		"@astrojs/starlight": "^0.21.3",
 		"astro": "^4.5.16",
-		"sharp": "^0.32.6"
+		"sharp": "^0.33.3",
+		"theme-playground": "workspace:^"
 	}
 }
