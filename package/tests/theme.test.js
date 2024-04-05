@@ -49,8 +49,8 @@ const astroConfigSetupParamsStub = (params) => ({
 	injectRoute: mock.fn(),
 	updateConfig: mock.fn(),
 	config: {
-		root: pathToFileURL(projectRoot + "/"),
-		srcDir: pathToFileURL(projectSrc + "/"),
+		root: pathToFileURL(`${projectRoot}/`),
+		srcDir: pathToFileURL(`${projectSrc}/`),
 	},
 	...(params || {}),
 });

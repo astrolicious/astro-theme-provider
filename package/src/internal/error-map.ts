@@ -24,7 +24,7 @@ export const errorMap: ZodErrorMap = (baseError, ctx) => {
 			if (unionError.code === "invalid_type" || unionError.code === "invalid_literal") {
 				const flattenedErrorPath = flattenErrorPath(unionError.path);
 				if (typeOrLiteralErrByPath.has(flattenedErrorPath)) {
-					typeOrLiteralErrByPath.get(flattenedErrorPath)!.expected.push(unionError.expected);
+					typeOrLiteralErrByPath.get(flattenedErrorPath)?.expected.push(unionError.expected);
 				} else {
 					typeOrLiteralErrByPath.set(flattenedErrorPath, {
 						code: unionError.code,
@@ -65,11 +65,11 @@ export const errorMap: ZodErrorMap = (baseError, ctx) => {
 				}),
 			),
 		};
-	} else if (baseError.message) {
-		return { message: prefix(baseErrorPath, baseError.message) };
-	} else {
-		return { message: prefix(baseErrorPath, ctx.defaultError) };
 	}
+	if (baseError.message) {
+		return { message: prefix(baseErrorPath, baseError.message) };
+	}
+	return { message: prefix(baseErrorPath, ctx.defaultError) };
 };
 
 const getTypeOrLiteralMsg = (error: TypeOrLiteralErrByPathEntry): string => {

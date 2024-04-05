@@ -65,7 +65,7 @@ export function resolveDirectory(base: string, path: string, safe = true): strin
 	}
 
 	if (safe && !existsSync(path)) {
-		throw new AstroError(`Directory does not exist!`, `"${path}"`);
+		throw new AstroError("Directory does not exist!", `"${path}"`);
 	}
 
 	return path;
@@ -82,11 +82,11 @@ export function resolveFilepath(base: string, path: string, safe = true): string
 
 	if (safe) {
 		if (!extname(path)) {
-			throw new AstroError(`Filepath is a directory!`, `"${path}"`);
+			throw new AstroError("Filepath is a directory!", `"${path}"`);
 		}
 
 		if (!existsSync(path)) {
-			throw new AstroError(`File does not exist!`, `"${path}"`);
+			throw new AstroError("File does not exist!", `"${path}"`);
 		}
 	}
 

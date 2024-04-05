@@ -198,7 +198,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						let interfaceTypes = virtualModule.types.interface();
 
 						// Add generated types to interface buffer
-						interfaceBuffers["AstroThemeExports"] += `
+						interfaceBuffers.AstroThemeExports += `
 							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : "string[]"},
 						`;
 
@@ -216,7 +216,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 								moduleBuffers[altModuleName] = moduleOverride.types.module();
 
 								// Add generated types to interface buffer
-								interfaceBuffers["AstroThemeExportOverrides"] += `
+								interfaceBuffers.AstroThemeExportOverrides += `
 									"${name}": {
 										${moduleOverride.types.interface()}
 									},
@@ -236,7 +236,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						interfaceTypes = virtualModule.types.interface();
 
 						// Add generated types to interface buffer
-						interfaceBuffers["AstroThemeExportsResolved"] += `
+						interfaceBuffers.AstroThemeExportsResolved += `
 							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : "string[]"},
 						`;
 					}
@@ -251,7 +251,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					const { pages, injectPages } = addPageDir(pageDirOption);
 
 					// Generate types for possibly injected routes
-					interfaceBuffers["AstroThemePagesAuthored"] += Object.entries(pages)
+					interfaceBuffers.AstroThemePagesAuthored += Object.entries(pages)
 						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
 						.join("");
 
@@ -276,7 +276,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							newPattern = addLeadingSlash(removeTrailingSlash(newPattern));
 							if (!validatePattern(newPattern, oldPattern)) {
 								throw new AstroError(
-									`Invalid page override, pattern must contain the same params in the same location`,
+									"Invalid page override, pattern must contain the same params in the same location",
 									`New: ${newPattern}\nOld: ${oldPattern}`,
 								);
 							}
@@ -286,13 +286,11 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							delete pages[oldPattern];
 							// Add types to buffer
 							pageOverrideBuffer += `\n"${oldPattern}": "${newPattern}";`;
-
-							continue;
 						}
 					}
 
 					// Add generated types to interface buffer
-					interfaceBuffers["AstroThemePagesOverrides"] += pageOverrideBuffer;
+					interfaceBuffers.AstroThemePagesOverrides += pageOverrideBuffer;
 
 					// Inject routes/pages
 					injectPages(injectRoute);
