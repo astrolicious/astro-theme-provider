@@ -12,9 +12,12 @@ export type ModuleImports = (ImportOption | ModuleImports)[];
 
 export type ResolvedModuleImports = string[];
 
-export interface ModuleExports {
-	[id: string]: ImportOption;
-}
+export type ModuleExports = 
+	{ 
+		imports?: ModuleImports; 
+		default?: ImportOption;
+	} & 
+	{ [name: string]: ImportOption; }
 
 export interface ResolvedModuleExports {
 	[id: string]: string;
@@ -75,6 +78,8 @@ export function toModuleObject(option: ModuleImports | ModuleExports | ModuleObj
 
 	const { imports = [], exports = option as ModuleExports } = option as ModuleObject;
 
+	delete exports.imports
+
 	return { imports, exports };
 }
 
@@ -109,11 +114,11 @@ export function resolveModuleObject(
 ): ResolvedModuleObject {
 	if (RESOLVED in module) return module;
 	const { imports = [], exports = {} } = module;
-	const rootResolved = normalizePath(resolveDirectory("./", root, false));
+	const resolvedRoot = normalizePath(resolveDirectory("./", root, false));
 	return {
-		root: rootResolved,
-		imports: resolveImportArray(rootResolved, imports),
-		exports: resolveExportObject(rootResolved, exports),
+		root: resolvedRoot,
+		imports: resolveImportArray(resolvedRoot, imports),
+		exports: resolveExportObject(resolvedRoot, exports),
 		[RESOLVED]: true,
 	};
 }
@@ -209,9 +214,9 @@ export function generateTypesFromModule(
 ) {
 	let buffer = "";
 
-	const { exports } = module;
+	const { exports = {} } = module;
 
-	for (const [name, path] of Object.entries(exports || {})) {
+	for (const [name, path] of Object.entries(exports)) {
 		if (!path || isSideEffectImport(path)) continue;
 
 		let type;
