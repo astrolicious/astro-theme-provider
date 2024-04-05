@@ -1,13 +1,19 @@
 # `astro-theme-provider`
 
 [![npm version](https://img.shields.io/npm/v/astro-theme-provider?labelColor=red&color=grey)](https://www.npmjs.com/package/astro-theme-provider)
-![beta](https://img.shields.io/badge/WIP-orange)
-[![readme](https://img.shields.io/badge/README-blue)](package)
-[![template](https://img.shields.io/badge/Theme_Template-green)](https://github.com/BryceRussell/astro-theme-template)
+![beta](https://img.shields.io/badge/Beta-orange)
 
-Easily create theme integrations for Astro
+Author themes for Astro like a normal project and export your work as an integration for others to use
 
-### [Documentation](https://astro-theme-provider.netlify.app)
+- [Read the docs!](https://astro-theme-provider.netlify.app) (coming soon)
+- [Create a theme](https://github.com/BryceRussell/astro-theme-template)
+
+### Contributing
+
+- [Contributing Guide](https://github.com/BryceRussell/astro-theme-provider/blob/main/CONTRIBUTING.md)
+- [Discord Channel](https://chat.astrolicious.dev)
+- [Discussions](https://github.com/BryceRussell/astro-theme-provider/discussions)
+- [Issues](https://github.com/BryceRussell/astro-theme-provider/issues)
 
 ### Example
 
@@ -20,7 +26,6 @@ import { z } from 'astro/zod'
 export default defineTheme({
   schema: z.object({
     title: z.string(),
-    description: z.string().optional(),
   })
 })
 ```
@@ -29,14 +34,13 @@ export default defineTheme({
 
 ```ts
 import { defineConfig } from 'astro/config';
-import MyTheme from 'my-theme';
+import Blog from 'blog-theme';
 
 export default defineConfig({
   integrations: [
-    MyTheme({
+    Blog({
       config: {
-        title: "Hey!",
-        description: "This is a theme integration!",
+        title: "My Blog"
       },
       pages: {
         '/404': false, // Toggle routes off
@@ -44,10 +48,10 @@ export default defineConfig({
       },
       overrides: {
         css: [
-          "./custom.css" // Add custom css
+          "./src/custom.css" // Add custom css
         ],
         components: {
-          Heading: './CustomHeading.astro' // Overwrite theme assets
+          Hero: './src/Custom.astro' // Overwrite theme assets
         },
       },
     }),
