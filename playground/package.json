@@ -9,8 +9,8 @@
 		"astro": "astro"
 	},
 	"dependencies": {
-		"astro": "^4.5.12",
-		"theme-playground": "workspace:^",
-		"sharp": "^0.33.3"
+		"astro": "^4.5.16",
+		"sharp": "^0.33.3",
+		"theme-playground": "workspace:^"
 	}
 }
