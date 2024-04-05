@@ -1,6 +1,6 @@
 {
 	"name": "astro-theme-provider",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Easily create theme integrations for Astro",
 	"keywords": ["astro", "withastro", "astro-integration"],
 	"author": "Bryce Russell",
