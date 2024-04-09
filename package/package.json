@@ -42,7 +42,7 @@
 		"typescript": "^5.4.4"
 	},
 	"dependencies": {
-		"astro-integration-kit": "^0.8.0",
+		"astro-integration-kit": "^0.9.0",
 		"astro-pages": "^0.2.1",
 		"astro-public": "^0.1.0",
 		"callsites": "^4.1.0",
