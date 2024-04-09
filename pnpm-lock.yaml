@@ -28,7 +28,7 @@ importers:
         version: 4.5.16(@types/node@20.12.5)(typescript@5.4.4)
       astro-integration-kit:
         specifier: ^0.8.0
-        version: 0.8.0(@astrojs/db@0.9.11)(astro@4.5.16)
+        version: 0.8.0(@astrojs/db@0.10.1)(astro@4.5.16)
       astro-pages:
         specifier: ^0.2.1
         version: 0.2.1(astro-integration-kit@0.8.0)(astro@4.5.16)
@@ -43,8 +43,8 @@ importers:
         version: 3.3.2
     devDependencies:
       '@astrojs/db':
-        specifier: ^0.9.11
-        version: 0.9.11
+        specifier: ^0.10.1
+        version: 0.10.1
       '@types/node':
         specifier: ^20.12.5
         version: 20.12.5
@@ -147,8 +147,8 @@ packages:
   /@astrojs/compiler@2.7.1:
     resolution: {integrity: sha512-/POejAYuj8WEw7ZI0J8JBvevjfp9jQ9Wmu/Bg52RiNwGXkMV7JnYpsenVfHvvf1G7R5sXHGKlTcxlQWhoUTiGQ==}
 
-  /@astrojs/db@0.9.11:
-    resolution: {integrity: sha512-zPGlMt+A3i10kmnhd/rDSJAx6sj3dAMqcJ8DcurzS8zbfRLfwgplUPrjzpQkoxyRvR1qWJAhVdCf7YEDdHV1mQ==}
+  /@astrojs/db@0.10.1:
+    resolution: {integrity: sha512-nNbatQVereDW4VopFXUS2hJ2fatRLzxJZ03XaafbI81RG0JVOkisJCjyOYXExuka9RXavZVkAQug5BpHhZzYLQ==}
     dependencies:
       '@libsql/client': 0.5.6
       async-listen: 3.0.1
@@ -1917,7 +1917,7 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /astro-integration-kit@0.8.0(@astrojs/db@0.9.11)(astro@4.5.16):
+  /astro-integration-kit@0.8.0(@astrojs/db@0.10.1)(astro@4.5.16):
     resolution: {integrity: sha512-YTdSYrE6xrYpYWZghUUhsTs6Mt1H+/Mucv2VUPfhHoeY8IS9XbpA2adFEBRMd4n+sFd8W490gCUtjmWxnhEs9Q==}
     peerDependencies:
       '@astrojs/db': ^0.9.0
@@ -1947,7 +1947,7 @@ packages:
       vue:
         optional: true
     dependencies:
-      '@astrojs/db': 0.9.11
+      '@astrojs/db': 0.10.1
       astro: 4.5.16(@types/node@20.12.5)(typescript@5.4.4)
       pathe: 1.1.2
       recast: 0.23.6
@@ -1960,7 +1960,7 @@ packages:
       astro-integration-kit: '>=0.1.0'
     dependencies:
       astro: 4.5.16(@types/node@20.12.5)(typescript@5.4.4)
-      astro-integration-kit: 0.8.0(@astrojs/db@0.9.11)(astro@4.5.16)
+      astro-integration-kit: 0.8.0(@astrojs/db@0.10.1)(astro@4.5.16)
       fast-glob: 3.3.2
     dev: false
 
