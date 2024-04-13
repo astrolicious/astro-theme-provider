@@ -35,14 +35,18 @@ export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny>
 }>;
 
 export type UserOptions<ThemeName extends string, Schema extends z.ZodTypeAny = z.ZodTypeAny> = {
-	config?: z.infer<Schema>,
-} & AstroThemeProvider.ThemeOptions[ThemeName]
+	config?: z.infer<Schema>;
+} & AstroThemeProvider.ThemeOptions[ThemeName];
 
 declare global {
 	namespace AstroThemeProvider {
-		export interface ThemeOptions extends Record<string, {
-			pages?: Record<string, string | boolean>
-			overrides?: Record<string, string[] | Record<string, string>>
-		}> {}
+		export interface ThemeOptions
+			extends Record<
+				string,
+				{
+					pages?: Record<string, string | boolean>;
+					overrides?: Record<string, string[] | Record<string, string>>;
+				}
+			> {}
 	}
 }

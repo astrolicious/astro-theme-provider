@@ -1,6 +1,7 @@
 // import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { AstroIntegration } from "astro";
 // import type { AstroDbIntegration } from "@astrojs/db/types";
 import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit";
 import "astro-integration-kit/types/db";
@@ -25,12 +26,13 @@ import {
 	validatePattern,
 } from "./utils/path.js";
 import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./utils/virtual.js";
-import type { AstroIntegration } from "astro";
 
-const thisFile = resolveFilepath( "./", import.meta.url);
+const thisFile = resolveFilepath("./", import.meta.url);
 const thisRoot = resolveDirectory("./", thisFile);
 
-export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(partialAuthorOptions: AuthorOptions<ThemeName, Schema>) {
+export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
+	partialAuthorOptions: AuthorOptions<ThemeName, Schema>,
+) {
 	// Theme package entrypoint (/package/index.ts)
 	const themeEntrypoint = callsites()
 		.reverse()
@@ -340,6 +342,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 			},
 		};
 
-		return themeIntegration
+		return themeIntegration;
 	};
 }
