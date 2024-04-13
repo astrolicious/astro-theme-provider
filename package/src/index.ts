@@ -135,7 +135,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					let themeTypesBuffer = `
 						type ThemeName = "${themeName}";
-						type ThemeConfig = NonNullable<NonNullable<Parameters<typeof import("C:/Users/Bryce/Desktop/Projects/Astro/astro-theme-provider/tests/themes/theme-playground/index.ts").default>[0]>["config"]>
+						type ThemeConfig = NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>
 
 						declare namespace AstroThemeProvider {
 								export interface Themes {
