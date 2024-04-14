@@ -127,10 +127,9 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// Interface type buffers
 					const interfaceBuffers = {
 						ThemeExports: "",
-						AstroThemeExportOverrides: "",
 						ThemeExportsResolved: "",
 						ThemeRoutes: "",
-						AstroThemePagesOverrides: "",
+						ThemeRoutesResolved: "",
 					};
 
 					let themeTypesBuffer = `
@@ -147,11 +146,11 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 								};
 						
 								export interface ThemePages {
-										"${themeName}": ThemeRoutes
+										"${themeName}": ThemeRoutesResolved
 								}
 						
 								export interface ThemeOverrides {
-										"${themeName}": ThemeExports
+										"${themeName}": ThemeExportsResolved
 								}
 						
 								export interface ThemeOptions {
@@ -225,13 +224,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 								// Add generated types to module buffer
 								moduleBuffers[altModuleName] = moduleOverride.types.module();
 
-								// Add generated types to interface buffer
-								interfaceBuffers.AstroThemeExportOverrides += `
-									"${name}": {
-										${moduleOverride.types.interface()}
-									},
-								`;
-
 								// Merge module override into virtual module
 								virtualModule.merge(moduleOverride);
 							}
@@ -265,9 +257,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
 						.join("");
 
-					// Buffer for AstroThemePagesOverrides interface
-					let pageOverrideBuffer = "";
-
 					// Filter out routes the theme user toggled off
 					for (const oldPattern of Object.keys(userPages)) {
 						// Skip pages that are not defined by author
@@ -294,13 +283,13 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							pages[newPattern] = pages[oldPattern]!;
 							// Remove old pattern
 							delete pages[oldPattern];
-							// Add types to buffer
-							pageOverrideBuffer += `\n"${oldPattern}": "${newPattern}";`;
 						}
 					}
 
-					// Add generated types to interface buffer
-					interfaceBuffers.AstroThemePagesOverrides += pageOverrideBuffer;
+					// Generate types for injected routes
+					interfaceBuffers.ThemeRoutesResolved += Object.entries(pages)
+						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
+						.join("");
 
 					// Inject routes/pages
 					injectPages(injectRoute);
