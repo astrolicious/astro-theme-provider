@@ -25,7 +25,7 @@ export interface PackageJSONOptions {
 }
 
 export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny> = Prettify<{
-	name?: ThemeName;
+	name: ThemeName;
 	entrypoint?: string;
 	srcDir?: string;
 	publicDir?: string | StaticDirOption;

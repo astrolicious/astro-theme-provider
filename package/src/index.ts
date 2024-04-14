@@ -81,7 +81,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	const themePackage = new PackageJSON(themeRoot);
 
 	// Assign theme name
-	const themeName = authorOptions.name || themePackage.json.name || "theme-integration";
+	const themeName = authorOptions.name;
 
 	// Return theme integration
 	return (userOptions: UserOptions<ThemeName, Schema> = {}) => {
