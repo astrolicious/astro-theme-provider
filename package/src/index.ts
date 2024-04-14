@@ -163,7 +163,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 														[Module in keyof ThemeExports]?:
 																ThemeExports[Module] extends Record<string, any>
 																		? ThemeExports[Module] extends string[]
-																				?	ThemeExports[Module]
+																				?	string[]
 																				: { [Export in keyof ThemeExports[Module]]?: string }
 																		: never
 												} & {};
@@ -211,7 +211,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 						// Add generated types to interface buffer
 						interfaceBuffers.ThemeExports += `
-							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : "string[]"},
+							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : JSON.stringify(virtualModule.imports)},
 						`;
 
 						const override = userOverrides[name];
@@ -249,7 +249,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 						// Add generated types to interface buffer
 						interfaceBuffers.ThemeExportsResolved += `
-							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : "string[]"},
+							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : JSON.stringify(virtualModule.imports)},
 						`;
 					}
 
