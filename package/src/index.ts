@@ -1,10 +1,8 @@
-// import { existsSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { AstroIntegration } from "astro";
-// import type { AstroDbIntegration } from "@astrojs/db/types";
+import type { AstroDbIntegration } from "@astrojs/db/types";
 import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit";
-import "astro-integration-kit/types/db";
 import { addPageDir } from "astro-pages";
 import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOption } from "astro-pages/types";
 import staticDir from "astro-public";
@@ -101,16 +99,16 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 		const userConfig = parsed.data;
 
-		const themeIntegration: AstroIntegration = {
+		const themeIntegration: AstroDbIntegration = {
 			name: themeName,
 			hooks: {
 				// Support `@astrojs/db` (Astro Studio)
-				// "astro:db:setup": ({ extendDb }) => {
-				// 	const configEntrypoint = resolve(themeRoot, "db/cofig.ts");
-				// 	const seedEntrypoint = resolve(themeRoot, "db/seed.ts");
-				// 	if (existsSync(configEntrypoint)) extendDb({ configEntrypoint });
-				// 	if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
-				// },
+				"astro:db:setup": ({ extendDb }) => {
+					const configEntrypoint = resolve(themeRoot, "db/cofig.ts");
+					const seedEntrypoint = resolve(themeRoot, "db/seed.ts");
+					if (existsSync(configEntrypoint)) extendDb({ configEntrypoint });
+					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
+				},
 				"astro:config:setup": (params) => {
 					const { config, logger, injectRoute } = params;
 
