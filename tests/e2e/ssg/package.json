@@ -15,7 +15,7 @@
 		"@astrojs/check": "^0.5.10",
 		"astro": "^4.5.16",
 		"theme-ssg": "workspace:^",
-		"typescript": "^5.4.4"
+		"typescript": "^5.4.5"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.43.0",
