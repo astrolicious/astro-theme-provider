@@ -3,7 +3,6 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AstroDbIntegration } from "@astrojs/db/types";
 import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit";
-import "astro-integration-kit/types/db";
 import { addPageDir } from "astro-pages";
 import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOption } from "astro-pages/types";
 import staticDir from "astro-public";
@@ -29,7 +28,9 @@ import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleO
 const thisFile = resolveFilepath("./", import.meta.url);
 const thisRoot = resolveDirectory("./", thisFile);
 
-export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: AuthorOptions<Schema>) {
+export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
+	partialAuthorOptions: AuthorOptions<ThemeName, Schema>,
+) {
 	// Theme package entrypoint (/package/index.ts)
 	const themeEntrypoint = callsites()
 		.reverse()
@@ -51,7 +52,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 			layouts: GLOB_ASTRO,
 			components: GLOB_COMPONENTS,
 		},
-	} as Required<AuthorOptions<z.ZodRecord>>;
+	} as Required<AuthorOptions<string, z.ZodRecord>>;
 
 	if (typeof authorOptions.pageDir === "string") {
 		authorOptions.pageDir = { dir: authorOptions.pageDir } as PageDirOption;
@@ -62,7 +63,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	}
 
 	// Merge author options with default options
-	authorOptions = mergeOptions(authorOptions, partialAuthorOptions) as Required<AuthorOptions<z.ZodRecord>>;
+	authorOptions = mergeOptions(authorOptions, partialAuthorOptions) as Required<AuthorOptions<string, z.ZodRecord>>;
 
 	// Theme package root (/package)
 	const themeRoot = resolveDirectory("./", authorOptions.entrypoint);
@@ -74,16 +75,16 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 	authorOptions = mergeOptions(authorOptions, {
 		pageDir: { cwd: themeSrc },
 		publicDir: { cwd: themeSrc },
-	}) as Required<AuthorOptions<z.ZodRecord>>;
+	}) as Required<AuthorOptions<string, z.ZodRecord>>;
 
 	// Theme `package.json`
 	const themePackage = new PackageJSON(themeRoot);
 
 	// Assign theme name
-	const themeName = authorOptions.name || themePackage.json.name || "theme-integration";
+	const themeName = authorOptions.name;
 
 	// Return theme integration
-	return (userOptions: UserOptions<Schema> = {}): AstroDbIntegration => {
+	return (userOptions: UserOptions<ThemeName, Schema> = {}) => {
 		const { config: userConfigUnparsed = {}, pages: userPages = {}, overrides: userOverrides = {} } = userOptions;
 
 		// Parse/validate config passed by user, throw formatted error if it is invalid
@@ -98,7 +99,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 		const userConfig = parsed.data;
 
-		return {
+		const themeIntegration: AstroDbIntegration = {
 			name: themeName,
 			hooks: {
 				// Support `@astrojs/db` (Astro Studio)
@@ -120,44 +121,55 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 
 					// Module type buffers
 					const moduleBuffers: Record<string, string> = {
-						[`${themeName}/config`]: "\nconst config: ThemeConfig;\nexport default config;",
+						[`${themeName}/config`]: `
+							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
+							export default config;
+						`,
 					};
 
 					// Interface type buffers
 					const interfaceBuffers = {
-						AstroThemeExports: "",
-						AstroThemeExportOverrides: "",
-						AstroThemeExportsResolved: "",
-						AstroThemePagesAuthored: "",
-						AstroThemePagesOverrides: "",
+						ThemeExports: "",
+						ThemeExportsResolved: "",
+						ThemeRoutes: "",
+						ThemeRoutesResolved: "",
 					};
 
 					let themeTypesBuffer = `
-						type Prettify<T> = { [K in keyof T]: T[K]; } & {};
-
 						type ThemeName = "${themeName}";
-						type ThemeConfig = NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]
+						type ThemeConfig = NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>
 
-						declare type AstroThemes = keyof AstroThemeConfigs;
-
-						declare type AstroThemeConfigs = {
-							"${themeName}": ThemeConfig
-						}
-
-						declare type GetAstroThemeExports<Name extends keyof AstroThemeConfigs> = AstroThemeExports[Name]
-
-						declare type AstroThemeExportOverrideOptions<Name extends keyof AstroThemeConfigs, Imports = GetAstroThemeExports<Name>> = {
-							[Module in keyof Imports]?:
-								Imports[Module] extends Record<string, any>
-									? Imports[Module] extends string[]
-										?	Imports[Module]
-										: { [Export in keyof Imports[Module]]?: string }
-									: never
-						} & {}
+						declare namespace AstroThemeProvider {
+								export interface Themes {
+										"${themeName}": true;
+								}
 						
-						declare type AstroThemePagesOverridesOptions<Name extends keyof AstroThemePagesAuthored> = Prettify<Partial<Record<keyof AstroThemePagesAuthored[Name], string | boolean>>>
-
-						declare type AstroThemePagesInjected = AstroThemePagesOverrides & AstroThemePagesAuthored
+								export interface ThemeConfigs {
+										"${themeName}": ThemeConfig;
+								};
+						
+								export interface ThemePages {
+										"${themeName}": ThemeRoutesResolved
+								}
+						
+								export interface ThemeOverrides {
+										"${themeName}": ThemeExportsResolved
+								}
+						
+								export interface ThemeOptions {
+										"${themeName}": {
+												pages?: { [Pattern in keyof ThemeRoutes]?: string | boolean }
+												overrides?: {
+														[Module in keyof ThemeExports]?:
+																ThemeExports[Module] extends Record<string, any>
+																		? ThemeExports[Module] extends string[]
+																				?	string[]
+																				: { [Export in keyof ThemeExports[Module]]?: string }
+																		: never
+												} & {};
+										};
+								}
+						}
 					`;
 
 					// Warn about issues with theme's `package.json`
@@ -198,8 +210,8 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						let interfaceTypes = virtualModule.types.interface();
 
 						// Add generated types to interface buffer
-						interfaceBuffers.AstroThemeExports += `
-							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : "string[]"},
+						interfaceBuffers.ThemeExports += `
+							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : JSON.stringify(virtualModule.imports)},
 						`;
 
 						const override = userOverrides[name];
@@ -215,13 +227,6 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 								// Add generated types to module buffer
 								moduleBuffers[altModuleName] = moduleOverride.types.module();
 
-								// Add generated types to interface buffer
-								interfaceBuffers.AstroThemeExportOverrides += `
-									"${name}": {
-										${moduleOverride.types.interface()}
-									},
-								`;
-
 								// Merge module override into virtual module
 								virtualModule.merge(moduleOverride);
 							}
@@ -236,8 +241,8 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 						interfaceTypes = virtualModule.types.interface();
 
 						// Add generated types to interface buffer
-						interfaceBuffers.AstroThemeExportsResolved += `
-							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : "string[]"},
+						interfaceBuffers.ThemeExportsResolved += `
+							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : JSON.stringify(virtualModule.imports)},
 						`;
 					}
 
@@ -251,12 +256,9 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					const { pages, injectPages } = addPageDir(pageDirOption);
 
 					// Generate types for possibly injected routes
-					interfaceBuffers.AstroThemePagesAuthored += Object.entries(pages)
+					interfaceBuffers.ThemeRoutes += Object.entries(pages)
 						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
 						.join("");
-
-					// Buffer for AstroThemePagesOverrides interface
-					let pageOverrideBuffer = "";
 
 					// Filter out routes the theme user toggled off
 					for (const oldPattern of Object.keys(userPages)) {
@@ -284,13 +286,13 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 							pages[newPattern] = pages[oldPattern]!;
 							// Remove old pattern
 							delete pages[oldPattern];
-							// Add types to buffer
-							pageOverrideBuffer += `\n"${oldPattern}": "${newPattern}";`;
 						}
 					}
 
-					// Add generated types to interface buffer
-					interfaceBuffers.AstroThemePagesOverrides += pageOverrideBuffer;
+					// Generate types for injected routes
+					interfaceBuffers.ThemeRoutesResolved += Object.entries(pages)
+						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
+						.join("");
 
 					// Inject routes/pages
 					injectPages(injectRoute);
@@ -305,10 +307,8 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 					for (const [name, buffer] of Object.entries(interfaceBuffers)) {
 						if (!buffer) continue;
 						themeTypesBuffer += `
-							declare interface ${name} {
-								"${themeName}": {
-									${buffer}
-								}
+							interface ${name} {
+								${buffer}
 							}
 						`;
 					}
@@ -331,5 +331,7 @@ export default function <Schema extends z.ZodTypeAny>(partialAuthorOptions: Auth
 				},
 			},
 		};
+
+		return themeIntegration;
 	};
 }

@@ -24,8 +24,8 @@ export interface PackageJSONOptions {
 		  };
 }
 
-export type AuthorOptions<Schema extends z.ZodTypeAny> = Prettify<{
-	name?: ThemeName;
+export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny> = Prettify<{
+	name: ThemeName;
 	entrypoint?: string;
 	srcDir?: string;
 	publicDir?: string | StaticDirOption;
@@ -34,13 +34,19 @@ export type AuthorOptions<Schema extends z.ZodTypeAny> = Prettify<{
 	imports?: Record<string, string | ModuleImports | ModuleExports | ModuleObject>;
 }>;
 
-export type UserOptions<Schema extends z.ZodTypeAny> = Prettify<{
+export type UserOptions<ThemeName extends string, Schema extends z.ZodTypeAny = z.ZodTypeAny> = {
 	config?: z.infer<Schema>;
-	pages?: AstroThemePagesOverridesOptions<ThemeName> | undefined;
-	overrides?: AstroThemeExportOverrideOptions<ThemeName> | undefined;
-}>;
+} & AstroThemeProvider.ThemeOptions[ThemeName];
 
-// Temporary until refactor on type-gen
-declare type ThemeName = "";
-declare type AstroThemePagesOverridesOptions<T extends ThemeName> = Record<string, string | boolean>;
-declare type AstroThemeExportOverrideOptions<T extends ThemeName> = Record<string, string[] | Record<string, string>>;
+declare global {
+	namespace AstroThemeProvider {
+		export interface ThemeOptions
+			extends Record<
+				string,
+				{
+					pages?: Record<string, string | boolean>;
+					overrides?: Record<string, string[] | Record<string, string>>;
+				}
+			> {}
+	}
+}

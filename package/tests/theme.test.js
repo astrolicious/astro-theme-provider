@@ -26,7 +26,7 @@ const defaultModules = {
 };
 
 const defineTheme = (option) => {
-	return _defineTheme(Object.assign(option, { entrypoint: packageEntrypoint }));
+	return _defineTheme(Object.assign(option, { name: "theme-mock", entrypoint: packageEntrypoint }));
 };
 
 const resolveId = (id) => {
