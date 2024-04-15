@@ -121,7 +121,10 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					// Module type buffers
 					const moduleBuffers: Record<string, string> = {
-						[`${themeName}/config`]: "\nconst config: ThemeConfig;\nexport default config;",
+						[`${themeName}/config`]: `
+							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
+							export default config;
+						`,
 					};
 
 					// Interface type buffers
