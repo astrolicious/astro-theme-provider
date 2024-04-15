@@ -12,7 +12,7 @@
 	"keywords": ["astro-integration"],
 	"scripts": {},
 	"devDependencies": {
-		"@types/node": "^20.12.5",
+		"@types/node": "^20.12.7",
 		"astro": "^4.5.16"
 	},
 	"dependencies": {
