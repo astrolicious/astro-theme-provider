@@ -1,8 +1,12 @@
 ---
-title: Introduction
+title: What is Astro Theme Provider?
 description: A reference page in my new Starlight docs site.
+sidebar:
+  order: 0
 ---
 import { FileTree } from '@astrojs/starlight/components';
+
+
 
 ## Why?
 
@@ -24,37 +28,20 @@ export default defineConfig({
 });
 ```
 
-## How it Works
-
-### Package Structure
+## How?
 
 <FileTree>
 - package/
-  - assets/
-    - logo.png
-  - css/
-    - styles.css
-  - components/
-    - Card.astro
-  - layouts/
-    - Layout.astro
-  - pages/
-    - blog/
-      - index.astro
-      - [...slug].astro
+  - public/
+  - src/
+    - assets/
+    - components/
+    - css/
+    - layouts/
+    - pages/
   - index.ts
   - package.json
 </FileTree>
-
-```json
-// package/package.json
-{
-  "name": "my-theme",
-  "description": "My Astro Theme!",
-  "version": "0.0.1",
-  // ...
-}
-```
 
 ```ts
 // package/index.ts
@@ -62,6 +49,7 @@ import defineTheme from 'astro-theme-provider';
 import { z } from 'astro/zod'
 
 export default defineTheme({
+  name: "my-theme",
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
@@ -80,36 +68,4 @@ import { Card } from 'my-theme/components';
 import { logo } from 'my-theme/assets'
 import 'my-theme/css';
 ---
-```
-
-### Using a theme
-
-```ts
-// astro.config.mjs
-import { defineConfig } from 'astro/config';
-import MyTheme from 'my-theme';
-
-export default defineConfig({
-  integrations: [
-    MyTheme({
-      config: {
-        title: 'Hey!',
-        description: 'This is my theme',
-      },
-      pages: {
-        '/blog': false, // Toggle route off
-        '/blog/[...slug]': '/projects/[...slug]', // Override path
-      },
-      overrides: {
-        css: [
-          "./custom.css" // Add custom css to theme
-        ],
-        components: {
-          // Overwrite default Heading component with a custom one
-          Heading: './CustomHeading.astro'
-        }
-      }
-    })
-  ]
-});
 ```
