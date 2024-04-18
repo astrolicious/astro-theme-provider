@@ -3,43 +3,86 @@ title: User API
 description: Aute est nulla voluptate sint voluptate consectetur Lorem nisi.
 ---
 
+All themes authored using Astro Theme Provider share a basic API for using the theme. 
+
 ## Reference
 
 ### `config`
 
+This type for this property depends on the theme, typically themes will use an object. The value must be JSON serializable.
+
+**Example**:
+
+```ts
+config: {
+  title: 'My Blog',
+  description: 'This is my theme',
+  favicon: '/favicon.svg'
+}
+```
+
 ### `pages`
 
-**Type**: `Record<string, string | boolean>`
+An object used to configure the pages injected by a theme
+
+**Example**:
+
+```ts
+pages: {
+  '/': '/blog',   // Rename pattern
+  '/404': false,  // Toggle page off
+  '/[...slug]': '/blog/[...slug]',
+},
+```
 
 ### `overrides`
 
-**Type**: `Record<string, string | Record<string, string>>`
+An object used to override the virtual modules created by a theme
+
+**Example**:
+
+```ts
+overrides: {
+  css: [
+    // Append imports to a virtual module using an array
+    './src/css/custom-styles.css',
+  ],
+  components: {
+    // Override exports from a virtual modules using an object
+    Hero: './src/components/CustomHero.astro'
+  }
+}
+```
 
 ## Example
+
+Example of how a blog theme might be configured
 
 ```ts
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import MyTheme from 'my-theme';
+import BlogTheme from 'blog-theme';
 
 export default defineConfig({
   integrations: [
-    MyTheme({
+    BlogTheme({
       config: {
-        title: 'Hey!',
+        title: 'My Blog',
         description: 'This is my theme',
+        favicon: '/favicon.svg'
       },
       pages: {
-        '/blog': false, // Toggle route off
-        '/blog/[...slug]': '/projects/[...slug]', // Override path
+        '/': '/blog',
+        '/404': false,
+        '/[...slug]': '/blog/[...slug]',
       },
       overrides: {
         css: [
-          "./custom.css" // Add custom css to theme
+          "./src/styles.css"
         ],
         components: {
-          // Overwrite default Heading component with a custom one
-          Heading: './CustomHeading.astro'
+          Card: './src/Card.astro',
+          Pagination: './src/Pagination.astro',
         }
       }
     })
