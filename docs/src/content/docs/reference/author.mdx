@@ -45,14 +45,14 @@ The name a theme, must be unique. If you are authoring your theme as a package, 
 
 A zod schema for validating the default value of a theme's config module
 
+**Example**:
+
 ```ts
 schema: z.object({
   title: z.string(),
   description: z.string().optional()
 })
 ```
-
-**Example**: Using the validated config module
 
 ```ts
 import config from "my-theme/config"
