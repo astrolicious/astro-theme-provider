@@ -176,3 +176,61 @@ For advanced use cases only, this should be infered automatically
 :::
 
 ## Example
+
+Author a theme like a normal project
+
+<FileTree>
+- package/
+  - public/
+    - favicon.svg
+  - src/
+    - assets/
+      - logo.png
+    - css/
+      - styles.css
+    - components/
+      - Card.astro
+    - layouts/
+      - Layout.astro
+    - pages/
+      - index.astro
+  - index.ts
+  - package.json
+</FileTree>
+
+Export the theme as an integration
+
+```ts
+// package/index.ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  name: "my-theme",
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional()
+  })
+})
+```
+
+Use the generated virtual modules to author the theme
+
+```tsx
+// package/src/pages/index.astro
+---
+import { Layout } from 'my-theme/layouts';
+import { Card } from 'my-theme/components';
+import { logo } from 'my-theme/assets'
+import config from 'my-theme/config'
+import 'my-theme/css';
+
+const {
+  title,
+  description = "Welcome to my theme"
+} = config
+---
+
+<Layout>
+  <Card {title} {description} img={logo}/>
+</Layout>
+```
