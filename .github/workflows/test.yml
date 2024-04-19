@@ -14,6 +14,8 @@ jobs:
       with:
         node-version: lts/*
     - uses: pnpm/action-setup@v3
+      with:
+        run_install: true
     - name: Install Browsers
       run: pnpm exec playwright install --with-deps
     - name: Build Package
