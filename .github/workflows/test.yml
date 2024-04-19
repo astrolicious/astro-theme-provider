@@ -13,7 +13,7 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-      uses: pnpm/action-setup@v3
+    - uses: pnpm/action-setup@v3
     - name: Install Browsers
       run: pnpm exec playwright install --with-deps
     - name: Build Package
