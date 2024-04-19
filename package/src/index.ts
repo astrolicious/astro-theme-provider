@@ -74,7 +74,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	// Force options
 	authorOptions = mergeOptions(authorOptions, {
 		pageDir: { cwd: themeSrc },
-		publicDir: { cwd: themeSrc },
+		publicDir: { cwd: themeRoot },
 	}) as Required<AuthorOptions<string, z.ZodRecord>>;
 
 	// Theme `package.json`
@@ -191,7 +191,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						if (!option) continue;
 
 						// Reserved module/import names
-						if (["config", "pages", "public", "content", "db"].includes(name)) {
+						if (["config", "pages", "content", "db"].includes(name)) {
 							logger.warn(`Module name '${name}' is reserved for the built in virtual import '${themeName}/${name}'`);
 							continue;
 						}
