@@ -30,7 +30,7 @@ export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny>
 	srcDir?: string;
 	publicDir?: string | StaticDirOption;
 	pageDir?: string | PageDirOption;
-	log?: "verbose" | "minimal" | boolean
+	log?: "verbose" | "minimal" | boolean;
 	schema?: Schema;
 	imports?: Record<string, string | ModuleImports | ModuleExports | ModuleObject>;
 }>;
