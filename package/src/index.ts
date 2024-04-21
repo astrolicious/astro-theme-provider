@@ -45,6 +45,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		srcDir: "src",
 		pageDir: "pages",
 		publicDir: "public",
+		log: true,
 		schema: z.record(z.any()),
 		imports: {
 			css: `css/${GLOB_CSS}`,
