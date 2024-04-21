@@ -47,10 +47,10 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		publicDir: "public",
 		schema: z.record(z.any()),
 		imports: {
-			css: GLOB_CSS,
-			assets: GLOB_IMAGES,
-			layouts: GLOB_ASTRO,
-			components: GLOB_COMPONENTS,
+			css: `css/${GLOB_CSS}`,
+			assets: `assets/${GLOB_IMAGES}`,
+			layouts: `layouts/${GLOB_ASTRO}`,
+			components: `components/${GLOB_COMPONENTS}`,
 		},
 	} as Required<AuthorOptions<string, z.ZodRecord>>;
 
@@ -197,11 +197,10 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						}
 
 						const moduleName = normalizePath(join(themeName, name));
-						const moduleRoot = normalizePath(resolve(themeSrc, name));
 
 						// Turn a glob string into a module object
 						if (typeof option === "string") {
-							option = globToModuleObject(moduleRoot, option);
+							option = globToModuleObject(themeSrc, option);
 						}
 
 						// Create virtual module object
