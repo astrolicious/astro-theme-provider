@@ -77,7 +77,7 @@ export function warnThemePackage(pkg: PackageJSON, logger: HookParameters<"astro
 		}
 
 		// Warn theme author if package does not have a README
-		if (!existsSync(resolveFilepath(pkg.path, "README.md"))) {
+		if (!existsSync(resolveFilepath(pkg.path, "README.md", false))) {
 			logger.warn(
 				`Add a 'README.md' to the root of your theme's package!\tNPM uses this file to populate the package page https://www.npmjs.com/package/${pkg.json.name}\n`,
 			);
