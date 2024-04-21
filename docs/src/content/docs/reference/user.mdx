@@ -56,7 +56,28 @@ overrides: {
 
 ## Example
 
-Example of how a blog theme might be configured
+Example for how a blog theme might be configured
+
+### Simple Customization
+
+```ts
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import BlogTheme from 'blog-theme';
+
+export default defineConfig({
+  integrations: [
+    BlogTheme({
+      config: {
+        title: 'My Blog',
+        description: 'This is my theme',
+      },
+    }),
+  ]
+});
+```
+
+### Advanced Customization
 
 ```ts
 // astro.config.mjs
