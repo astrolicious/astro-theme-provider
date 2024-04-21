@@ -49,7 +49,7 @@ The name of a theme, must be unique. If you are authoring your theme as a packag
 
 **Default**: `ZodTypeAny`
 
-A zod schema for validating the default value of a theme's config module. This value this schema returns must be JSON serializable.
+A zod schema for validating the default value of a theme's config module. The schema must be JSON serializable.
 
 **Example**:
 
@@ -61,9 +61,11 @@ schema: z.object({
 ```
 
 ```ts
+---
 import config from "my-theme/config"
 
 console.log(config.title, config.description)
+---
 ```
 
 ### `srcDir`
@@ -88,7 +90,7 @@ Directory that contains all of the pages for a theme
 
 **Default**: `"public"`
 
-Directory that contains a theme's static assets (`favicon.svg`, etc). By default, these assets act as placeholders and can be overwritten by assets located in a user's `public` folder.
+Directory that contains a theme's static assets (`favicon.svg`, etc). By default, these assets act as placeholders and can be overwritten by assets located in a user's `public` real folder.
 
 ### `imports`
 
@@ -171,7 +173,7 @@ import Layout, { Head, Button } from "my-theme/components"
 
 **Type**: `string`
 
-**Default**: infered automatically
+**Default**: directory of the file the theme is exported from
 
 A path to the root directory, or file inside the root directory, of a theme
 
