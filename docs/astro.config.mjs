@@ -19,7 +19,7 @@ export default defineConfig({
 					label: "Authoring a Theme",
 					badge: {
 						text: "Coming Soon",
-						variant: 'success'
+						variant: "success",
 					},
 					link: "#",
 					attrs: {
@@ -30,7 +30,7 @@ export default defineConfig({
 					label: "Using a Theme",
 					badge: {
 						text: "Coming Soon",
-						variant: 'success'
+						variant: "success",
 					},
 					link: "#",
 					attrs: {
