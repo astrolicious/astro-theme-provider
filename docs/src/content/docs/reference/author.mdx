@@ -100,14 +100,14 @@ Directory that contains a theme's static assets (`favicon.svg`, etc). By default
 
 ```js
 imports: {
-  css: "**.{css,scss,sass,styl,less}",
-  assets: "**.{jpeg,jpg,png,tiff,webp,gif,svg,avif}",
-  layouts: "**.astro",
-  components: "**.{astro,tsx,jsx,svelte,vue}"
+  css: "css/**.{css,scss,sass,styl,less}",
+  assets: "assets**.{jpeg,jpg,png,tiff,webp,gif,svg,avif}",
+  layouts: "layouts/**.astro",
+  components: "components/**.{astro,tsx,jsx,svelte,vue}"
 }
 ```
 
-Create virtual modules to access assets inside a theme and allow users to override them. Keys represent sub directories of the src directory
+Create virtual modules to access assets inside a theme and allow users to override them.
 
 **`false`**: 
 
@@ -124,24 +124,24 @@ imports: {
 
 **`string`**: 
 
-Glob files into a virtual module
+Glob files into a virtual module, glob patterns are relative to a theme's `srcDir`
 
 <FileTree>
 - package/
   - src/
-    - **components/**
+    - components/
       - Hero.astro
       - Card.astro
       - Button.astro
 </FileTree>
 
-```ts /components/
+```ts
 imports: {
-  components: "**.astro",
+  components: "components/**.astro",
 }
 ```
 
-```ts "components"
+```ts
 import { Hero, Card, Button } from "my-theme/components"
 ```
 
@@ -152,9 +152,9 @@ Use an array to combine imports into a single virtual module
 ```ts
 imports: {
   css: [
-    "./reset.css",
-    "./global.css",
-    "./utils.css",
+    "./src/css/reset.css",
+    "./src/css/global.css",
+    "./src/css/utils.css",
   ],
 }
 ```
@@ -170,10 +170,10 @@ Use an object to create more complex custom virtual modules
 ```ts
 imports: {
   components: {
-    imports: [ "./global.css" ],
-    default: "./Layout.astro",
-    Head: "./Head.astro",
-    Button: "./Button.astro"
+    imports: [ "./src/css/global.css" ],
+    default: "./src/layout/Layout.astro",
+    Head: "./src/components/Head.astro",
+    Button: "./src/components/Button.astro"
   }
 }
 ```
