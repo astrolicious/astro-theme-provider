@@ -109,6 +109,19 @@ imports: {
 
 Create virtual modules to access assets inside a theme and allow users to override them. Keys represent sub directories of the src directory
 
+**`false`**: 
+
+Toggle default virtual modules off
+
+```js
+imports: {
+  css: false,
+  assets: false,
+  layouts: false,
+  components: false,
+}
+```
+
 **`string`**: 
 
 Glob files into a virtual module
@@ -116,20 +129,20 @@ Glob files into a virtual module
 <FileTree>
 - package/
   - src/
-    - **css/**
-      - reset.css
-      - global.css
-      - utils.css
+    - **components/**
+      - Hero.astro
+      - Card.astro
+      - Button.astro
 </FileTree>
 
-```ts /css[^,]/
+```ts /components/
 imports: {
-  css: "**.{css,scss,sass,styl,less}",
+  components: "**.astro",
 }
 ```
 
-```ts "css"
-import "my-theme/css"
+```ts "components"
+import { Hero, Card, Button } from "my-theme/components"
 ```
 
 **`array`**: 
