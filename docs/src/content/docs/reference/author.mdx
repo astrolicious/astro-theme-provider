@@ -15,17 +15,21 @@ import { FileTree } from '@astrojs/starlight/components';
     - components/
     - layouts/
     - pages/
-  - index.ts
+  - **index.ts**
   - package.json
 </FileTree>
 
 ```ts
 // package/index.ts
+import { z } from 'astro/zod'
 import defineTheme from 'astro-theme-provider';
 
 export default defineTheme({
   name: "my-theme",
-  // ...
+  schema: z.object({
+    title: z.string(),
+    description: z.sting().optional()
+  })
 })
 ```
 
@@ -110,19 +114,19 @@ Glob files into a virtual module
 <FileTree>
 - package/
   - src/
-    - css/
+    - **css/**
       - reset.css
       - global.css
       - utils.css
 </FileTree>
 
-```ts
+```ts /css[^,]/
 imports: {
   css: "**.{css,scss,sass,styl,less}",
 }
 ```
 
-```ts
+```ts "css"
 import "my-theme/css"
 ```
 
@@ -172,12 +176,12 @@ import Layout, { Head, Button } from "my-theme/components"
 A path to the root directory, or file inside the root directory, of a theme
 
 :::note
-For advanced use cases only, this should be infered automatically 
+For advanced use cases only, this will be infered automatically assuming that this called at the root of the theme (see [Default Structure](#default-structure))
 :::
 
 ## Example
 
-Author a theme like a normal project
+Author a theme inside a package similar a normal project
 
 <FileTree>
 - package/
@@ -196,12 +200,14 @@ Author a theme like a normal project
       - index.astro
   - index.ts
   - package.json
+  - README.md
 </FileTree>
 
 Export the theme as an integration
 
 ```ts
 // package/index.ts
+import { z } from 'astro/zod';
 import defineTheme from 'astro-theme-provider';
 
 export default defineTheme({
