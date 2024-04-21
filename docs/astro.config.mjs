@@ -15,22 +15,28 @@ export default defineConfig({
 					label: "Introduction",
 					autogenerate: { directory: "introduction" },
 				},
-				// {
-				// 	label: "Authoring a Theme",
-				// 	badge: {
-				// 		text: "WIP",
-				// 		variant: 'caution'
-				// 	},
-				// 	link: "/authoring-a-theme",
-				// },
-				// {
-				// 	label: "Using a Theme",
-				// 	badge: {
-				// 		text: "WIP",
-				// 		variant: 'caution'
-				// 	},
-				// 	link: "/using-a-theme",
-				// },
+				{
+					label: "Authoring a Theme",
+					badge: {
+						text: "Coming Soon",
+						variant: 'success'
+					},
+					link: "#",
+					attrs: {
+						style: "opacity:0.5",
+					},
+				},
+				{
+					label: "Using a Theme",
+					badge: {
+						text: "Coming Soon",
+						variant: 'success'
+					},
+					link: "#",
+					attrs: {
+						style: "opacity:0.5",
+					},
+				},
 				{
 					label: "Reference",
 					autogenerate: { directory: "reference" },
