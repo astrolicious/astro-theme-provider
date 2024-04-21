@@ -74,8 +74,8 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 	// Force options
 	authorOptions = mergeOptions(authorOptions, {
-		pageDir: { cwd: themeSrc },
-		publicDir: { cwd: themeRoot },
+		pageDir: { cwd: themeSrc, log: authorOptions.log },
+		publicDir: { cwd: themeRoot, log: authorOptions.log },
 	}) as Required<AuthorOptions<string, z.ZodRecord>>;
 
 	// Theme `package.json`
