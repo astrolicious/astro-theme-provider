@@ -173,8 +173,10 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						}
 					`;
 
-					// Warn about issues with theme's `package.json`
-					warnThemePackage(themePackage, logger);
+					if (authorOptions.log) {
+						// Warn about issues with theme's `package.json`
+						warnThemePackage(themePackage, logger);
+					}
 
 					//HMR for `astro-theme-provider` package
 					watchIntegration(params, thisRoot);
