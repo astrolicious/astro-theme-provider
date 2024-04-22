@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import type { AstroDbIntegration } from "@astrojs/db/types";
 import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
-import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOption } from "astro-pages/types";
+import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOption } from "astro-pages";
 import staticDir from "astro-public";
 import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
@@ -39,7 +39,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		.find((path) => path && !path.startsWith("file://") && path !== thisFile)!;
 
 	// Default options
-	let authorOptions = {
+	let authorOptions: Required<AuthorOptions<string, z.ZodRecord>> = {
 		name: "",
 		entrypoint: themeEntrypoint,
 		srcDir: "src",
@@ -53,7 +53,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 			layouts: `layouts/${GLOB_ASTRO}`,
 			components: `components/${GLOB_COMPONENTS}`,
 		},
-	} as Required<AuthorOptions<string, z.ZodRecord>>;
+	};
 
 	if (typeof authorOptions.pageDir === "string") {
 		authorOptions.pageDir = { dir: authorOptions.pageDir } as PageDirOption;
@@ -64,7 +64,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	}
 
 	// Merge author options with default options
-	authorOptions = mergeOptions(authorOptions, partialAuthorOptions) as Required<AuthorOptions<string, z.ZodRecord>>;
+	authorOptions = mergeOptions(authorOptions, partialAuthorOptions) as typeof authorOptions;
 
 	// Theme package root (/package)
 	const themeRoot = resolveDirectory("./", authorOptions.entrypoint);
@@ -76,7 +76,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	authorOptions = mergeOptions(authorOptions, {
 		pageDir: { cwd: themeSrc, log: authorOptions.log },
 		publicDir: { cwd: themeRoot, log: authorOptions.log },
-	}) as Required<AuthorOptions<string, z.ZodRecord>>;
+	}) as typeof authorOptions;
 
 	// Theme `package.json`
 	const themePackage = new PackageJSON(themeRoot);
@@ -248,11 +248,11 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						`;
 					}
 
-					const pageDirOption = {
-						...(authorOptions.pageDir as PageDirOption),
+					const pageDirOption: PageDirIntegrationOption = {
+						...authorOptions.pageDir,
 						config,
 						logger,
-					} as PageDirIntegrationOption;
+					}
 
 					// Initialize route injection
 					const { pages, injectPages } = addPageDir(pageDirOption);
