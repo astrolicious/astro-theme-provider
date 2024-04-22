@@ -248,7 +248,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						...(authorOptions.pageDir as PageDirOption),
 						config,
 						logger,
-					}
+					};
 
 					// Initialize route injection
 					const { pages, injectPages } = addPageDir(pageDirOption);
