@@ -1,8 +1,12 @@
 {
 	"name": "astro-theme-provider",
-	"version": "0.1.2",
+	"version": "0.2.0",
 	"description": "Easily create theme integrations for Astro",
-	"keywords": ["astro", "withastro", "astro-integration"],
+	"keywords": [
+		"astro",
+		"withastro",
+		"astro-integration"
+	],
 	"author": "Bryce Russell",
 	"license": "Unlicense",
 	"repository": {
@@ -24,7 +28,9 @@
 			"default": "./dist/index.js"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"peerDependencies": {
 		"@astrojs/db": ">=0.8.0",
 		"astro": ">=3"

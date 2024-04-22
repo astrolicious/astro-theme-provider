@@ -1,5 +1,42 @@
 # astro-theme-provider
 
+## 0.2.0
+
+### Minor Changes
+
+- 1a40dfd: Fixed typing for theme integrations, `name` property is now required again
+- 9655a45: Added a `log` option for theme authors
+
+  - `false`: No logging
+  - `"minimal" | true`: Default logging, includes warnings
+  - `"verbose"`: Log everything, including debug information like page injection and static asset handling
+
+  Fixed warnings for a missing README throwing errors if README did not exist
+
+- ca1f3b3: Updated root directory for glob modules, glob patterns are now relative to a theme's `srcDir`
+
+  ```diff
+   imports: {
+  -  css: '**.css'
+  +  css: 'css/**.css'
+   }
+  ```
+
+- 12b5819: Moved the default location of the public dir to the root of a theme
+
+  ```diff
+    package/
+  + ├── public
+    ├── src/
+  - │   ├── public
+    │   └── ...
+    └── ...
+  ```
+
+### Patch Changes
+
+- b503fed: Upgrade to `astro-integration-kit` 0.11.0, package HMR is now only applied inside the playground
+
 ## 0.1.2
 
 ### Patch Changes
@@ -36,4 +73,3 @@
 - Infer theme name from package name
 - Removed `virtual:` prefix for virtual imports
 - Removed `context` module
-
