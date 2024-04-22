@@ -1,9 +1,11 @@
 import { defineConfig } from "astro/config";
-import MyTheme from "theme-playground";
+import { createResolver } from "astro-integration-kit";
+import { hmrIntegration } from "astro-integration-kit/dev";
+const { default: themePlayground } = await import("theme-playground");
 
 export default defineConfig({
 	integrations: [
-		MyTheme({
+		themePlayground({
 			config: {
 				title: "Hey!",
 				description: "This is a theme created using",
@@ -21,5 +23,8 @@ export default defineConfig({
 				},
 			},
 		}),
+		hmrIntegration({
+			directory: createResolver(import.meta.url).resolve("../package/dist")
+		})
 	],
 });

@@ -63,6 +63,9 @@ importers:
       astro:
         specifier: ^4.6.3
         version: 4.6.3(@types/node@20.12.7)(typescript@5.4.5)
+      astro-integration-kit:
+        specifier: ^0.11.0
+        version: 0.11.0(@astrojs/db@0.10.5)(astro@4.6.3(@types/node@20.12.7)(typescript@5.4.5))
       sharp:
         specifier: ^0.33.3
         version: 0.33.3
