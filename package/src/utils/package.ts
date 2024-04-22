@@ -36,38 +36,38 @@ export class PackageJSON {
 }
 
 export function warnThemePackage(pkg: PackageJSON, logger: HookParameters<"astro:config:setup">["logger"]) {
-	const { json } = pkg;
+	const { name, private: isPrivate, keywords = [], description, homepage, repository } = pkg.json;
 
 	// If package is not private, warn theme author about issues with package
-	if (!json.private) {
+	if (!isPrivate) {
 		// Warn theme author if `astro-integration` keyword does not exist inside 'package.json'
-		if (!json?.keywords?.includes("astro-integration")) {
+		if (!keywords.includes("astro-integration")) {
 			logger.warn(
-				`Add the 'astro-integration' keyword to your theme's 'package.json'!\tAstro uses this value to support the command 'astro add ${pkg.json.name}'\n\n\t"keywords": [ "astro-integration" ],\n`,
+				`Add the 'astro-integration' keyword to your theme's 'package.json'!\tAstro uses this value to support the command 'astro add ${name}'\n\n\t"keywords": [ "astro-integration" ],\n`,
 			);
 		}
 
 		// Warn theme author if no 'description' property exists inside 'package.json'
-		if (!json?.description) {
+		if (!description) {
 			logger.warn(
 				`Add a 'description' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"description": "My awesome Astro theme!",\n`,
 			);
 		}
 
 		// Warn theme author if no 'homepage' property exists inside 'package.json'
-		if (!json?.homepage) {
+		if (!homepage) {
 			logger.warn(
 				`Add a 'homepage' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"homepage": "https://github.com/UserName/theme-playground",\n`,
 			);
 		}
 
 		// Warn theme author if no 'repository' property exists inside 'package.json'
-		if (!json?.repository) {
+		if (!repository) {
 			logger.warn(
 				`Add a 'repository' to your theme's 'package.json'!\tAstro uses this value to populate the integrations page https://astro.build/integrations/\n\n\t"repository": ${JSON.stringify(
 					{
 						type: "git",
-						url: `https://github.com/UserName/${pkg.json.name}`,
+						url: `https://github.com/UserName/${name}`,
 						directory: "package",
 					},
 					null,
@@ -77,9 +77,9 @@ export function warnThemePackage(pkg: PackageJSON, logger: HookParameters<"astro
 		}
 
 		// Warn theme author if package does not have a README
-		if (!existsSync(resolveFilepath(pkg.path, "README.md"))) {
+		if (!existsSync(resolveFilepath(pkg.path, "README.md", false))) {
 			logger.warn(
-				`Add a 'README.md' to the root of your theme's package!\tNPM uses this file to populate the package page https://www.npmjs.com/package/${pkg.json.name}\n`,
+				`Add a 'README.md' to the root of your theme's package!\tNPM uses this file to populate the package page https://www.npmjs.com/package/${name}\n`,
 			);
 		}
 	}

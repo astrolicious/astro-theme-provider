@@ -45,6 +45,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		srcDir: "src",
 		pageDir: "pages",
 		publicDir: "public",
+		log: true,
 		schema: z.record(z.any()),
 		imports: {
 			css: `css/${GLOB_CSS}`,
@@ -73,8 +74,8 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 	// Force options
 	authorOptions = mergeOptions(authorOptions, {
-		pageDir: { cwd: themeSrc },
-		publicDir: { cwd: themeRoot },
+		pageDir: { cwd: themeSrc, log: authorOptions.log },
+		publicDir: { cwd: themeRoot, log: authorOptions.log },
 	}) as Required<AuthorOptions<string, z.ZodRecord>>;
 
 	// Theme `package.json`
@@ -172,8 +173,10 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						}
 					`;
 
-					// Warn about issues with theme's `package.json`
-					warnThemePackage(themePackage, logger);
+					if (authorOptions.log) {
+						// Warn about issues with theme's `package.json`
+						warnThemePackage(themePackage, logger);
+					}
 
 					//HMR for `astro-theme-provider` package
 					watchIntegration(params, thisRoot);
