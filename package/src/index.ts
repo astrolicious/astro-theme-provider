@@ -26,7 +26,6 @@ import {
 import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./utils/virtual.js";
 
 const thisFile = resolveFilepath("./", import.meta.url);
-const thisRoot = resolveDirectory("./", thisFile);
 
 export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	partialAuthorOptions: AuthorOptions<ThemeName, Schema>,
@@ -246,7 +245,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					}
 
 					const pageDirOption: PageDirIntegrationOption = {
-						...authorOptions.pageDir,
+						...(authorOptions.pageDir as PageDirOption),
 						config,
 						logger,
 					}
