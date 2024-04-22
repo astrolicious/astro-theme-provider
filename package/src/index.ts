@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AstroDbIntegration } from "@astrojs/db/types";
-import { addDts, addIntegration, addVirtualImports, watchIntegration } from "astro-integration-kit";
+import { addDts, addIntegration, addVirtualImports, watchDirectory } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
 import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOption } from "astro-pages";
 import staticDir from "astro-public";
@@ -178,11 +178,8 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						warnThemePackage(themePackage, logger);
 					}
 
-					//HMR for `astro-theme-provider` package
-					watchIntegration(params, thisRoot);
-
 					// HMR for theme author's package
-					watchIntegration(params, themeRoot);
+					watchDirectory(params, themeRoot);
 
 					// Add `astro-public` integration to handle `/public` folder logic
 					addIntegration(params, {
