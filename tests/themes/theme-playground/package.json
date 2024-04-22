@@ -13,7 +13,7 @@
 	"scripts": {},
 	"devDependencies": {
 		"@types/node": "^20.12.7",
-		"astro": "^4.5.16"
+		"astro": "^4.6.3"
 	},
 	"dependencies": {
 		"astro-theme-provider": "workspace:^"

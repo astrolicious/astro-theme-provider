@@ -3,7 +3,6 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { afterEach, describe, it, mock } from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { watchIntegration } from "astro-integration-kit";
 import { z } from "astro/zod";
 import _defineTheme from "../dist/index.js";
 
