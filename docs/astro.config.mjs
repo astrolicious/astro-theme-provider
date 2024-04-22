@@ -13,18 +13,33 @@ export default defineConfig({
 			sidebar: [
 				{
 					label: "Introduction",
-					items: [
-						{ label: "Why?", link: "/introduction#why" },
-						{ label: "How it Works", link: "/introduction#how-it-works" },
-					],
+					autogenerate: { directory: "introduction" },
 				},
 				{
 					label: "Authoring a Theme",
-					autogenerate: { directory: "author" },
+					badge: {
+						text: "Coming Soon",
+						variant: "success",
+					},
+					link: "#",
+					attrs: {
+						style: "opacity:0.5",
+					},
 				},
 				{
 					label: "Using a Theme",
-					autogenerate: { directory: "user" },
+					badge: {
+						text: "Coming Soon",
+						variant: "success",
+					},
+					link: "#",
+					attrs: {
+						style: "opacity:0.5",
+					},
+				},
+				{
+					label: "Reference",
+					autogenerate: { directory: "reference" },
 				},
 			],
 		}),

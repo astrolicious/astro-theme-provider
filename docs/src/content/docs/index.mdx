@@ -1,49 +1,37 @@
 ---
-title: Welcome to Astro Theme Provider
-description: Easily create theme integration for Astro!
+title: Astro Theme Provider
+description: A tool for authoring Astro themes as integrations
+# banner:
+#   content: Astro Theme Provider is currently a work in progress, Coming Soon!
 template: splash
-banner:
-  content: Astro Theme Provider is currently a work in progress, Coming Soon!
 hero:
-  tagline: Lets create a Theme!
+  tagline: A tool for creating theme integrations in Astro
+  image:
+    file: ../../assets/houston.webp
   actions:
-    - text: Coming Soon
-      link: /#
+    # - text: What is Astro Theme Provider?
+    #   link: /introduction/
+    #   variant: 'secondary'
+    - text: Get Started
+      link: /introduction/getting-started/
       variant: primary
+    - text: Contribute
+      link: https://github.com/astrolicious/astro-theme-provider/blob/main/CONTRIBUTING.md
+      icon: external
 ---
-
 import { Card, CardGrid } from '@astrojs/starlight/components';
-
-## Features
 
 <CardGrid>
 	<Card title="Theme Integrations" icon="pen">
-		Author themes as integrations that can be installed with a single command
+		Author themes integrations that can be published and consumed as a package.
 	</Card>
 	<Card title="Easy to use" icon="rocket">
-		No integration code required! Author themes like a normal Astro project
-	</Card>
-	<Card title="Type safe" icon="approve-check-circle">
-		Type safe for both theme authors and theme users
+    Author themes similar to a normal Astro project, no integration code required.
 	</Card>
 	<Card title="Customizable" icon="setting">
-		Theme users can override assets like components and layouts for complete customization
+		Theme pages and assets can be customized by users.
+	</Card>
+	<Card title="Type safe" icon="approve-check-circle">
+		Type safe for both theme authors and theme users.
 	</Card>
 </CardGrid>
-
-<style set:html={`
-	body {
-		--sl-nav-height: 0px;
-	}
-
-	header {
-		display: none;
-	}
-
-	.hero {
-		grid-template-columns: 1fr;
-		place-content: center;
-		max-width: 75ch;
-		margin-inline: auto;
-	}
-`}></style>

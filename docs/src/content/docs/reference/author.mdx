@@ -1,0 +1,271 @@
+---
+title: Author API
+description: Occaecat culpa culpa labore nulla ut et voluptate est occaecat aliqua aliquip esse do anim.
+---
+import { FileTree } from '@astrojs/starlight/components';
+
+## Default Structure
+
+<FileTree>
+- package/
+  - public/
+  - src/
+    - assets/
+    - css/
+    - components/
+    - layouts/
+    - pages/
+  - **index.ts**
+  - package.json
+</FileTree>
+
+```ts
+// package/index.ts
+import { z } from 'astro/zod'
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  name: "my-theme",
+  schema: z.object({
+    title: z.string(),
+    description: z.sting().optional()
+  })
+})
+```
+
+## Reference
+
+### `name`
+
+**Type**: `string`
+
+**Required**
+
+The name of a theme, must be unique. If you are authoring your theme as a package, it is recomended to use the package name as the name of your theme
+
+### `schema`
+
+**Type**: [`Zod Schema`](https://zod.dev/?id=basic-usage)
+
+**Default**: `ZodTypeAny`
+
+A zod schema for validating the default value of a theme's config module. The schema must be JSON serializable.
+
+**Example**:
+
+```ts
+schema: z.object({
+  title: z.string(),
+  description: z.string().optional()
+})
+```
+
+```ts
+---
+import config from "my-theme/config"
+
+console.log(config.title, config.description)
+---
+```
+
+### `srcDir`
+
+**Type**: `string`
+
+**Default**: `"src"`
+
+Directory that contains a theme's assets (pages, components, images, css, etc). Assets inside the src directory can be accessed using virtual modules (see `imports`)
+
+### `pageDir`
+
+**Type**: `string` | [`AstroPagesOption`](https://github.com/BryceRussell/astro-pages/blob/main/package/README.md#option-reference)
+
+**Default**: `"pages"`
+
+Directory that contains all of the pages for a theme
+
+### `publicDir`
+
+**Type**: `string` | [`AstroPublicOption`](https://github.com/BryceRussell/astro-public/tree/main/package#option-reference)
+
+**Default**: `"public"`
+
+Directory that contains a theme's static assets (`favicon.svg`, etc). By default, these assets act as placeholders and can be overwritten by assets located in a user's `public` real folder.
+
+### `imports`
+
+**Type**: `Record<string, Record<string, string> | string[] | string | false>`
+
+**Default**:
+
+```js
+imports: {
+  css: "css/**.{css,scss,sass,styl,less}",
+  assets: "assets**.{jpeg,jpg,png,tiff,webp,gif,svg,avif}",
+  layouts: "layouts/**.astro",
+  components: "components/**.{astro,tsx,jsx,svelte,vue}"
+}
+```
+
+Create virtual modules to access assets inside a theme and allow users to override them.
+
+**`false`**: 
+
+Toggle default virtual modules off
+
+```js
+imports: {
+  css: false,
+  assets: false,
+  layouts: false,
+  components: false,
+}
+```
+
+**`string`**: 
+
+Glob files into a virtual module, glob patterns are relative to a theme's `srcDir`
+
+<FileTree>
+- package/
+  - src/
+    - components/
+      - Hero.astro
+      - Card.astro
+      - Button.astro
+</FileTree>
+
+```ts
+imports: {
+  components: "components/**.astro",
+}
+```
+
+```ts
+import { Hero, Card, Button } from "my-theme/components"
+```
+
+**`array`**: 
+
+Use an array to combine imports into a single virtual module
+
+```ts
+imports: {
+  css: [
+    "./src/css/reset.css",
+    "./src/css/global.css",
+    "./src/css/utils.css",
+  ],
+}
+```
+
+```ts
+import "my-theme/css"
+```
+
+**`object`**: 
+
+Use an object to create more complex custom virtual modules
+
+```ts
+imports: {
+  components: {
+    imports: [ "./src/css/global.css" ],
+    default: "./src/layout/Layout.astro",
+    Head: "./src/components/Head.astro",
+    Button: "./src/components/Button.astro"
+  }
+}
+```
+
+```ts
+import Layout, { Head, Button } from "my-theme/components"
+```
+
+### `log`
+
+**Type**: `"verbose" | "minimal" | boolean`
+
+**Default**: `true`
+
+Toggle logging for the theme
+
+| Level | Description |
+| --- | --- |
+| `false` | Zero logging |
+| `"minimal" \| true` | Log warnings
+| `"verbose"` | Log everything, including debug information |
+
+### `entrypoint`
+
+**Type**: `string`
+
+**Default**: directory of the file the theme is exported from
+
+A path to the root directory, or file inside the root directory, of a theme
+
+:::note
+For advanced use cases only, this will be infered automatically assuming that this called at the root of the theme (see [Default Structure](#default-structure))
+:::
+
+## Example
+
+Author a theme inside a package similar a normal project
+
+<FileTree>
+- package/
+  - public/
+    - favicon.svg
+  - src/
+    - assets/
+      - logo.png
+    - css/
+      - styles.css
+    - components/
+      - Card.astro
+    - layouts/
+      - Layout.astro
+    - pages/
+      - index.astro
+  - index.ts
+  - package.json
+  - README.md
+</FileTree>
+
+Export the theme as an integration
+
+```ts
+// package/index.ts
+import { z } from 'astro/zod';
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  name: "my-theme",
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional()
+  })
+})
+```
+
+Use the generated virtual modules to author the theme
+
+```tsx
+// package/src/pages/index.astro
+---
+import { Layout } from 'my-theme/layouts';
+import { Card } from 'my-theme/components';
+import { logo } from 'my-theme/assets'
+import config from 'my-theme/config'
+import 'my-theme/css';
+
+const {
+  title,
+  description = "Welcome to my theme"
+} = config
+---
+
+<Layout>
+  <Card {title} {description} img={logo}/>
+</Layout>
+```

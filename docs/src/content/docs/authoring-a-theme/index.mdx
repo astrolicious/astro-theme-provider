@@ -1,6 +1,8 @@
 ---
-title: Getting Started
-description: A reference page in my new Starlight docs site.
+title: Authoring a Theme
+description: How to author a theme using Astro Theme Provider
+sidebar:
+  hidden: true
 ---
 import { FileTree } from '@astrojs/starlight/components';
 
@@ -67,10 +69,11 @@ export default defineTheme({
 
 <FileTree>
 - package/
-  - custom/
-    - logo.png
-    - styles.css
-    - Heading.astro
+  - src/
+    - custom/
+      - logo.png
+      - styles.css
+      - Heading.astro
   - ...
   - index.ts
   - package.json
