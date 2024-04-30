@@ -41,14 +41,14 @@
 		}
 	},
 	"devDependencies": {
-		"@astrojs/db": "^0.10.5",
+		"@astrojs/db": "^0.10.6",
 		"@types/node": "^20.12.7",
 		"playwright": "^1.43.1",
 		"tsup": "^8.0.2",
 		"typescript": "^5.4.5"
 	},
 	"dependencies": {
-		"astro-integration-kit": "^0.11.0",
+		"astro-integration-kit": "^0.13.1",
 		"astro-pages": "^0.3.0",
 		"astro-public": "^0.1.0",
 		"callsites": "^4.1.0",
