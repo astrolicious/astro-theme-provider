@@ -7,7 +7,7 @@ Author themes for Astro like a normal project and export your work as an integra
 
 ### [Documentation](https://astro-theme-provider.netlify.app)
 
-### [Theme Template](https://github.com/astrolicious/astro-theme-template)
+### [Theme Template](https://github.com/astrolicious/astro-theme-provider-template)
 
 
 ### Contributing
