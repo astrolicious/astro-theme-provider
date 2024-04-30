@@ -2,8 +2,8 @@
 
 [![npm version](https://img.shields.io/npm/v/astro-theme-provider?labelColor=red&color=grey)](https://www.npmjs.com/package/astro-theme-provider)
 ![beta](https://img.shields.io/badge/WIP-orange)
-[![readme](https://img.shields.io/badge/README-blue)](https://github.com/BryceRussell/astro-theme-provider/tree/main/package)
-[![template](https://img.shields.io/badge/Theme_Template-green)](https://github.com/BryceRussell/astro-theme-template)
+[![readme](https://img.shields.io/badge/README-blue)](https://github.com/astrolicious/astro-theme-provider/tree/main/package)
+[![template](https://img.shields.io/badge/Theme_Template-green)](https://github.com/astrolicious/astro-theme-template)
 
 Easily create theme integrations for Astro
 

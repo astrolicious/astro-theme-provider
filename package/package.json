@@ -11,10 +11,10 @@
 	"license": "Unlicense",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/brycerussell/astro-theme-provider",
+		"url": "https://github.com/astrolicious/astro-theme-provider",
 		"directory": "packages/astro-theme-provider"
 	},
-	"bugs": "https://github.com/brycerussell/astro-theme-provider/issues",
+	"bugs": "https://github.com/astrolicious/astro-theme-provider/issues",
 	"homepage": "https://astro-theme-provider.netlify.app/",
 	"scripts": {
 		"test": "node --test",
