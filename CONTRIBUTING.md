@@ -1,5 +1,3 @@
-[add links after transfer]
-
 ## What is `astro-theme-provider`?
 
 Astro Theme Provider is a tool that allows you to author themes for Astro like a normal project and export your work as an integration for others to use.
