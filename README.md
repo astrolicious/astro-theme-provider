@@ -5,21 +5,37 @@
 
 Author themes for Astro like a normal project and export your work as an integration for others to use
 
-- [Read the docs!](https://astro-theme-provider.netlify.app) (coming soon)
-- [Create a theme](https://github.com/BryceRussell/astro-theme-template)
+### [Documentation](https://astro-theme-provider.netlify.app)
+
+### [Theme Template](https://github.com/astrolicious/astro-theme-provider-template)
+
 
 ### Contributing
 
-- [Contributing Guide](https://github.com/BryceRussell/astro-theme-provider/blob/main/CONTRIBUTING.md)
+- [Contributing Guide](https://github.com/astrolicious/astro-theme-provider/blob/main/CONTRIBUTING.md)
 - [Discord Channel](https://chat.astrolicious.dev)
-- [Discussions](https://github.com/BryceRussell/astro-theme-provider/discussions)
-- [Issues](https://github.com/BryceRussell/astro-theme-provider/issues)
+- [Discussions](https://github.com/astrolicious/astro-theme-provider/discussions)
+- [Issues](https://github.com/astrolicious/astro-theme-provider/issues)
 
 ### Example
 
 **Authoring a Theme**:
 
+```
+package/
+├── public/
+├── src/
+│   ├── assets/
+│   ├── css/
+│   ├── components/
+│   ├── layouts/
+│   └── pages/
+├── index.ts
+└── package.json
+```
+
 ```ts
+// package/index.ts
 import defineTheme from 'astro-theme-provider';
 import { z } from 'astro/zod'
 
@@ -33,6 +49,7 @@ export default defineTheme({
 **Using a Theme**:
 
 ```ts
+// astro.config.mjs
 import { defineConfig } from 'astro/config';
 import Blog from 'blog-theme';
 

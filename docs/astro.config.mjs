@@ -8,7 +8,7 @@ export default defineConfig({
 			customCss: ["./src/css/styles.css"],
 			title: "Astro Theme Provider",
 			social: {
-				github: "https://github.com/BryceRussell/astro-theme-provider",
+				github: "https://github.com/astrolicious/astro-theme-provider",
 			},
 			sidebar: [
 				{

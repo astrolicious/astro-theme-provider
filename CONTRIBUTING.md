@@ -1,8 +1,6 @@
-[add links after transfer]
-
 ## What is `astro-theme-provider`?
 
-[Get content from blog post after transfer]
+Astro Theme Provider is a tool that allows you to author themes for Astro like a normal project and export your work as an integration for others to use.
 
 ### Core Goals
 
@@ -21,8 +19,8 @@ There are many ways to contribute and many of them do not involve code, giving f
 
 - Help improve the documentation
 - Use `astro-theme-provider`, give feedback about your experience and open issues for any bugs you find
-- Participate in discussions in the ~Discord Channel?~, Issues Tab, Dicussions Tab, etc and give suggestions for improvments or enhancments 
-- Take ownership of an issue tagged `help wanted`, this can be anything from a simple bug fix to a large enhancement for the project
+- Participate in discussions in the [Discord Channel](https://chat.astrolicious.dev), [Issues Tab](https://github.com/astrolicious/astro-theme-provider/issues), [Discussions Tab](https://github.com/astrolicious/astro-theme-provider/discussions), etc and give suggestions for improvments or enhancments 
+- Take ownership of an issue (typically tagged as `help wanted`), this can be anything from a simple bug fix to a large enhancement for the project
 - Review PRs, it is important that code is reviewed and approved by someone that did not author the PR
 
 ### Setting up local repo
@@ -32,7 +30,7 @@ There are many ways to contribute and many of them do not involve code, giving f
 1. Clone the repo locally
 
 ```
-git clone ...
+git clone https://github.com/astrolicious/astro-theme-provider.git
 ```
 
 2. Install dependencies
@@ -49,16 +47,8 @@ pnpm exec playwright install --with-deps
 
 4. Build the package
 
-Watch mode:
-
 ```
 pnpm package:dev
-```
-
-Build once:
-
-```
-pnpm package:build
 ```
 
 Now that the repo has been setup and the package has been built, you can use `pnpm test` to test your changes and use `pnpm playground:dev` to play around with your changes
@@ -66,7 +56,7 @@ Now that the repo has been setup and the package has been built, you can use `pn
 ### PRs
 
 - Use the command `pnpm lint:fix` to lint your PR (last commit)
-- Use the command `pnpm changeset` to add a changeset to your PR
+- Use the command `pnpm changeset` to add a changeset to your PR 
 
 #### Merging
 
