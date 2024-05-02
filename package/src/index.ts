@@ -52,7 +52,9 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 			layouts: `layouts/${GLOB_ASTRO}`,
 			components: `components/${GLOB_COMPONENTS}`,
 		},
-		integrations: []
+		integrations: [
+			() => staticDir(authorOptions.publicDir)
+		]
 	};
 
 	if (typeof authorOptions.pageDir === "string") {
@@ -181,10 +183,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// HMR for theme author's package
 					watchDirectory(params, themeRoot);
 
-					// Add `astro-public` integration to handle `/public` folder logic
-					addIntegration(params, {
-						integration: staticDir(authorOptions.publicDir!),
-					});
 					// Add integrations from author (like mdx or sitemap)
 					for (const option of authorOptions.integrations) {
 						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>
