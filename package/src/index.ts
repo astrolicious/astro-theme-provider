@@ -209,7 +209,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	
 						for (const entrypoint of middlewareEntrypoints) {
 							const name = basename(entrypoint).slice(0, -extname(entrypoint).length)
-							console.log('MIDDLEWARE', entrypoint)
 							if (['middleware', 'index', 'pre'].includes(name)) {
 								addMiddleware({ entrypoint, order: 'pre' })
 							}
