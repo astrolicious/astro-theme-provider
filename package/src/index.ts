@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { basename, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AstroDbIntegration } from "@astrojs/db/types";
 import { addDts, addIntegration, addVirtualImports, watchDirectory } from "astro-integration-kit";
@@ -10,7 +10,8 @@ import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
 import { z } from "astro/zod";
 import callsites from "callsites";
-import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./internal/consts.js";
+import fg from "fast-glob";
+import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IGNORE, GLOB_IMAGES } from "./internal/consts.js";
 import { errorMap } from "./internal/error-map.js";
 import type { AuthorOptions, UserOptions } from "./internal/types.js";
 import { mergeOptions } from "./utils/options.js";
@@ -44,6 +45,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		srcDir: "src",
 		pageDir: "pages",
 		publicDir: "public",
+		middlewareDir: "./",
 		log: true,
 		schema: z.record(z.any()),
 		imports: {
@@ -72,10 +74,14 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	// Theme source dir (/package/src)
 	const themeSrc = resolveDirectory(themeRoot, authorOptions.srcDir);
 
+	// Root dir used to search for middleware files
+	const middlewareDir = authorOptions.middlewareDir ? resolveDirectory(themeSrc, authorOptions.middlewareDir) : false;
+
 	// Force options
 	authorOptions = mergeOptions(authorOptions, {
 		pageDir: { cwd: themeSrc, log: authorOptions.log },
 		publicDir: { cwd: themeRoot, log: authorOptions.log },
+		middlewareDir,
 	}) as typeof authorOptions;
 
 	// Theme `package.json`
@@ -111,7 +117,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
 				"astro:config:setup": (params) => {
-					const { config, logger, injectRoute } = params;
+					const { config, logger, injectRoute, addMiddleware } = params;
 
 					const projectRoot = normalizePath(fileURLToPath(config.root.toString()));
 
@@ -192,6 +198,22 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						}
 						if (!integration) continue;
 						addIntegration(params, { integration });
+					}
+
+					// Add middleware
+					if (middlewareDir) {
+						const middlewareGlob = ["middleware.{ts,js}", "middleware/*{ts,js}", GLOB_IGNORE].flat();
+						const middlewareEntrypoints = fg.globSync(middlewareGlob, { cwd: middlewareDir, absolute: true });
+
+						for (const entrypoint of middlewareEntrypoints) {
+							const name = basename(entrypoint).slice(0, -extname(entrypoint).length);
+							if (["middleware", "index", "pre"].includes(name)) {
+								addMiddleware({ entrypoint, order: "pre" });
+							}
+							if (name === "post") {
+								addMiddleware({ entrypoint, order: "post" });
+							}
+						}
 					}
 
 					// Dynamically create virtual modules using globs, imports, or exports
