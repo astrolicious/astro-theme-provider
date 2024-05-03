@@ -11,7 +11,7 @@ import { AstroError } from "astro/errors";
 import { z } from "astro/zod";
 import fg from 'fast-glob';
 import callsites from "callsites";
-import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./internal/consts.js";
+import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IGNORE, GLOB_IMAGES } from "./internal/consts.js";
 import { errorMap } from "./internal/error-map.js";
 import type { AuthorOptions, UserOptions } from "./internal/types.js";
 import { mergeOptions } from "./utils/options.js";
@@ -45,6 +45,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		srcDir: "src",
 		pageDir: "pages",
 		publicDir: "public",
+		middlewareDir: './',
 		log: true,
 		schema: z.record(z.any()),
 		imports: {
@@ -73,10 +74,16 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	// Theme source dir (/package/src)
 	const themeSrc = resolveDirectory(themeRoot, authorOptions.srcDir);
 
+	// Root dir used to search for middleware files
+	const middlewareDir = authorOptions.middlewareDir
+		? resolveDirectory(themeSrc, authorOptions.middlewareDir)
+		: false
+
 	// Force options
 	authorOptions = mergeOptions(authorOptions, {
 		pageDir: { cwd: themeSrc, log: authorOptions.log },
 		publicDir: { cwd: themeRoot, log: authorOptions.log },
+		middlewareDir
 	}) as typeof authorOptions;
 
 	// Theme `package.json`
@@ -196,15 +203,19 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					}
 
 					// Add middleware
-					const middlewareEntrypoints = fg.globSync(['middleware.{ts,js}', 'middleware/*{ts,js}'], { cwd: themeSrc, absolute: true })
-
-					for (const entrypoint of middlewareEntrypoints) {
-						const name = basename(entrypoint).slice(0, -extname(entrypoint).length)
-						if (['middleware', 'index', 'pre'].includes(name)) {
-							addMiddleware({ entrypoint, order: 'pre' })
-						}
-						if (name === 'post') {
-							addMiddleware({ entrypoint, order: 'post' })
+					if (middlewareDir) {
+						const middlewareGlob = ['middleware.{ts,js}', 'middleware/*{ts,js}', GLOB_IGNORE].flat()
+						const middlewareEntrypoints = fg.globSync(middlewareGlob, { cwd: middlewareDir, absolute: true })
+	
+						for (const entrypoint of middlewareEntrypoints) {
+							const name = basename(entrypoint).slice(0, -extname(entrypoint).length)
+							console.log('MIDDLEWARE', entrypoint)
+							if (['middleware', 'index', 'pre'].includes(name)) {
+								addMiddleware({ entrypoint, order: 'pre' })
+							}
+							if (name === 'post') {
+								addMiddleware({ entrypoint, order: 'post' })
+							}
 						}
 					}
 					
