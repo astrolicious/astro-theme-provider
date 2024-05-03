@@ -132,15 +132,15 @@ describe("defineTheme", () => {
 				theme.hooks["astro:config:setup"]?.(params);
 
 				for (const call of params.addMiddleware.mock.calls) {
-					const name = call.arguments[0].entrypoint.split('/').pop().split('.').shift()
-					const order = call.arguments[0].order
+					const name = call.arguments[0].entrypoint.split("/").pop().split(".").shift();
+					const order = call.arguments[0].order;
 
-					if (['middleware', 'index', 'pre'].includes(name)) {
-						assert.equal(order, 'pre');
+					if (["middleware", "index", "pre"].includes(name)) {
+						assert.equal(order, "pre");
 					}
 
-					if (name === 'post') {
-						assert.equal(order, 'post');
+					if (name === "post") {
+						assert.equal(order, "post");
 					}
 				}
 			});

@@ -9,8 +9,8 @@ import staticDir from "astro-public";
 import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
 import { z } from "astro/zod";
-import fg from 'fast-glob';
 import callsites from "callsites";
+import fg from "fast-glob";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IGNORE, GLOB_IMAGES } from "./internal/consts.js";
 import { errorMap } from "./internal/error-map.js";
 import type { AuthorOptions, UserOptions } from "./internal/types.js";
@@ -45,7 +45,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		srcDir: "src",
 		pageDir: "pages",
 		publicDir: "public",
-		middlewareDir: './',
+		middlewareDir: "./",
 		log: true,
 		schema: z.record(z.any()),
 		imports: {
@@ -75,15 +75,13 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	const themeSrc = resolveDirectory(themeRoot, authorOptions.srcDir);
 
 	// Root dir used to search for middleware files
-	const middlewareDir = authorOptions.middlewareDir
-		? resolveDirectory(themeSrc, authorOptions.middlewareDir)
-		: false
+	const middlewareDir = authorOptions.middlewareDir ? resolveDirectory(themeSrc, authorOptions.middlewareDir) : false;
 
 	// Force options
 	authorOptions = mergeOptions(authorOptions, {
 		pageDir: { cwd: themeSrc, log: authorOptions.log },
 		publicDir: { cwd: themeRoot, log: authorOptions.log },
-		middlewareDir
+		middlewareDir,
 	}) as typeof authorOptions;
 
 	// Theme `package.json`
@@ -204,20 +202,20 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					// Add middleware
 					if (middlewareDir) {
-						const middlewareGlob = ['middleware.{ts,js}', 'middleware/*{ts,js}', GLOB_IGNORE].flat()
-						const middlewareEntrypoints = fg.globSync(middlewareGlob, { cwd: middlewareDir, absolute: true })
-	
+						const middlewareGlob = ["middleware.{ts,js}", "middleware/*{ts,js}", GLOB_IGNORE].flat();
+						const middlewareEntrypoints = fg.globSync(middlewareGlob, { cwd: middlewareDir, absolute: true });
+
 						for (const entrypoint of middlewareEntrypoints) {
-							const name = basename(entrypoint).slice(0, -extname(entrypoint).length)
-							if (['middleware', 'index', 'pre'].includes(name)) {
-								addMiddleware({ entrypoint, order: 'pre' })
+							const name = basename(entrypoint).slice(0, -extname(entrypoint).length);
+							if (["middleware", "index", "pre"].includes(name)) {
+								addMiddleware({ entrypoint, order: "pre" });
 							}
-							if (name === 'post') {
-								addMiddleware({ entrypoint, order: 'post' })
+							if (name === "post") {
+								addMiddleware({ entrypoint, order: "post" });
 							}
 						}
 					}
-					
+
 					// Dynamically create virtual modules using globs, imports, or exports
 					for (let [name, option] of Object.entries(authorOptions.imports)) {
 						if (!option) continue;
