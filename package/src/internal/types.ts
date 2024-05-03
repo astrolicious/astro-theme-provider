@@ -1,3 +1,4 @@
+import type { AstroIntegration } from "astro";
 import type { Option as PageDirOption } from "astro-pages";
 import type { Option as StaticDirOption } from "astro-public/types";
 import type { z } from "astro/zod";
@@ -33,6 +34,10 @@ export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny>
 	log?: "verbose" | "minimal" | boolean;
 	schema?: Schema;
 	imports?: Record<string, string | ModuleImports | ModuleExports | ModuleObject>;
+	integrations?: Array<
+		| AstroIntegration
+		| ((options: { config: z.infer<Schema>; integrations: string[] }) => AstroIntegration | false | null | undefined)
+	>;
 }>;
 
 export type UserOptions<ThemeName extends string, Schema extends z.ZodTypeAny = z.ZodTypeAny> = {

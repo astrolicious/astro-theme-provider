@@ -52,6 +52,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 			layouts: `layouts/${GLOB_ASTRO}`,
 			components: `components/${GLOB_COMPONENTS}`,
 		},
+		integrations: [() => staticDir(authorOptions.publicDir)],
 	};
 
 	if (typeof authorOptions.pageDir === "string") {
@@ -180,10 +181,18 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// HMR for theme author's package
 					watchDirectory(params, themeRoot);
 
-					// Add `astro-public` integration to handle `/public` folder logic
-					addIntegration(params, {
-						integration: staticDir(authorOptions.publicDir!),
-					});
+					// Add integrations from author (like mdx or sitemap)
+					for (const option of authorOptions.integrations) {
+						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>;
+						if (typeof option === "function") {
+							const names = config.integrations.map((i) => i.name);
+							integration = option({ config: userConfig, integrations: names });
+						} else {
+							integration = option;
+						}
+						if (!integration) continue;
+						addIntegration(params, { integration });
+					}
 
 					// Dynamically create virtual modules using globs, imports, or exports
 					for (let [name, option] of Object.entries(authorOptions.imports)) {
