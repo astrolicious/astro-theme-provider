@@ -16,6 +16,7 @@ const packagePages = resolve(packageSrc, "pages");
 const packageEntrypoint = resolve(packageRoot, "index.ts");
 const packageJSON = JSON.parse(readFileSync(resolve(packageRoot, "package.json"), "utf-8"));
 const packageName = packageJSON.name;
+const astroIntegration = { name: 'astro-integration' }
 const defaultModules = {
 	[`${packageName}/config`]: {},
 	[`${packageName}/css`]: ["css/styles.css"],
@@ -50,6 +51,9 @@ const astroConfigSetupParamsStub = (params) => ({
 	config: {
 		root: pathToFileURL(`${projectRoot}/`),
 		srcDir: pathToFileURL(`${projectSrc}/`),
+		integrations: [
+			astroIntegration,
+		]
 	},
 	...(params || {}),
 });
@@ -120,6 +124,42 @@ describe("defineTheme", () => {
 					entrypoint,
 					pattern: "/a",
 				});
+			});
+
+			it("should inject integrations", () => {
+				const theme = defineTheme({ integrations: [ astroIntegration ] })();
+				const params = astroConfigSetupParamsStub();
+
+				theme.hooks["astro:config:setup"]?.(params);
+
+				const call = params.updateConfig.mock.calls.find(call => call.arguments[0]?.integrations?.[0].name === astroIntegration.name);
+
+				for (const moduleName of Object.keys(defaultModules)) {
+					assert.equal(call.arguments[0].integrations[0], astroIntegration);
+				}
+			});
+
+			it("should inject integrations with user config", () => {
+				const theme = defineTheme({ 
+					schema: z.object({ a: z.literal('do-not-add').nullish() }),
+					integrations: [ 
+						({ config }) => {
+							if (!config.a) return astroIntegration
+						} 
+					]
+				})({ 
+					config: { a: 'do-not-add' }
+				});
+
+				const params = astroConfigSetupParamsStub();
+
+				theme.hooks["astro:config:setup"]?.(params);
+
+				const called = params.updateConfig.mock.calls.some(call => call.arguments[0]?.integrations?.[0].name === astroIntegration.name);
+
+				for (const moduleName of Object.keys(defaultModules)) {
+					assert.equal(called, false);
+				}
 			});
 
 			it("should resolve virtual modules", () => {
