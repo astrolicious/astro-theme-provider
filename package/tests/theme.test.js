@@ -131,7 +131,11 @@ describe("defineTheme", () => {
 
 				theme.hooks["astro:config:setup"]?.(params);
 
-				for (const call of params.addMiddleware.mock.calls) {
+				const calls = params.addMiddleware.mock.calls
+
+				assert.equal(calls.length, 5);
+
+				for (const call of calls) {
 					const name = call.arguments[0].entrypoint.split("/").pop().split(".").shift();
 					const order = call.arguments[0].order;
 
