@@ -92,6 +92,41 @@ Directory that contains all of the pages for a theme
 
 Directory that contains a theme's static assets (`favicon.svg`, etc). By default, these assets act as placeholders and can be overwritten by assets located in a user's `public` real folder.
 
+### `integrations`
+
+**Type**: `Array<AstroIntegration | (options: { config: z.infer<Schema>, integrations: string[] }) => AstroIntegration | false | null | undefined>`
+
+An array of integrations that will be included with the theme
+
+```ts
+integrations: [
+  mdx(),
+  sitemap(),
+]
+```
+
+```ts
+integrations: [
+  // Check for other integrations
+  ({ integrations }) => {
+    if (!integrations.contains('@astrojs/sitemap')) {
+      return inoxsitemap()
+    }
+  },
+]
+```
+
+```ts
+integrations: [
+  // Pass user options to integrations
+  ({ config }) => {
+    if (config.sitemap) {
+      return inoxsitemap(config.sitemap)
+    }
+  },
+]
+```
+
 ### `imports`
 
 **Type**: `Record<string, Record<string, string> | string[] | string | false>`
