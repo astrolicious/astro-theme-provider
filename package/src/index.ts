@@ -188,7 +188,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>
 						if (typeof option === "function") {
 							const names = config.integrations.map(i => i.name)
-							integration = option({ userConfig: userConfig, integrations: names })
+							integration = option({ config: userConfig, integrations: names })
 						} else {
 							integration = option
 						}
