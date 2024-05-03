@@ -48,6 +48,7 @@ const astroConfigSetupParamsStub = (params) => ({
 	command: "dev",
 	injectRoute: mock.fn(),
 	updateConfig: mock.fn(),
+	addMiddleware: mock.fn(),
 	config: {
 		root: pathToFileURL(`${projectRoot}/`),
 		srcDir: pathToFileURL(`${projectSrc}/`),
@@ -124,6 +125,26 @@ describe("defineTheme", () => {
 				});
 			});
 
+			it("should inject middleware", () => {
+				const theme = defineTheme({})();
+				const params = astroConfigSetupParamsStub();
+
+				theme.hooks["astro:config:setup"]?.(params);
+
+				for (const call of params.addMiddleware.mock.calls) {
+					const name = call.arguments[0].entrypoint.split('/').pop().split('.').shift()
+					const order = call.arguments[0].order
+
+					if (['middleware', 'index', 'pre'].includes(name)) {
+						assert.equal(order, 'pre');
+					}
+
+					if (name === 'post') {
+						assert.equal(order, 'post');
+					}
+				}
+			});
+
 			it("should inject integrations", () => {
 				const theme = defineTheme({ integrations: [astroIntegration] })();
 				const params = astroConfigSetupParamsStub();
@@ -134,9 +155,7 @@ describe("defineTheme", () => {
 					(call) => call.arguments[0]?.integrations?.[0].name === astroIntegration.name,
 				);
 
-				for (const moduleName of Object.keys(defaultModules)) {
-					assert.equal(call.arguments[0].integrations[0], astroIntegration);
-				}
+				assert.equal(call.arguments[0].integrations[0], astroIntegration);
 			});
 
 			it("should inject integrations with user config", () => {
@@ -159,9 +178,7 @@ describe("defineTheme", () => {
 					(call) => call.arguments[0]?.integrations?.[0].name === astroIntegration.name,
 				);
 
-				for (const moduleName of Object.keys(defaultModules)) {
-					assert.equal(called, false);
-				}
+				assert.equal(called, false);
 			});
 
 			it("should resolve virtual modules", () => {
