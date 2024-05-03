@@ -52,9 +52,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 			layouts: `layouts/${GLOB_ASTRO}`,
 			components: `components/${GLOB_COMPONENTS}`,
 		},
-		integrations: [
-			() => staticDir(authorOptions.publicDir)
-		]
+		integrations: [() => staticDir(authorOptions.publicDir)],
 	};
 
 	if (typeof authorOptions.pageDir === "string") {
@@ -185,15 +183,15 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					// Add integrations from author (like mdx or sitemap)
 					for (const option of authorOptions.integrations) {
-						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>
+						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>;
 						if (typeof option === "function") {
-							const names = config.integrations.map(i => i.name)
-							integration = option({ config: userConfig, integrations: names })
+							const names = config.integrations.map((i) => i.name);
+							integration = option({ config: userConfig, integrations: names });
 						} else {
-							integration = option
+							integration = option;
 						}
-						if (!integration) continue
-						addIntegration(params, { integration })
+						if (!integration) continue;
+						addIntegration(params, { integration });
 					}
 
 					// Dynamically create virtual modules using globs, imports, or exports
