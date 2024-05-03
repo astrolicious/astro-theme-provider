@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { basename, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AstroDbIntegration } from "@astrojs/db/types";
 import { addDts, addIntegration, addVirtualImports, watchDirectory } from "astro-integration-kit";
@@ -9,6 +9,7 @@ import staticDir from "astro-public";
 import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
 import { z } from "astro/zod";
+import fg from 'fast-glob';
 import callsites from "callsites";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_CSS, GLOB_IMAGES } from "./internal/consts.js";
 import { errorMap } from "./internal/error-map.js";
@@ -111,7 +112,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
 				"astro:config:setup": (params) => {
-					const { config, logger, injectRoute } = params;
+					const { config, logger, injectRoute, addMiddleware } = params;
 
 					const projectRoot = normalizePath(fileURLToPath(config.root.toString()));
 
@@ -194,6 +195,19 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						addIntegration(params, { integration });
 					}
 
+					// Add middleware
+					const middlewareEntrypoints = fg.globSync(['middleware.{ts,js}', 'middleware/*{ts,js}'], { cwd: themeSrc, absolute: true })
+
+					for (const entrypoint of middlewareEntrypoints) {
+						const name = basename(entrypoint).slice(0, -extname(entrypoint).length)
+						if (['middleware', 'index', 'pre'].includes(name)) {
+							addMiddleware({ entrypoint, order: 'pre' })
+						}
+						if (name === 'post') {
+							addMiddleware({ entrypoint, order: 'post' })
+						}
+					}
+					
 					// Dynamically create virtual modules using globs, imports, or exports
 					for (let [name, option] of Object.entries(authorOptions.imports)) {
 						if (!option) continue;
