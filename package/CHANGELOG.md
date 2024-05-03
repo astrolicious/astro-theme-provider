@@ -1,5 +1,50 @@
 # astro-theme-provider
 
+## 0.3.0
+
+### Minor Changes
+
+- 0388fd8: Add support for adding integrations to a theme
+
+  ```ts
+  integrations: [
+    // Add integrations
+    inoxsitemap(),
+    // Check for other integrations
+    ({ integrations }) => {
+      if (!integrations.contains("@astrojs/sitemap")) {
+        return inoxsitemap();
+      }
+    },
+    // Pass user options to integrations
+    ({ config }) => {
+      if (config.sitemap) {
+        return inoxsitemap(config.sitemap);
+      }
+    },
+  ];
+  ```
+
+- f66b214: Add support for adding middleware to a theme
+
+  ```
+  package/
+  ├── src/
+  │   ├── middleware.ts  // Support middleware like Astro, defaults to 'pre'
+  │   └── middleware/
+  │       ├── index.ts   // Same as `src/middleware.ts`
+  │       ├── pre.ts     // Middleware with order 'pre'
+  │       └── post.ts    // Middleware with order 'post'
+  └── index.ts
+  ```
+
+  ```ts
+  defineTheme({
+    name: "my-theme",
+    middlewareDir: false, // Disable middleware injection
+  });
+  ```
+
 ## 0.2.0
 
 ### Minor Changes
