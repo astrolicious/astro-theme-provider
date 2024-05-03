@@ -92,6 +92,14 @@ Directory that contains all of the pages for a theme
 
 Directory that contains a theme's static assets (`favicon.svg`, etc). By default, these assets act as placeholders and can be overwritten by assets located in a user's `public` real folder.
 
+### `middlewareDir`
+
+**Type**: `string` | `false`
+
+**Default**: `srcDir`
+
+Directory that contains a theme's middleware. Relative paths are resolved relative to the theme's `srcDir`, use `false` to disable middleware injection
+
 ### `integrations`
 
 **Type**: `Array<AstroIntegration | (options: { config: z.infer<Schema>, integrations: string[] }) => AstroIntegration | false | null | undefined>`
