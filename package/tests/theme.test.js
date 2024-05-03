@@ -131,7 +131,7 @@ describe("defineTheme", () => {
 
 				theme.hooks["astro:config:setup"]?.(params);
 
-				const calls = params.addMiddleware.mock.calls
+				const calls = params.addMiddleware.mock.calls;
 
 				assert.equal(calls.length, 5);
 
