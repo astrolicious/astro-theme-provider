@@ -19,7 +19,7 @@ importers:
         version: 1.43.1
       astro:
         specifier: ^4.7.0
-        version: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+        version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
 
   docs:
     dependencies:
@@ -28,10 +28,10 @@ importers:
         version: 0.5.10(prettier@2.8.8)(typescript@5.4.5)
       '@astrojs/starlight':
         specifier: ^0.21.5
-        version: 0.21.5(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5))
+        version: 0.21.5(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       astro:
         specifier: ^4.7.0
-        version: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+        version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       sharp:
         specifier: ^0.32.6
         version: 0.32.6
@@ -40,16 +40,16 @@ importers:
     dependencies:
       astro:
         specifier: '>=3'
-        version: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+        version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       astro-integration-kit:
         specifier: ^0.13.1
-        version: 0.13.1(@astrojs/db@0.10.6)(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5))
+        version: 0.13.1(@astrojs/db@0.10.6)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       astro-pages:
         specifier: ^0.3.0
-        version: 0.3.0(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5))
+        version: 0.3.0(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       astro-public:
         specifier: ^0.1.0
-        version: 0.1.0(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5))
+        version: 0.1.0(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       callsites:
         specifier: ^4.1.0
         version: 4.1.0
@@ -61,8 +61,8 @@ importers:
         specifier: ^0.10.6
         version: 0.10.6
       '@types/node':
-        specifier: ^20.12.7
-        version: 20.12.7
+        specifier: ^20.12.8
+        version: 20.12.8
       playwright:
         specifier: ^1.43.1
         version: 1.43.1
@@ -77,10 +77,10 @@ importers:
     dependencies:
       astro:
         specifier: ^4.7.0
-        version: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+        version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       astro-integration-kit:
         specifier: ^0.13.1
-        version: 0.13.1(@astrojs/db@0.10.6)(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5))
+        version: 0.13.1(@astrojs/db@0.10.6)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       sharp:
         specifier: ^0.33.3
         version: 0.33.3
@@ -95,7 +95,7 @@ importers:
         version: 0.5.10(prettier@2.8.8)(typescript@5.4.5)
       astro:
         specifier: ^4.7.0
-        version: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+        version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       theme-ssg:
         specifier: workspace:^
         version: link:../../themes/theme-ssg
@@ -107,8 +107,8 @@ importers:
         specifier: ^1.43.1
         version: 1.43.1
       '@types/node':
-        specifier: ^20.12.7
-        version: 20.12.7
+        specifier: ^20.12.8
+        version: 20.12.8
 
   tests/themes/theme-playground:
     dependencies:
@@ -117,11 +117,11 @@ importers:
         version: link:../../../package
     devDependencies:
       '@types/node':
-        specifier: ^20.12.7
-        version: 20.12.7
+        specifier: ^20.12.8
+        version: 20.12.8
       astro:
         specifier: ^4.7.0
-        version: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+        version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
 
   tests/themes/theme-ssg:
     dependencies:
@@ -130,11 +130,11 @@ importers:
         version: link:../../../package
     devDependencies:
       '@types/node':
-        specifier: ^20.12.7
-        version: 20.12.7
+        specifier: ^20.12.8
+        version: 20.12.8
       astro:
         specifier: ^4.7.0
-        version: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+        version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
 
 packages:
 
@@ -1114,8 +1114,8 @@ packages:
   '@types/node@17.0.45':
     resolution: {integrity: sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==}
 
-  '@types/node@20.12.7':
-    resolution: {integrity: sha512-wq0cICSkRLVaf3UGLMGItu/PtdY7oaXaI/RVU+xliKVOtRna3PRY57ZDfztpDL0n11vfymMUnXv8QwYCO7L1wg==}
+  '@types/node@20.12.8':
+    resolution: {integrity: sha512-NU0rJLJnshZWdE/097cdCBbyW1h4hEg0xpovcoAQYHl8dnEyp/NAOiE45pvc+Bd1Dt+2r94v2eGFpQJ4R7g+2w==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -3970,12 +3970,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@2.3.1(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5))':
+  '@astrojs/mdx@2.3.1(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))':
     dependencies:
       '@astrojs/markdown-remark': 5.1.0
       '@mdx-js/mdx': 3.0.1
       acorn: 8.11.3
-      astro: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+      astro: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       es-module-lexer: 1.5.2
       estree-util-visit: 2.0.0
       github-slugger: 2.0.0
@@ -4001,15 +4001,15 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 3.23.5
 
-  '@astrojs/starlight@0.21.5(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5))':
+  '@astrojs/starlight@0.21.5(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))':
     dependencies:
-      '@astrojs/mdx': 2.3.1(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5))
+      '@astrojs/mdx': 2.3.1(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       '@astrojs/sitemap': 3.1.4
       '@pagefind/default-ui': 1.1.0
       '@types/hast': 3.0.4
       '@types/mdast': 4.0.3
-      astro: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
-      astro-expressive-code: 0.33.5(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5))
+      astro: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
+      astro-expressive-code: 0.33.5(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       bcp-47: 2.1.0
       hast-util-from-html: 2.0.1
       hast-util-select: 6.0.2
@@ -4915,7 +4915,7 @@ snapshots:
 
   '@types/node@17.0.45': {}
 
-  '@types/node@20.12.7':
+  '@types/node@20.12.8':
     dependencies:
       undici-types: 5.26.5
 
@@ -4925,7 +4925,7 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 17.0.45
+      '@types/node': 20.12.8
 
   '@types/semver@7.5.8': {}
 
@@ -4935,7 +4935,7 @@ snapshots:
 
   '@types/ws@8.5.10':
     dependencies:
-      '@types/node': 20.12.7
+      '@types/node': 20.12.8
 
   '@ungap/structured-clone@1.2.0': {}
 
@@ -5079,30 +5079,30 @@ snapshots:
 
   astring@1.8.6: {}
 
-  astro-expressive-code@0.33.5(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5)):
+  astro-expressive-code@0.33.5(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5)):
     dependencies:
-      astro: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+      astro: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       hast-util-to-html: 8.0.4
       remark-expressive-code: 0.33.5
 
-  astro-integration-kit@0.13.1(@astrojs/db@0.10.6)(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5)):
+  astro-integration-kit@0.13.1(@astrojs/db@0.10.6)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5)):
     dependencies:
-      astro: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+      astro: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       pathe: 1.1.2
       recast: 0.23.6
     optionalDependencies:
       '@astrojs/db': 0.10.6
 
-  astro-pages@0.3.0(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5)):
+  astro-pages@0.3.0(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5)):
     dependencies:
-      astro: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+      astro: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       fast-glob: 3.3.2
 
-  astro-public@0.1.0(astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5)):
+  astro-public@0.1.0(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5)):
     dependencies:
-      astro: 4.7.0(@types/node@20.12.7)(typescript@5.4.5)
+      astro: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
 
-  astro@4.7.0(@types/node@20.12.7)(typescript@5.4.5):
+  astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5):
     dependencies:
       '@astrojs/compiler': 2.7.1
       '@astrojs/internal-helpers': 0.4.0
@@ -5161,8 +5161,8 @@ snapshots:
       tsconfck: 3.0.3(typescript@5.4.5)
       unist-util-visit: 5.0.0
       vfile: 6.0.1
-      vite: 5.2.10(@types/node@20.12.7)
-      vitefu: 0.2.5(vite@5.2.10(@types/node@20.12.7))
+      vite: 5.2.10(@types/node@20.12.8)
+      vitefu: 0.2.5(vite@5.2.10(@types/node@20.12.8))
       which-pm: 2.1.1
       yargs-parser: 21.1.1
       zod: 3.23.5
@@ -8110,18 +8110,18 @@ snapshots:
       unist-util-stringify-position: 4.0.0
       vfile-message: 4.0.2
 
-  vite@5.2.10(@types/node@20.12.7):
+  vite@5.2.10(@types/node@20.12.8):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
       rollup: 4.17.2
     optionalDependencies:
-      '@types/node': 20.12.7
+      '@types/node': 20.12.8
       fsevents: 2.3.3
 
-  vitefu@0.2.5(vite@5.2.10(@types/node@20.12.7)):
+  vitefu@0.2.5(vite@5.2.10(@types/node@20.12.8)):
     optionalDependencies:
-      vite: 5.2.10(@types/node@20.12.7)
+      vite: 5.2.10(@types/node@20.12.8)
 
   volar-service-css@0.0.34(@volar/language-service@2.1.6):
     dependencies:
