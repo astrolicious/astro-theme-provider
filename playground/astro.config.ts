@@ -15,7 +15,7 @@ export default defineConfig({
 				// '/cats/[...cat]': '/dogs/[...cat]',
 			},
 			overrides: {
-				css: [
+				styles: [
 					// "./src/custom.css"
 				],
 				components: {

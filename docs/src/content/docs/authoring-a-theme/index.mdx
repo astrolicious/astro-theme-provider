@@ -30,11 +30,11 @@ import { Heading } from 'my-theme/components';
 
 ### Styles
 
-By default, any Styles inside the `css` folder at the root of your package will be included in the `/css` module
+By default, any Styles inside the `styles` folder at the root of your package will be included in the `/styles` module
 
 ```ts
 ---
-import 'my-theme/css'
+import 'my-theme/styles'
 ---
 ```
 
@@ -57,7 +57,7 @@ import defineTheme from 'astro-theme-provider';
 
 export default defineTheme({
   modules: {
-    css: false,
+    styles: false,
     assets: false,
     layouts: false,
     components: false,
@@ -72,7 +72,7 @@ export default defineTheme({
   - src/
     - custom/
       - logo.png
-      - styles.css
+      - global.css
       - Heading.astro
   - ...
   - index.ts
@@ -102,7 +102,7 @@ import defineTheme from 'astro-theme-provider';
 
 export default defineTheme({
   modules: {
-    custom: [ './styles.css' ]
+    custom: [ './global.css' ]
   }
 })
 ```
@@ -116,7 +116,7 @@ import defineTheme from 'astro-theme-provider';
 export default defineTheme({
   modules: {
     custom: {
-      css: './styles.css',
+      styles: './global.css',
       logo: './logo.png',
       Heading: './heading.astro'
     }

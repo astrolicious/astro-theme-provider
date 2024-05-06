@@ -19,7 +19,7 @@ const packageName = packageJSON.name;
 const astroIntegration = { name: "astro-integration" };
 const defaultModules = {
 	[`${packageName}/config`]: {},
-	[`${packageName}/css`]: ["css/styles.css"],
+	[`${packageName}/styles`]: ["styles/global.css"],
 	[`${packageName}/assets`]: ["assets/levi.png"],
 	[`${packageName}/layouts`]: ["layouts/Layout.astro"],
 	[`${packageName}/components`]: ["components/Heading.astro"],
@@ -220,7 +220,7 @@ describe("defineTheme", () => {
 
 			it("should override virtual modules", () => {
 				const overrides = {
-					css: ["./styles.css"],
+					styles: ["./global.css"],
 					assets: ["./levi.png"],
 					layouts: ["./Layout.astro"],
 					components: ["./Heading.astro"],

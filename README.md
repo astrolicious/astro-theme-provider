@@ -26,7 +26,7 @@ package/
 ├── public/
 ├── src/
 │   ├── assets/
-│   ├── css/
+│   ├── styles/
 │   ├── components/
 │   ├── layouts/
 │   └── pages/
@@ -64,7 +64,7 @@ export default defineConfig({
         '/blog': '/projects', // Overwrite routes
       },
       overrides: {
-        css: [
+        styles: [
           "./src/custom.css" // Add custom css
         ],
         components: {

@@ -5,7 +5,7 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
 	integrations: [
 		starlight({
-			customCss: ["./src/css/styles.css"],
+			customCss: ["./src/styles/global.css"],
 			title: "Astro Theme Provider",
 			social: {
 				github: "https://github.com/astrolicious/astro-theme-provider",

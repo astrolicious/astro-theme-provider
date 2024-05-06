@@ -43,9 +43,9 @@ An object used to override the virtual modules created by a theme
 
 ```ts
 overrides: {
-  css: [
+  styles: [
     // Append imports to a virtual module using an array
-    './src/css/custom-styles.css',
+    './src/styles/custom-styles.css',
   ],
   components: {
     // Override exports from a virtual modules using an object
@@ -98,8 +98,8 @@ export default defineConfig({
         '/[...slug]': '/blog/[...slug]',
       },
       overrides: {
-        css: [
-          "./src/styles.css"
+        styles: [
+          "./src/global.css"
         ],
         components: {
           Card: './src/Card.astro',
