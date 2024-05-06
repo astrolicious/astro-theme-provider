@@ -43,7 +43,7 @@ importers:
         version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       astro-integration-kit:
         specifier: ^0.13.1
-        version: 0.13.1(@astrojs/db@0.10.6)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
+        version: 0.13.1(@astrojs/db@0.11.0)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       astro-pages:
         specifier: ^0.3.0
         version: 0.3.0(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
@@ -58,8 +58,8 @@ importers:
         version: 3.3.2
     devDependencies:
       '@astrojs/db':
-        specifier: ^0.10.6
-        version: 0.10.6
+        specifier: ^0.11.0
+        version: 0.11.0
       '@types/node':
         specifier: ^20.12.8
         version: 20.12.8
@@ -80,7 +80,7 @@ importers:
         version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       astro-integration-kit:
         specifier: ^0.13.1
-        version: 0.13.1(@astrojs/db@0.10.6)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
+        version: 0.13.1(@astrojs/db@0.11.0)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       sharp:
         specifier: ^0.33.3
         version: 0.33.3
@@ -151,8 +151,8 @@ packages:
   '@astrojs/compiler@2.7.1':
     resolution: {integrity: sha512-/POejAYuj8WEw7ZI0J8JBvevjfp9jQ9Wmu/Bg52RiNwGXkMV7JnYpsenVfHvvf1G7R5sXHGKlTcxlQWhoUTiGQ==}
 
-  '@astrojs/db@0.10.6':
-    resolution: {integrity: sha512-dUh86Y2JEmmDiyha52tzK605RYWQr2lwJmwNW8UUGeDnA94XOVHnySdnubL3dtyQWIM0V5HTc/5rPhy/zHsWaQ==}
+  '@astrojs/db@0.11.0':
+    resolution: {integrity: sha512-UK+XFmmLr3Fz4UJTy69QE5thxn8SK2y9eYZc28PRHwRggT91SIOzcQBMV+H2XthCnPphi9ifz0KF0yZcwCklhA==}
 
   '@astrojs/internal-helpers@0.4.0':
     resolution: {integrity: sha512-6B13lz5n6BrbTqCTwhXjJXuR1sqiX/H6rTxzlXx+lN1NnV4jgnq/KJldCQaUWJzPL5SiWahQyinxAbxQtwgPHA==}
@@ -3840,10 +3840,11 @@ snapshots:
 
   '@astrojs/compiler@2.7.1': {}
 
-  '@astrojs/db@0.10.6':
+  '@astrojs/db@0.11.0':
     dependencies:
       '@libsql/client': 0.6.0
       async-listen: 3.0.1
+      ci-info: 4.0.0
       deep-diff: 1.0.2
       drizzle-orm: 0.30.9(@libsql/client@0.6.0)
       github-slugger: 2.0.0
@@ -5040,13 +5041,13 @@ snapshots:
       astro: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       rehype-expressive-code: 0.35.3
 
-  astro-integration-kit@0.13.1(@astrojs/db@0.10.6)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5)):
+  astro-integration-kit@0.13.1(@astrojs/db@0.11.0)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5)):
     dependencies:
       astro: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       pathe: 1.1.2
       recast: 0.23.6
     optionalDependencies:
-      '@astrojs/db': 0.10.6
+      '@astrojs/db': 0.11.0
 
   astro-pages@0.3.0(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5)):
     dependencies:
