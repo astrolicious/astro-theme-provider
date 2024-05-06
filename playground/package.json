@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"astro": "^4.7.0",
-		"astro-integration-kit": "^0.13.1",
+		"astro-integration-kit": "^0.13.2",
 		"sharp": "^0.33.3",
 		"theme-playground": "workspace:^"
 	}

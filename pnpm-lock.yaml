@@ -42,8 +42,8 @@ importers:
         specifier: '>=3'
         version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       astro-integration-kit:
-        specifier: ^0.13.1
-        version: 0.13.1(@astrojs/db@0.11.0)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
+        specifier: ^0.13.2
+        version: 0.13.2(@astrojs/db@0.11.0)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       astro-pages:
         specifier: ^0.3.0
         version: 0.3.0(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
@@ -79,8 +79,8 @@ importers:
         specifier: ^4.7.0
         version: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       astro-integration-kit:
-        specifier: ^0.13.1
-        version: 0.13.1(@astrojs/db@0.11.0)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
+        specifier: ^0.13.2
+        version: 0.13.2(@astrojs/db@0.11.0)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5))
       sharp:
         specifier: ^0.33.3
         version: 0.33.3
@@ -1259,10 +1259,10 @@ packages:
     peerDependencies:
       astro: ^4.0.0-beta || ^3.3.0
 
-  astro-integration-kit@0.13.1:
-    resolution: {integrity: sha512-c/VEvRXJdnKa7/Y4s9CYr81L7Vvue7Bijtgp2TKuf9etCXiMDzEzQ3C5RdjMCzRI68VlKuVblfnLmY4iWizFdg==}
+  astro-integration-kit@0.13.2:
+    resolution: {integrity: sha512-0NkGf91Q+Vgs+Aj70kj8YCMon750llWnv+9TdRWcqrpccjDgt6LtG+wagS7j8CTyBrTiQvvDg3kIdvYNLcu/xg==}
     peerDependencies:
-      '@astrojs/db': ^0.9 || ^0.10
+      '@astrojs/db': ^0.9 || ^0.10 || ^0.11
       astro: ^4.4.1
     peerDependenciesMeta:
       '@astrojs/db':
@@ -5041,7 +5041,7 @@ snapshots:
       astro: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       rehype-expressive-code: 0.35.3
 
-  astro-integration-kit@0.13.1(@astrojs/db@0.11.0)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5)):
+  astro-integration-kit@0.13.2(@astrojs/db@0.11.0)(astro@4.7.0(@types/node@20.12.8)(typescript@5.4.5)):
     dependencies:
       astro: 4.7.0(@types/node@20.12.8)(typescript@5.4.5)
       pathe: 1.1.2
