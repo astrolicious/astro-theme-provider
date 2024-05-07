@@ -1,9 +1,9 @@
 ---
 import { Image } from "astro:assets";
-import { Layout } from "theme-playground/layouts";
+import { Layout } from "theme-playground:layouts";
 
 export async function getStaticPaths() {
-	const images = Object.entries(await import("theme-playground/assets"));
+	const images = Object.entries(await import("theme-playground:assets"));
 	return images.map(([name, image], i) => {
 		return {
 			params: {
