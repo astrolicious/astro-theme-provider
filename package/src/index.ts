@@ -226,7 +226,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							continue;
 						}
 
-						const moduleName = normalizePath(join(themeName, name)).replace(/\//, ':');
+						const moduleName = normalizePath(join(themeName, name)).replace(/\//, ":");
 
 						// Turn a glob string into a module object
 						if (typeof option === "string") {
