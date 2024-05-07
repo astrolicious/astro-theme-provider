@@ -1,5 +1,23 @@
 # astro-theme-provider
 
+## 0.4.0
+
+### Minor Changes
+
+- b1947f8: Change virtual module separator from `/` to `:`.
+
+  ```diff
+  - import "my-theme/styles"
+  + import "my-theme:styles"
+  ```
+
+- b1947f8: Renamed `/css` directory to `/styles`. Change imports as:
+
+  ```diff
+  - import "my-theme:css"
+  + import "my-theme:styles"
+  ```
+
 ## 0.3.0
 
 ### Minor Changes
