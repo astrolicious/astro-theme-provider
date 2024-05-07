@@ -18,11 +18,11 @@ const packageJSON = JSON.parse(readFileSync(resolve(packageRoot, "package.json")
 const packageName = packageJSON.name;
 const astroIntegration = { name: "astro-integration" };
 const defaultModules = {
-	[`${packageName}/config`]: {},
-	[`${packageName}/css`]: ["css/styles.css"],
-	[`${packageName}/assets`]: ["assets/levi.png"],
-	[`${packageName}/layouts`]: ["layouts/Layout.astro"],
-	[`${packageName}/components`]: ["components/Heading.astro"],
+	[`${packageName}:config`]: {},
+	[`${packageName}:css`]: ["css/styles.css"],
+	[`${packageName}:assets`]: ["assets/levi.png"],
+	[`${packageName}:layouts`]: ["layouts/Layout.astro"],
+	[`${packageName}:components`]: ["components/Heading.astro"],
 };
 
 const defineTheme = (option) => {
