@@ -11,10 +11,10 @@ import { FileTree } from '@astrojs/starlight/components';
   - public/
   - src/
     - assets/
-    - css/
     - components/
     - layouts/
     - pages/
+    - styles/
   - **index.ts**
   - package.json
 </FileTree>
@@ -143,10 +143,10 @@ integrations: [
 
 ```js
 imports: {
-  css: "css/**.{css,scss,sass,styl,less}",
   assets: "assets**.{jpeg,jpg,png,tiff,webp,gif,svg,avif}",
-  layouts: "layouts/**.astro",
   components: "components/**.{astro,tsx,jsx,svelte,vue}"
+  layouts: "layouts/**.astro",
+  styles: "styles/**.{css,scss,sass,styl,less}",
 }
 ```
 
@@ -158,10 +158,10 @@ Toggle default virtual modules off
 
 ```js
 imports: {
-  css: false,
   assets: false,
-  layouts: false,
   components: false,
+  layouts: false,
+  styles: false,
 }
 ```
 
@@ -194,16 +194,16 @@ Use an array to combine imports into a single virtual module
 
 ```ts
 imports: {
-  css: [
-    "./src/css/reset.css",
-    "./src/css/global.css",
-    "./src/css/utils.css",
+  styles: [
+    "./src/styles/reset.css",
+    "./src/styles/global.css",
+    "./src/styles/utils.css",
   ],
 }
 ```
 
 ```ts
-import "my-theme:css"
+import "my-theme:styles"
 ```
 
 **`object`**: 
@@ -213,7 +213,7 @@ Use an object to create more complex custom virtual modules
 ```ts
 imports: {
   components: {
-    imports: [ "./src/css/global.css" ],
+    imports: [ "./src/styles/global.css" ],
     default: "./src/layout/Layout.astro",
     Head: "./src/components/Head.astro",
     Button: "./src/components/Button.astro"
@@ -262,14 +262,14 @@ Author a theme inside a package similar a normal project
   - src/
     - assets/
       - logo.png
-    - css/
-      - styles.css
     - components/
       - Card.astro
     - layouts/
       - Layout.astro
     - pages/
       - index.astro
+    - styles/
+      - global.css
   - index.ts
   - package.json
   - README.md
@@ -300,7 +300,7 @@ import { Layout } from 'my-theme:layouts';
 import { Card } from 'my-theme:components';
 import { logo } from 'my-theme:assets'
 import config from 'my-theme:config'
-import 'my-theme:css';
+import 'my-theme:styles';
 
 const {
   title,

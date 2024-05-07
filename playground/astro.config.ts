@@ -15,12 +15,12 @@ export default defineConfig({
 				// '/cats/[...cat]': '/dogs/[...cat]',
 			},
 			overrides: {
-				css: [
-					// "./src/custom.css"
-				],
 				components: {
 					// Heading: './src/CustomHeading.astro'
 				},
+				styles: [
+					// "./src/custom.css"
+				],
 			},
 		}),
 		hmrIntegration({

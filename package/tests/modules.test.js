@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 import { resolveModuleObject, toModuleObject } from "../dist/utils/virtual.js";
 
 describe("toModuleObject()", () => {
-	const imports = ["./styles.css"];
+	const imports = ["./global.css"];
 
 	const exports = {
 		Layout: "./Layout.astro",
@@ -36,7 +36,7 @@ describe("resolveModuleObject()", () => {
 	});
 
 	it("should have absolute imports", () => {
-		const resolvedModuledObject = resolveModuleObject(import.meta.url, { imports: ["./styles.css"] });
+		const resolvedModuledObject = resolveModuleObject(import.meta.url, { imports: ["./global.css"] });
 
 		assert.equal(resolvedModuledObject.imports.every(isAbsolute), true);
 	});

@@ -12,7 +12,7 @@ export const API_FORMATS = ["ts", "js"];
 
 export const UI_FRAMEWORK_FORMATS = ["tsx", "jsx", "svelte", "vue", "lit"];
 
-export const GLOB_CSS = `**.{${CSS_FORMATS.join(",")}}`;
+export const GLOB_STYLES = `**.{${CSS_FORMATS.join(",")}}`;
 export const GLOB_API = `**.{${API_FORMATS.join(",")}}`;
 export const GLOB_DATA = `**.{${DATA_FORMATS.join(",")}}`;
 export const GLOB_ASTRO = "**.astro";

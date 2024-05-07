@@ -8,16 +8,6 @@ import { FileTree } from '@astrojs/starlight/components';
 
 ## Modules
 
-### Layouts
-
-By default, any Layouts inside the `layouts` folder at the root of your package will be included in the `/layouts` module
-
-```ts
----
-import { Layout } from 'my-theme:layout';
----
-```
-
 ### Components
 
 By default, any Components inside the `components` folder at the root of your package will be included in the `/components` module
@@ -28,23 +18,33 @@ import { Heading } from 'my-theme:components';
 ---
 ```
 
-### Styles
-
-By default, any Styles inside the `css` folder at the root of your package will be included in the `/css` module
-
-```ts
----
-import 'my-theme:css'
----
-```
-
 ### Images
 
 By default, any Images inside the `assets` folder at the root of your package will be included in the `/assets` module
 
 ```ts
 ---
-import { logo } from 'my-theme:layout';
+import { logo } from 'my-theme:assets';
+---
+```
+
+### Layouts
+
+By default, any Layouts inside the `layouts` folder at the root of your package will be included in the `/layouts` module
+
+```ts
+---
+import { Layout } from 'my-theme:layouts';
+---
+```
+
+### Styles
+
+By default, any Styles inside the `styles` folder at the root of your package will be included in the `/styles` module
+
+```ts
+---
+import 'my-theme:styles'
 ---
 ```
 
@@ -57,10 +57,10 @@ import defineTheme from 'astro-theme-provider';
 
 export default defineTheme({
   modules: {
-    css: false,
     assets: false,
-    layouts: false,
     components: false,
+    layouts: false,
+    styles: false,
   }
 })
 ```
@@ -72,7 +72,7 @@ export default defineTheme({
   - src/
     - custom/
       - logo.png
-      - styles.css
+      - global.css
       - Heading.astro
   - ...
   - index.ts
@@ -102,7 +102,7 @@ import defineTheme from 'astro-theme-provider';
 
 export default defineTheme({
   modules: {
-    custom: [ './styles.css' ]
+    custom: [ './global.css' ]
   }
 })
 ```
@@ -116,9 +116,9 @@ import defineTheme from 'astro-theme-provider';
 export default defineTheme({
   modules: {
     custom: {
-      css: './styles.css',
       logo: './logo.png',
       Heading: './heading.astro'
+      styles: './global.css',
     }
   }
 })
