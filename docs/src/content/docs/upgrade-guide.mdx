@@ -1,0 +1,38 @@
+---
+title: Upgrade Guide
+description: How to upgrade to the latest version of Astro Theme Provider
+---
+import { FileTree } from '@astrojs/starlight/components';
+
+## `0.4.0`
+
+### Renamed: Virtual Imports
+
+Virtual imports have been updated to follow [conventions for virtual modules](https://vitejs.dev/guide/api-plugin.html#virtual-modules-convention). This fix now allows theme packages use an `export` property inside the `package.json` without breaking.
+
+```diff
+- import { Component } from 'my-theme/components'
+- import 'my-theme/styles'
++ import { Component } from 'my-theme:components'
++ import 'my-theme:styles'
+```
+
+### Renamed: Default module for styling
+
+The default module for styling `css` has been renamed to `styles`
+
+```diff
+- import 'my-theme/css'
++ import 'my-theme:styles'
+```
+
+Make sure to also update the name of the folder inside of your theme
+
+<FileTree>
+- package/
+	- src/
+		- **styles/** \<- Renamed from "css"
+			- ...
+</FileTree>
+
+
