@@ -38,6 +38,14 @@ export default defineConfig({
 					},
 				},
 				{
+					label: "Upgrade Guide",
+					link: "/upgrade-guide",
+					badge: {
+						text: "Updated",
+						variant: "caution",
+					},
+				},
+				{
 					label: "Reference",
 					autogenerate: { directory: "reference" },
 				},
