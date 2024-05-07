@@ -62,7 +62,7 @@ schema: z.object({
 
 ```ts
 ---
-import config from "my-theme/config"
+import config from "my-theme:config"
 
 console.log(config.title, config.description)
 ---
@@ -185,7 +185,7 @@ imports: {
 ```
 
 ```ts
-import { Hero, Card, Button } from "my-theme/components"
+import { Hero, Card, Button } from "my-theme:components"
 ```
 
 **`array`**: 
@@ -203,7 +203,7 @@ imports: {
 ```
 
 ```ts
-import "my-theme/styles"
+import "my-theme:styles"
 ```
 
 **`object`**: 
@@ -222,7 +222,7 @@ imports: {
 ```
 
 ```ts
-import Layout, { Head, Button } from "my-theme/components"
+import Layout, { Head, Button } from "my-theme:components"
 ```
 
 ### `log`
@@ -296,11 +296,11 @@ Use the generated virtual modules to author the theme
 ```tsx
 // package/src/pages/index.astro
 ---
-import { Layout } from 'my-theme/layouts';
-import { Card } from 'my-theme/components';
-import { logo } from 'my-theme/assets'
-import config from 'my-theme/config'
-import 'my-theme/styles';
+import { Layout } from 'my-theme:layouts';
+import { Card } from 'my-theme:components';
+import { logo } from 'my-theme:assets'
+import config from 'my-theme:config'
+import 'my-theme:styles';
 
 const {
   title,

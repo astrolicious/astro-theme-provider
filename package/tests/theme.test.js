@@ -18,11 +18,11 @@ const packageJSON = JSON.parse(readFileSync(resolve(packageRoot, "package.json")
 const packageName = packageJSON.name;
 const astroIntegration = { name: "astro-integration" };
 const defaultModules = {
-	[`${packageName}/config`]: {},
-	[`${packageName}/assets`]: ["assets/levi.png"],
-	[`${packageName}/components`]: ["components/Heading.astro"],
-	[`${packageName}/layouts`]: ["layouts/Layout.astro"],
-	[`${packageName}/styles`]: ["styles/global.css"],
+	[`${packageName}:config`]: {},
+	[`${packageName}:assets`]: ["assets/levi.png"],
+	[`${packageName}:components`]: ["components/Heading.astro"],
+	[`${packageName}:layouts`]: ["layouts/Layout.astro"],
+	[`${packageName}:styles`]: ["styles/global.css"],
 };
 
 const defineTheme = (option) => {
@@ -237,7 +237,7 @@ describe("defineTheme", () => {
 					if (!Array.isArray(moduleFiles)) continue;
 					const resolved = resolveId(moduleName);
 					const content = plugin.load(resolved);
-					const key = moduleName.split("/").pop();
+					const key = moduleName.split(":").pop();
 					for (const file of overrides[key]) {
 						const testImport = new RegExp(`import \"${normalizePath(resolve(projectRoot, file))}\";`, "g");
 						const testExport = new RegExp(`export {.*} from \"${normalizePath(resolve(projectRoot, file))}\";`, "g");

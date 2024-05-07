@@ -14,7 +14,7 @@ By default, any Components inside the `components` folder at the root of your pa
 
 ```ts
 ---
-import { Heading } from 'my-theme/components';
+import { Heading } from 'my-theme:components';
 ---
 ```
 
@@ -24,7 +24,7 @@ By default, any Images inside the `assets` folder at the root of your package wi
 
 ```ts
 ---
-import { logo } from 'my-theme/layout';
+import { logo } from 'my-theme:assets';
 ---
 ```
 
@@ -34,7 +34,7 @@ By default, any Layouts inside the `layouts` folder at the root of your package 
 
 ```ts
 ---
-import { Layout } from 'my-theme/layout';
+import { Layout } from 'my-theme:layouts';
 ---
 ```
 
@@ -44,7 +44,7 @@ By default, any Styles inside the `styles` folder at the root of your package wi
 
 ```ts
 ---
-import 'my-theme/styles'
+import 'my-theme:styles'
 ---
 ```
 
@@ -129,7 +129,7 @@ export default defineTheme({
 ```astro
 ---
 // Includes styles from css files
-import { Heading, logo } from 'my-theme/custom';
+import { Heading, logo } from 'my-theme:custom';
 ---
 ```
 

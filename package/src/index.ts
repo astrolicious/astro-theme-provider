@@ -123,12 +123,12 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					// Record of virtual imports and their content
 					const virtualImports: Record<string, string> = {
-						[`${themeName}/config`]: `export default ${JSON.stringify(userConfig)}`,
+						[`${themeName}:config`]: `export default ${JSON.stringify(userConfig)}`,
 					};
 
 					// Module type buffers
 					const moduleBuffers: Record<string, string> = {
-						[`${themeName}/config`]: `
+						[`${themeName}:config`]: `
 							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
 							export default config;
 						`,
@@ -222,11 +222,11 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 						// Reserved module/import names
 						if (["config", "pages", "content", "db"].includes(name)) {
-							logger.warn(`Module name '${name}' is reserved for the built in virtual import '${themeName}/${name}'`);
+							logger.warn(`Module name '${name}' is reserved for the built in virtual import '${themeName}:${name}'`);
 							continue;
 						}
 
-						const moduleName = normalizePath(join(themeName, name));
+						const moduleName = normalizePath(join(themeName, name)).replace(/\//, ':');
 
 						// Turn a glob string into a module object
 						if (typeof option === "string") {
@@ -247,7 +247,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 						// Check if module exists and contains overrides
 						if (override) {
-							const altModuleName = moduleName.replace(/\//, ":");
+							const altModuleName = moduleName.replace(/:/, "::");
 							const moduleOverride = createVirtualModule(altModuleName, projectRoot, toModuleObject(override));
 							if (!isEmptyModuleObject(moduleOverride)) {
 								// Add virtual module to import buffer
