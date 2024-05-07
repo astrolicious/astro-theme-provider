@@ -237,7 +237,7 @@ describe("defineTheme", () => {
 					if (!Array.isArray(moduleFiles)) continue;
 					const resolved = resolveId(moduleName);
 					const content = plugin.load(resolved);
-					const key = moduleName.split("/").pop();
+					const key = moduleName.split(":").pop();
 					for (const file of overrides[key]) {
 						const testImport = new RegExp(`import \"${normalizePath(resolve(projectRoot, file))}\";`, "g");
 						const testExport = new RegExp(`export {.*} from \"${normalizePath(resolve(projectRoot, file))}\";`, "g");
