@@ -26,10 +26,10 @@ package/
 ├── public/
 ├── src/
 │   ├── assets/
-│   ├── styles/
 │   ├── components/
 │   ├── layouts/
-│   └── pages/
+│   ├── pages/
+│   └── styles/
 ├── index.ts
 └── package.json
 ```
@@ -64,12 +64,12 @@ export default defineConfig({
         '/blog': '/projects', // Overwrite routes
       },
       overrides: {
-        styles: [
-          "./src/custom.css" // Add custom css
-        ],
         components: {
           Hero: './src/Custom.astro' // Overwrite theme assets
         },
+        styles: [
+          "./src/custom.css" // Add custom stylesheets
+        ],
       },
     }),
   ],

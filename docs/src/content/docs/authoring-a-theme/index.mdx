@@ -8,16 +8,6 @@ import { FileTree } from '@astrojs/starlight/components';
 
 ## Modules
 
-### Layouts
-
-By default, any Layouts inside the `layouts` folder at the root of your package will be included in the `/layouts` module
-
-```ts
----
-import { Layout } from 'my-theme/layout';
----
-```
-
 ### Components
 
 By default, any Components inside the `components` folder at the root of your package will be included in the `/components` module
@@ -25,16 +15,6 @@ By default, any Components inside the `components` folder at the root of your pa
 ```ts
 ---
 import { Heading } from 'my-theme/components';
----
-```
-
-### Styles
-
-By default, any Styles inside the `styles` folder at the root of your package will be included in the `/styles` module
-
-```ts
----
-import 'my-theme/styles'
 ---
 ```
 
@@ -48,6 +28,26 @@ import { logo } from 'my-theme/layout';
 ---
 ```
 
+### Layouts
+
+By default, any Layouts inside the `layouts` folder at the root of your package will be included in the `/layouts` module
+
+```ts
+---
+import { Layout } from 'my-theme/layout';
+---
+```
+
+### Styles
+
+By default, any Styles inside the `styles` folder at the root of your package will be included in the `/styles` module
+
+```ts
+---
+import 'my-theme/styles'
+---
+```
+
 ### Examples
 
 #### Toggle default modules off
@@ -57,10 +57,10 @@ import defineTheme from 'astro-theme-provider';
 
 export default defineTheme({
   modules: {
-    styles: false,
     assets: false,
-    layouts: false,
     components: false,
+    layouts: false,
+    styles: false,
   }
 })
 ```
@@ -116,9 +116,9 @@ import defineTheme from 'astro-theme-provider';
 export default defineTheme({
   modules: {
     custom: {
-      styles: './global.css',
       logo: './logo.png',
       Heading: './heading.astro'
+      styles: './global.css',
     }
   }
 })
@@ -188,7 +188,7 @@ export default defineTheme({
   pages: {
     dir: 'pages',
     glob: [
-      '**.astro', 
+      '**.astro',
       '!**.{ts,js}'
     ]
   }

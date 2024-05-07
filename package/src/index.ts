@@ -11,7 +11,7 @@ import { AstroError } from "astro/errors";
 import { z } from "astro/zod";
 import callsites from "callsites";
 import fg from "fast-glob";
-import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_STYLES, GLOB_IGNORE, GLOB_IMAGES } from "./internal/consts.js";
+import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_IGNORE, GLOB_IMAGES, GLOB_STYLES } from "./internal/consts.js";
 import { errorMap } from "./internal/error-map.js";
 import type { AuthorOptions, UserOptions } from "./internal/types.js";
 import { mergeOptions } from "./utils/options.js";
@@ -49,10 +49,10 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		log: true,
 		schema: z.record(z.any()),
 		imports: {
-			styles: `styles/${GLOB_STYLES}`,
 			assets: `assets/${GLOB_IMAGES}`,
-			layouts: `layouts/${GLOB_ASTRO}`,
 			components: `components/${GLOB_COMPONENTS}`,
+			layouts: `layouts/${GLOB_ASTRO}`,
+			styles: `styles/${GLOB_STYLES}`,
 		},
 		integrations: [() => staticDir(authorOptions.publicDir)],
 	};

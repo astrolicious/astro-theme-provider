@@ -43,14 +43,14 @@ An object used to override the virtual modules created by a theme
 
 ```ts
 overrides: {
+  components: {
+    // Override exports from a virtual modules using an object
+    Hero: './src/components/CustomHero.astro'
+  },
   styles: [
     // Append imports to a virtual module using an array
     './src/styles/custom-styles.css',
   ],
-  components: {
-    // Override exports from a virtual modules using an object
-    Hero: './src/components/CustomHero.astro'
-  }
 }
 ```
 
@@ -98,13 +98,13 @@ export default defineConfig({
         '/[...slug]': '/blog/[...slug]',
       },
       overrides: {
-        styles: [
-          "./src/global.css"
-        ],
         components: {
           Card: './src/Card.astro',
           Pagination: './src/Pagination.astro',
-        }
+        },
+        styles: [
+          "./src/global.css"
+        ],
       }
     })
   ]

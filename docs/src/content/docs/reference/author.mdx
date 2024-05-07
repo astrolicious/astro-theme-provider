@@ -11,10 +11,10 @@ import { FileTree } from '@astrojs/starlight/components';
   - public/
   - src/
     - assets/
-    - styles/
     - components/
     - layouts/
     - pages/
+    - styles/
   - **index.ts**
   - package.json
 </FileTree>
@@ -143,10 +143,10 @@ integrations: [
 
 ```js
 imports: {
-  styles: "styles/**.{css,scss,sass,styl,less}",
   assets: "assets**.{jpeg,jpg,png,tiff,webp,gif,svg,avif}",
-  layouts: "layouts/**.astro",
   components: "components/**.{astro,tsx,jsx,svelte,vue}"
+  layouts: "layouts/**.astro",
+  styles: "styles/**.{css,scss,sass,styl,less}",
 }
 ```
 
@@ -158,10 +158,10 @@ Toggle default virtual modules off
 
 ```js
 imports: {
-  styles: false,
   assets: false,
-  layouts: false,
   components: false,
+  layouts: false,
+  styles: false,
 }
 ```
 
@@ -262,14 +262,14 @@ Author a theme inside a package similar a normal project
   - src/
     - assets/
       - logo.png
-    - styles/
-      - global.css
     - components/
       - Card.astro
     - layouts/
       - Layout.astro
     - pages/
       - index.astro
+    - styles/
+      - global.css
   - index.ts
   - package.json
   - README.md
