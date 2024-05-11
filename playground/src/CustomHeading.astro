@@ -1,5 +1,8 @@
 ---
+import { getCollection } from "astro:content";
 import { Heading } from "theme-playground:components";
+
+console.log(await getCollection('blog'))
 ---
 
 <Heading>

@@ -12,7 +12,7 @@ export default defineConfig((options) => {
 		sourcemap: true,
 		clean: true,
 		splitting: true,
-		noExternal: ["astro-pages", "astro-public"],
+		noExternal: ["astro-public"],
 		minify: !dev,
 		external: [...Object.keys(peerDependencies)],
 		tsconfig: "tsconfig.build.json",

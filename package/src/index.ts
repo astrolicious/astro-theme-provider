@@ -25,6 +25,7 @@ import {
 	validatePattern,
 } from "./utils/path.js";
 import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./utils/virtual.js";
+import { injectCollections } from "@inox-tools/content-utils";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 
@@ -45,6 +46,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		srcDir: "src",
 		pageDir: "pages",
 		publicDir: "public",
+		contentDir: "content",
 		middlewareDir: "./",
 		log: true,
 		schema: z.record(z.any()),
@@ -77,10 +79,13 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	// Root dir used to search for middleware files
 	const middlewareDir = authorOptions.middlewareDir ? resolveDirectory(themeSrc, authorOptions.middlewareDir) : false;
 
+	const contentDir = authorOptions.contentDir ? resolveDirectory(themeSrc, authorOptions.contentDir) : false
+
 	// Force options
 	authorOptions = mergeOptions(authorOptions, {
 		pageDir: { cwd: themeSrc, log: authorOptions.log },
 		publicDir: { cwd: themeRoot, log: authorOptions.log },
+		contentDir,
 		middlewareDir,
 	}) as typeof authorOptions;
 
@@ -121,13 +126,36 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					const projectRoot = normalizePath(fileURLToPath(config.root.toString()));
 
+					const contentConfig = ['config.mjs', 'config.js', 'config.mts', 'config.ts']
+						.map((configPath) => resolve(contentDir || './', configPath))
+						.find((configPath) => existsSync(configPath));
+
 					// Record of virtual imports and their content
 					const virtualImports: Record<string, string> = {
 						[`${themeName}:config`]: `export default ${JSON.stringify(userConfig)}`,
+						[`${themeName}:content`]: `export * from "@it-astro:content"`,
+						[`${themeName}:collections`]: `export * from ${JSON.stringify(contentConfig)}`,
 					};
 
 					// Module type buffers
 					const moduleBuffers: Record<string, string> = {
+						['@it-astro:content/injector']: `
+							import type { defineCollection } from 'astro:content';
+							import type { FancyCollection } from '@inox-tools/content-utils/runtime/fancyContent';
+							export type CollectionConfig = ReturnType<typeof defineCollection>;
+							export const injectedCollections: Record<string, CollectionConfig | FancyCollection>;
+						`,
+						['@it-astro:content']: `
+							export { z, reference } from "astro:content";
+							export type { SchemaContext, CollectionEntry, ContentCollectionKey, CollectionKey } from "astro:content";
+							export { defineCollection } from "@inox-tools/content-utils/runtime/fancyContent";
+						`,
+						[`${themeName}:content`]: `
+						export * from "@it-astro:content"
+						`,
+						[`${themeName}:collections`]: `
+							export const collections: typeof import(${JSON.stringify(contentConfig)}).collections;
+						`,
 						[`${themeName}:config`]: `
 							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
 							export default config;
@@ -150,19 +178,19 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 								export interface Themes {
 										"${themeName}": true;
 								}
-						
+
 								export interface ThemeConfigs {
 										"${themeName}": ThemeConfig;
 								};
-						
+
 								export interface ThemePages {
 										"${themeName}": ThemeRoutesResolved
 								}
-						
+
 								export interface ThemeOverrides {
 										"${themeName}": ThemeExportsResolved
 								}
-						
+
 								export interface ThemeOptions {
 										"${themeName}": {
 												pages?: { [Pattern in keyof ThemeRoutes]?: string | boolean }
@@ -213,6 +241,24 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							if (name === "post") {
 								addMiddleware({ entrypoint, order: "post" });
 							}
+						}
+					}
+
+					// Inject collections
+					if (contentDir) {
+						const possibleConfigs = ['config.mjs', 'config.js', 'config.mts', 'config.ts'];
+
+						const contentConfig = possibleConfigs
+							.map((configPath) => resolve(contentDir, configPath))
+							.find((configPath) => existsSync(configPath));
+
+						if (contentConfig) {
+							injectCollections(params, {
+								entrypoint: `${themeName}:collections`,
+								seedTemplateDirectory: contentDir
+							})
+						} else {
+							logger.warn(`Could not find a config file inside the content directory `)
 						}
 					}
 

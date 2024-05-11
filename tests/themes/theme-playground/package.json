@@ -18,6 +18,7 @@
 		"astro": "^4.7.1"
 	},
 	"dependencies": {
+		"@inox-tools/content-utils": "^0.2.0",
 		"astro-theme-provider": "workspace:^"
 	}
 }
