@@ -150,19 +150,19 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 								export interface Themes {
 										"${themeName}": true;
 								}
-						
+
 								export interface ThemeConfigs {
 										"${themeName}": ThemeConfig;
 								};
-						
+
 								export interface ThemePages {
 										"${themeName}": ThemeRoutesResolved
 								}
-						
+
 								export interface ThemeOverrides {
 										"${themeName}": ThemeExportsResolved
 								}
-						
+
 								export interface ThemeOptions {
 										"${themeName}": {
 												pages?: { [Pattern in keyof ThemeRoutes]?: string | boolean }
@@ -187,6 +187,8 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// HMR for theme author's package
 					watchDirectory(params, themeRoot);
 
+					const resolvedIntegrations: string[] = []
+
 					// Add integrations from author (like mdx or sitemap)
 					for (const option of authorOptions.integrations) {
 						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>;
@@ -197,8 +199,12 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							integration = option;
 						}
 						if (!integration) continue;
+						resolvedIntegrations.push(integration.name)
 						addIntegration(params, { integration });
 					}
+
+					virtualImports[`${themeName}:integrations`] = `export const integrations = new Set(${JSON.stringify(resolvedIntegrations)})`
+					moduleBuffers[`${themeName}:integrations`] = `export const integrations: Set<string>`
 
 					// Add middleware
 					if (middlewareDir) {
