@@ -2,7 +2,7 @@
 "astro-theme-provider": minor
 ---
 
-Added a built in virtual module for integration utilities. Includes a utility to query what integrations are added to a theme:
+Added a built in virtual module for integration utilities. Includes a utility to query what integrations are inside the project:
 
 ```astro
 ---
