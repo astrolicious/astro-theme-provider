@@ -25,8 +25,8 @@ export default defineConfig({
 				],
 			},
 			integrations: {
-				'@astrojs/sitemap': false
-			}
+				"@astrojs/sitemap": false,
+			},
 		}),
 		hmrIntegration({
 			directory: createResolver(import.meta.url).resolve("../package/dist"),

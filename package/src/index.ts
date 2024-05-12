@@ -26,7 +26,7 @@ import {
 } from "./utils/path.js";
 import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./utils/virtual.js";
 
-const INTEGRATION_INTERNAL = Symbol('astro-theme-provider/internal-integration')
+const INTEGRATION_INTERNAL = Symbol("astro-theme-provider/internal-integration");
 
 const thisFile = resolveFilepath("./", import.meta.url);
 
@@ -143,7 +143,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						ThemeRoutes: "",
 						ThemeRoutesResolved: "",
 						ThemeIntegrations: "",
-						ThemeIntegrationsResolved: ""
+						ThemeIntegrationsResolved: "",
 					};
 
 					let themeTypesBuffer = `
@@ -195,9 +195,9 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					watchDirectory(params, themeRoot);
 
 					// Add integrations from author (like mdx or sitemap)
-					const integrationsResolved: Record<string, true> = {}
-					const integrationsIgnored: Record<string, false> = {}
-					const integrationsAdded: Record<string, true> = {}
+					const integrationsResolved: Record<string, true> = {};
+					const integrationsIgnored: Record<string, false> = {};
+					const integrationsAdded: Record<string, true> = {};
 
 					for (const option of authorOptions.integrations) {
 						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>;
@@ -213,32 +213,30 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 						if (INTEGRATION_INTERNAL in integration) {
 							addIntegration(params, { integration });
-							continue
+							continue;
 						}
 
-						const { name } = integration
+						const { name } = integration;
 
-						integrationsResolved[name] = true
+						integrationsResolved[name] = true;
 
-						if (
-							userOptions.integrations &&
-							name in userOptions.integrations &&
-							!userOptions.integrations[name]
-						) {
-							integrationsIgnored[name] = false
-							continue
+						if (userOptions.integrations && name in userOptions.integrations && !userOptions.integrations[name]) {
+							integrationsIgnored[name] = false;
+							continue;
 						}
 
-						integrationsAdded[name] = true
+						integrationsAdded[name] = true;
 
 						addIntegration(params, { integration });
 					}
 
-					virtualImports[`${themeName}:integrations`] = `export const integrations = new Set(${JSON.stringify(Array.from(Object.keys(integrationsAdded)))})`
-					moduleBuffers[`${themeName}:integrations`] = `export const integrations: Set<string>`
-					interfaceBuffers.ThemeIntegrations = `${JSON.stringify(integrationsResolved, null, 4).slice(1, -1)}` || '\n'
-					interfaceBuffers.ThemeIntegrationsResolved = `${JSON.stringify({ ...integrationsAdded, ...integrationsIgnored }, null, 4).slice(1, -1)}` || '\n'
-
+					virtualImports[`${themeName}:integrations`] = `export const integrations = new Set(${JSON.stringify(
+						Array.from(Object.keys(integrationsAdded)),
+					)})`;
+					moduleBuffers[`${themeName}:integrations`] = `export const integrations: Set<string>`;
+					interfaceBuffers.ThemeIntegrations = `${JSON.stringify(integrationsResolved, null, 4).slice(1, -1)}` || "\n";
+					interfaceBuffers.ThemeIntegrationsResolved =
+						`${JSON.stringify({ ...integrationsAdded, ...integrationsIgnored }, null, 4).slice(1, -1)}` || "\n";
 
 					// Add middleware
 					if (middlewareDir) {
