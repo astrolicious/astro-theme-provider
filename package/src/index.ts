@@ -195,7 +195,9 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					watchDirectory(params, themeRoot);
 
 					// Integrations inside the config (including the theme) and integrations injected by the theme
-					const integrationsExisting: Record<string, true> = Object.fromEntries(config.integrations.map((i) => [i.name, true]))
+					const integrationsExisting: Record<string, true> = Object.fromEntries(
+						config.integrations.map((i) => [i.name, true]),
+					);
 					// Integrations added by a theme but possibly do not exist because a user disabled it
 					const integrationsPossible: Record<string, true> = {};
 					// Integrations that are injected into a theme
@@ -266,7 +268,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					}
 
 					// Reserved names for built-in virtual modules
-					const reservedNames = new Set(["config", "pages", "content", "db", "integrations"])
+					const reservedNames = new Set(["config", "pages", "content", "db", "integrations"]);
 
 					// Dynamically create virtual modules using globs, imports, or exports
 					for (let [name, option] of Object.entries(authorOptions.imports)) {

@@ -37,7 +37,12 @@ export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny>
 	imports?: Record<string, string | ModuleImports | ModuleExports | ModuleObject>;
 	integrations?: Array<
 		| AstroIntegration
-		| ((options: { config: z.infer<Schema>; integrations: string[] }) => AstroIntegration | false | null | undefined | void)
+		| ((options: { config: z.infer<Schema>; integrations: string[] }) =>
+				| AstroIntegration
+				| false
+				| null
+				| undefined
+				| void)
 	>;
 }>;
 

@@ -1,7 +1,7 @@
+import sitemap from "@astrojs/sitemap";
 import { createResolver } from "astro-integration-kit";
 import { hmrIntegration } from "astro-integration-kit/dev";
 import { defineConfig } from "astro/config";
-import sitemap from '@astrojs/sitemap'
 
 const { default: themePlayground } = await import("theme-playground");
 
