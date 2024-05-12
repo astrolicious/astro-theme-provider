@@ -42,7 +42,7 @@ export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny>
 }>;
 
 export type UserOptions<ThemeName extends string, Schema extends z.ZodTypeAny = z.ZodTypeAny> = {
-	config?: z.infer<Schema>;
+	config?: z.input<Schema>;
 } & AstroThemeProvider.ThemeOptions[ThemeName];
 
 declare global {
