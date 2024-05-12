@@ -2,4 +2,4 @@
 "astro-theme-provider": minor
 ---
 
-Updated the type for the user config to use `z.input` instead of `z.infer`. This allows authors to use optional schemas with a default value, ex: `z.boolean().optional().default(true)`
+Updated the type of the user config to `z.input` instead of `z.infer` for proper typing
