@@ -15,3 +15,5 @@ if (integrations.has('@inox-tools/sitemap-ext')) {
 }
 ---
 ```
+
+The virtual module name `my-theme:integrations` is now reserved, users can no longer create custom virtual modules with this name
