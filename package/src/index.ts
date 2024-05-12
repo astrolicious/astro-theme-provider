@@ -179,7 +179,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 																		: never
 												} & {}
 												integrations?: keyof ThemeIntegrationsResolved extends never
-													? "This theme is not injecting any integrations"
+													? \`\$\{ThemeName\} is not injecting any integrations\`
 													: { [Name in keyof ThemeIntegrationsResolved]?: boolean }
 										};
 								}
