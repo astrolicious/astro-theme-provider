@@ -242,7 +242,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					// Virtual module for integration utilities
 					virtualImports[`${themeName}:integrations`] = `export const integrations = new Set(${JSON.stringify(
-						Array.from(Object.keys(integrationsInjected)),
+						Array.from(Object.keys(integrationsExisting)),
 					)})`;
 					moduleBuffers[`${themeName}:integrations`] = `export const integrations: Set<string>`;
 
