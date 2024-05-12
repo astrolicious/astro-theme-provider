@@ -194,23 +194,28 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// HMR for theme author's package
 					watchDirectory(params, themeRoot);
 
-					// Add integrations from author (like mdx or sitemap)
-					const integrationsResolved: Record<string, true> = {};
+					// Integrations inside the config (including the theme) and integrations injected by the theme
+					const integrationsExisting: Record<string, true> = Object.fromEntries(config.integrations.map((i) => [i.name, true]))
+					// Integrations added by a theme but possibly do not exist because a user disabled it
+					const integrationsPossible: Record<string, true> = {};
+					// Integrations that are injected into a theme
+					const integrationsInjected: Record<string, true> = {};
+					// Integrations ignored/disabled by a user
 					const integrationsIgnored: Record<string, false> = {};
-					const integrationsAdded: Record<string, true> = {};
 
 					for (const option of authorOptions.integrations) {
 						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>;
 
+						// Handle integration options that might be a callback for conditonal injection
 						if (typeof option === "function") {
-							const names = config.integrations.map((i) => i.name);
-							integration = option({ config: userConfig, integrations: names });
+							integration = option({ config: userConfig, integrations: Object.keys(integrationsExisting) });
 						} else {
 							integration = option;
 						}
 
 						if (!integration) continue;
 
+						// Skip integrations marked as internal
 						if (INTEGRATION_INTERNAL in integration) {
 							addIntegration(params, { integration });
 							continue;
@@ -218,25 +223,31 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 						const { name } = integration;
 
-						integrationsResolved[name] = true;
+						integrationsPossible[name] = true;
 
+						// Allow users to ignore/disable an integration
 						if (userOptions.integrations && name in userOptions.integrations && !userOptions.integrations[name]) {
 							integrationsIgnored[name] = false;
 							continue;
 						}
 
-						integrationsAdded[name] = true;
+						integrationsInjected[name] = true;
+						integrationsExisting[name] = true;
 
+						// Add the integration
 						addIntegration(params, { integration });
 					}
 
+					// Virtual module for integration utilities
 					virtualImports[`${themeName}:integrations`] = `export const integrations = new Set(${JSON.stringify(
-						Array.from(Object.keys(integrationsAdded)),
+						Array.from(Object.keys(integrationsInjected)),
 					)})`;
 					moduleBuffers[`${themeName}:integrations`] = `export const integrations: Set<string>`;
-					interfaceBuffers.ThemeIntegrations = `${JSON.stringify(integrationsResolved, null, 4).slice(1, -1)}` || "\n";
+
+					// Type interfaces for theme integrations, used to build other types like the user config
+					interfaceBuffers.ThemeIntegrations = `${JSON.stringify(integrationsPossible, null, 4).slice(1, -1)}` || "\n";
 					interfaceBuffers.ThemeIntegrationsResolved =
-						`${JSON.stringify({ ...integrationsAdded, ...integrationsIgnored }, null, 4).slice(1, -1)}` || "\n";
+						`${JSON.stringify({ ...integrationsInjected, ...integrationsIgnored }, null, 4).slice(1, -1)}` || "\n";
 
 					// Add middleware
 					if (middlewareDir) {
