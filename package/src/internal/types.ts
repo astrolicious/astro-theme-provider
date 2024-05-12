@@ -53,6 +53,7 @@ declare global {
 				{
 					pages?: Record<string, string | boolean>;
 					overrides?: Record<string, string[] | Record<string, string>>;
+					integrations?: Record<string, boolean>
 				}
 			> {}
 	}
