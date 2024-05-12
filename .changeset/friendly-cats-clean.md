@@ -2,7 +2,7 @@
 "astro-theme-provider": minor
 ---
 
-Added a user facing API for disabling injected by a theme
+Added a user facing API for disabling integrations injected by a theme
 
 ```ts
 import { defineConfig } from "astro/config";
