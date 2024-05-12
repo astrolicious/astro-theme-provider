@@ -265,12 +265,15 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						}
 					}
 
+					// Reserved names for built-in virtual modules
+					const reservedNames = new Set(["config", "pages", "content", "db", "integrations"])
+
 					// Dynamically create virtual modules using globs, imports, or exports
 					for (let [name, option] of Object.entries(authorOptions.imports)) {
 						if (!option) continue;
 
 						// Reserved module/import names
-						if (["config", "pages", "content", "db"].includes(name)) {
+						if (reservedNames.has(name)) {
 							logger.warn(`Module name '${name}' is reserved for the built in virtual import '${themeName}:${name}'`);
 							continue;
 						}
