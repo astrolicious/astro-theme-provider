@@ -43,7 +43,7 @@ importers:
         version: 4.7.1(@types/node@20.12.10)(typescript@5.4.5)
       astro-integration-kit:
         specifier: ^0.13.2
-        version: 0.13.2(@astrojs/db@0.11.0)(astro@4.7.1(@types/node@20.12.10)(typescript@5.4.5))
+        version: 0.13.2(@astrojs/db@0.11.1)(astro@4.7.1(@types/node@20.12.10)(typescript@5.4.5))
       astro-pages:
         specifier: ^0.3.0
         version: 0.3.0(astro@4.7.1(@types/node@20.12.10)(typescript@5.4.5))
@@ -58,8 +58,8 @@ importers:
         version: 3.3.2
     devDependencies:
       '@astrojs/db':
-        specifier: ^0.11.0
-        version: 0.11.0
+        specifier: ^0.11.1
+        version: 0.11.1
       '@types/node':
         specifier: ^20.12.10
         version: 20.12.10
@@ -80,7 +80,7 @@ importers:
         version: 4.7.1(@types/node@20.12.10)(typescript@5.4.5)
       astro-integration-kit:
         specifier: ^0.13.2
-        version: 0.13.2(@astrojs/db@0.11.0)(astro@4.7.1(@types/node@20.12.10)(typescript@5.4.5))
+        version: 0.13.2(@astrojs/db@0.11.1)(astro@4.7.1(@types/node@20.12.10)(typescript@5.4.5))
       sharp:
         specifier: ^0.33.3
         version: 0.33.3
@@ -151,8 +151,8 @@ packages:
   '@astrojs/compiler@2.8.0':
     resolution: {integrity: sha512-yrpD1WRGqsJwANaDIdtHo+YVjvIOFAjC83lu5qENIgrafwZcJgSXDuwVMXOgok4tFzpeKLsFQ6c3FoUdloLWBQ==}
 
-  '@astrojs/db@0.11.0':
-    resolution: {integrity: sha512-UK+XFmmLr3Fz4UJTy69QE5thxn8SK2y9eYZc28PRHwRggT91SIOzcQBMV+H2XthCnPphi9ifz0KF0yZcwCklhA==}
+  '@astrojs/db@0.11.1':
+    resolution: {integrity: sha512-3hFcSib3u7kBZyYlSzaJVCWBJBz8CKmh1RWndYFiAIi37aT69PGneSSyZ/8w3yy3ARiUOt4oJLvl9sRwwH7Tzg==}
 
   '@astrojs/internal-helpers@0.4.0':
     resolution: {integrity: sha512-6B13lz5n6BrbTqCTwhXjJXuR1sqiX/H6rTxzlXx+lN1NnV4jgnq/KJldCQaUWJzPL5SiWahQyinxAbxQtwgPHA==}
@@ -3819,6 +3819,9 @@ packages:
   zod@3.23.6:
     resolution: {integrity: sha512-RTHJlZhsRbuA8Hmp/iNL7jnfc4nZishjsanDAfEY1QpDQZCahUp3xDzl+zfweE9BklxMUcgBgS1b7Lvie/ZVwA==}
 
+  zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
@@ -3843,7 +3846,7 @@ snapshots:
 
   '@astrojs/compiler@2.8.0': {}
 
-  '@astrojs/db@0.11.0':
+  '@astrojs/db@0.11.1':
     dependencies:
       '@libsql/client': 0.6.0
       async-listen: 3.0.1
@@ -3858,7 +3861,7 @@ snapshots:
       prompts: 2.4.2
       strip-ansi: 7.1.0
       yargs-parser: 21.1.1
-      zod: 3.23.6
+      zod: 3.23.8
     transitivePeerDependencies:
       - '@aws-sdk/client-rds-data'
       - '@cloudflare/workers-types'
@@ -5051,13 +5054,13 @@ snapshots:
       astro: 4.7.1(@types/node@20.12.10)(typescript@5.4.5)
       rehype-expressive-code: 0.35.3
 
-  astro-integration-kit@0.13.2(@astrojs/db@0.11.0)(astro@4.7.1(@types/node@20.12.10)(typescript@5.4.5)):
+  astro-integration-kit@0.13.2(@astrojs/db@0.11.1)(astro@4.7.1(@types/node@20.12.10)(typescript@5.4.5)):
     dependencies:
       astro: 4.7.1(@types/node@20.12.10)(typescript@5.4.5)
       pathe: 1.1.2
       recast: 0.23.6
     optionalDependencies:
-      '@astrojs/db': 0.11.0
+      '@astrojs/db': 0.11.1
 
   astro-pages@0.3.0(astro@4.7.1(@types/node@20.12.10)(typescript@5.4.5)):
     dependencies:
@@ -8213,5 +8216,7 @@ snapshots:
       zod: 3.23.6
 
   zod@3.23.6: {}
+
+  zod@3.23.8: {}
 
   zwitch@2.0.4: {}
