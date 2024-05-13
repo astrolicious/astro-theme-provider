@@ -13,7 +13,7 @@
 	"dependencies": {
 		"@astrojs/check": "^0.5.10",
 		"@astrojs/starlight": "^0.22.2",
-		"astro": "^4.7.1",
+		"astro": "^4.8.2",
 		"sharp": "^0.32.6"
 	}
 }
