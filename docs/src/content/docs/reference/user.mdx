@@ -3,7 +3,7 @@ title: User API
 description: Aute est nulla voluptate sint voluptate consectetur Lorem nisi.
 ---
 
-All themes authored using Astro Theme Provider share a basic API for using the theme. 
+All themes authored using Astro Theme Provider share a basic API for using the theme.
 
 ## Reference
 
@@ -52,6 +52,16 @@ overrides: {
     './src/styles/custom-styles.css',
   ],
 }
+```
+
+### `integrations`
+
+An object used to disable/ignore integrations added by a theme
+
+```ts
+integrations: {
+  "@astrojs/sitemap": false,
+},
 ```
 
 ## Example
@@ -105,7 +115,10 @@ export default defineConfig({
         styles: [
           "./src/global.css"
         ],
-      }
+      },
+			integrations: {
+				"@astrojs/sitemap": false,
+			},
     })
   ]
 });
