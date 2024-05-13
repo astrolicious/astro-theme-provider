@@ -126,7 +126,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// Record of virtual imports and their content
 					const virtualImports: Record<string, string> = {
 						[`${themeName}:config`]: `export default ${JSON.stringify(userConfig)}`,
-						[`${themeName}:context`]: ''
+						[`${themeName}:context`]: "",
 					};
 
 					// Module type buffers
@@ -135,7 +135,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
 							export default config;
 						`,
-						[`${themeName}:context`]: ''
+						[`${themeName}:context`]: "",
 					};
 
 					// Interface type buffers
@@ -243,9 +243,9 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					}
 
 					// Virtual module for integration utilities
-					virtualImports[`${themeName}:context`] += `\nexport const integrations = new Set(${
-						JSON.stringify(Array.from(Object.keys(integrationsExisting)))
-					})`;
+					virtualImports[`${themeName}:context`] += `\nexport const integrations = new Set(${JSON.stringify(
+						Array.from(Object.keys(integrationsExisting)),
+					)})`;
 					moduleBuffers[`${themeName}:context`] += `\nexport const integrations: Set<string>`;
 
 					// Type interfaces for theme integrations, used to build other types like the user config
