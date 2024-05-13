@@ -6,15 +6,15 @@ import { FileTree } from '@astrojs/starlight/components';
 
 ### `0.5.0`
 
-### Added: Virtual import for integration utilities
+### Added: Virtual import for theme utilities
 
-The virtual import `<name>:integrations` is now reserved and can no longer be used when creating custom virtual imports:
+The virtual import `<name>:context` is now reserved, authors can no longer create custom virtual modules with this name, example:
 
 ```diff
   defineTheme({
     imports: {
--      integrations: {
-+      something: {
+-     context: {
++     options: {
         // ...
       }
     }
