@@ -339,7 +339,9 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					// Initialize route injection
 					const { pages: pagesInjected, injectPages } = addPageDir(pageDirOption);
-					const pagesResolved: Record<string, string | false> = Object.fromEntries(Object.keys(pagesInjected).map(p => [p, p]))
+					const pagesResolved: Record<string, string | false> = Object.fromEntries(
+						Object.keys(pagesInjected).map((p) => [p, p]),
+					);
 
 					// Generate types for possibly injected routes
 					interfaceBuffers.ThemeRoutes += Object.entries(pagesInjected)
@@ -355,7 +357,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 						// If user passes falsy value remove the route
 						if (!newPattern) {
-							pagesResolved[oldPattern] = false
+							pagesResolved[oldPattern] = false;
 							delete pagesInjected[oldPattern];
 							continue;
 						}
@@ -371,7 +373,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							}
 							// Add new pattern
 							pagesInjected[newPattern] = pagesInjected[oldPattern]!;
-							pagesResolved[oldPattern] = newPattern
+							pagesResolved[oldPattern] = newPattern;
 							// Remove old pattern
 							delete pagesInjected[oldPattern];
 						}
@@ -381,7 +383,9 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					virtualImports[`${themeName}:context`] += `\nexport const pages = new Map(Object.entries(${JSON.stringify(
 						pagesResolved,
 					)}))`;
-					moduleBuffers[`${themeName}:context`] += `\nexport const pages: Map<${Object.keys(pagesResolved).map(p => `"${p}"`).join(' | ')}, tring | false>`;
+					moduleBuffers[`${themeName}:context`] += `\nexport const pages: Map<${Object.keys(pagesResolved)
+						.map((p) => `"${p}"`)
+						.join(" | ")}, tring | false>`;
 
 					// Generate types for injected routes
 					interfaceBuffers.ThemeRoutesResolved += Object.entries(pagesInjected)
