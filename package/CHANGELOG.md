@@ -1,5 +1,68 @@
 # astro-theme-provider
 
+## 0.5.0
+
+### Minor Changes
+
+- 5188e12: Added a user facing API for disabling integrations injected by a theme
+
+  ```ts
+  import { defineConfig } from "astro/config";
+  import myTheme from "my-theme";
+
+  export default defineConfig({
+    integrations: [
+      myTheme({
+        integrations: {
+          "@astrojs/sitemap": false,
+        },
+      }),
+    ],
+  });
+  ```
+
+- 5188e12: Updated the type of the user config to `z.input` instead of `z.infer` for proper typing
+- cfcdca1: Added a utility to query the final path of a page:
+
+  ```astro
+  ---
+  import { pages } from 'my-theme:context'
+  ---
+
+  { pages.has('/blog') &&
+    <a href={pages.get('/blog')}>Blog</a>
+  }
+  ```
+
+- 5188e12: Added a built in virtual module for theme utilities `<name>:context`.
+
+  This name is now reserved, authors can no longer create custom virtual modules with this name, example:
+
+  ```diff
+    defineTheme({
+      imports: {
+  -     context: {
+  +     options: {
+          // ...
+        }
+      }
+    })
+  ```
+
+- 5188e12: Added a utility to query what integrations are inside the project:
+
+  ```astro
+  ---
+  import { integrations } from 'my-theme:context'
+
+  if (integrations.has('@inox-tools/sitemap-ext')) {
+  	import('sitemap-ext:config').then((sitemap) => {
+  			sitemap.default(true)
+  	})
+  }
+  ---
+  ```
+
 ## 0.4.0
 
 ### Minor Changes
