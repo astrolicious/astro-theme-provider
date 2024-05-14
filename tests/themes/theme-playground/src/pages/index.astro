@@ -1,11 +1,9 @@
 ---
 import { Heading } from "theme-playground:components";
 import config from "theme-playground:config";
-import { integrations } from "theme-playground:context";
+import { integrations, pages } from "theme-playground:context";
 import { Layout } from "theme-playground:layouts";
-
-if (integrations.has("@astrojs/sitemap")) {
-}
+import type { cat } from "theme-ssg/assets";
 ---
 
 <Layout>
@@ -16,6 +14,15 @@ if (integrations.has("@astrojs/sitemap")) {
   <ul>
     <li><a href="/cats">Cats - Dynamic routing and images</a></li>
   </ul>
+	<h3>Pages</h3>
+	<table>
+		{Object.entries(Object.fromEntries(pages)).map(path => {
+			return <tr>
+				<td>{path[0]}</td>
+				<td>{path[1] || 'false'}</td>
+			</tr>
+		})}
+	<table/>
 	<h3>Integrations</h3>
 	<ul>
 		{Array.from(integrations).map(name => {

@@ -338,23 +338,27 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					};
 
 					// Initialize route injection
-					const { pages, injectPages } = addPageDir(pageDirOption);
+					const { pages: pagesInjected, injectPages } = addPageDir(pageDirOption);
+					const pagesResolved: Record<string, string | false> = Object.fromEntries(
+						Object.keys(pagesInjected).map((pattern) => [pattern, pattern]),
+					);
 
 					// Generate types for possibly injected routes
-					interfaceBuffers.ThemeRoutes += Object.entries(pages)
+					interfaceBuffers.ThemeRoutes += Object.entries(pagesInjected)
 						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
 						.join("");
 
 					// Filter out routes the theme user toggled off
 					for (const oldPattern of Object.keys(userPages)) {
 						// Skip pages that are not defined by author
-						if (!pages?.[oldPattern!]) continue;
+						if (!pagesInjected?.[oldPattern!]) continue;
 
 						let newPattern = userPages[oldPattern as keyof typeof userPages];
 
 						// If user passes falsy value remove the route
 						if (!newPattern) {
-							delete pages[oldPattern];
+							pagesResolved[oldPattern] = false;
+							delete pagesInjected[oldPattern];
 							continue;
 						}
 
@@ -368,14 +372,23 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 								);
 							}
 							// Add new pattern
-							pages[newPattern] = pages[oldPattern]!;
+							pagesInjected[newPattern] = pagesInjected[oldPattern]!;
+							pagesResolved[oldPattern] = newPattern;
 							// Remove old pattern
-							delete pages[oldPattern];
+							delete pagesInjected[oldPattern];
 						}
 					}
 
+					// Virtual module for integration utilities
+					virtualImports[`${themeName}:context`] += `\nexport const pages = new Map(Object.entries(${JSON.stringify(
+						pagesResolved,
+					)}))`;
+					moduleBuffers[`${themeName}:context`] += `\nexport const pages: Map<${Object.keys(pagesResolved)
+						.map((p) => `"${p}"`)
+						.join(" | ")}, string | false>`;
+
 					// Generate types for injected routes
-					interfaceBuffers.ThemeRoutesResolved += Object.entries(pages)
+					interfaceBuffers.ThemeRoutesResolved += Object.entries(pagesInjected)
 						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
 						.join("");
 
