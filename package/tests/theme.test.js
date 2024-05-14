@@ -162,6 +162,19 @@ describe("defineTheme", () => {
 				assert.equal(call.arguments[0].integrations[0], astroIntegration);
 			});
 
+			it("should not inject integrations", () => {
+				const theme = defineTheme({ integrations: [astroIntegration] })({ integrations: { "astro-integration": false } });
+				const params = astroConfigSetupParamsStub();
+
+				theme.hooks["astro:config:setup"]?.(params);
+
+				const call = params.updateConfig.mock.calls.some(
+					(call) => call.arguments[0]?.integrations?.[0].name === astroIntegration.name,
+				);
+
+				assert.equal(call, false);
+			});
+
 			it("should inject integrations with user config", () => {
 				const theme = defineTheme({
 					schema: z.object({ a: z.literal("do-not-add").nullish() }),
