@@ -163,7 +163,9 @@ describe("defineTheme", () => {
 			});
 
 			it("should not inject integrations", () => {
-				const theme = defineTheme({ integrations: [astroIntegration] })({ integrations: { "astro-integration": false } });
+				const theme = defineTheme({ integrations: [astroIntegration] })({
+					integrations: { "astro-integration": false },
+				});
 				const params = astroConfigSetupParamsStub();
 
 				theme.hooks["astro:config:setup"]?.(params);
