@@ -385,7 +385,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					)}))`;
 					moduleBuffers[`${themeName}:context`] += `\nexport const pages: Map<${Object.keys(pagesResolved)
 						.map((p) => `"${p}"`)
-						.join(" | ")}, tring | false>`;
+						.join(" | ")}, string | false>`;
 
 					// Generate types for injected routes
 					interfaceBuffers.ThemeRoutesResolved += Object.entries(pagesInjected)
