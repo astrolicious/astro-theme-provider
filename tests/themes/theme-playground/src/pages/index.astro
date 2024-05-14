@@ -1,7 +1,11 @@
 ---
 import { Heading } from "theme-playground:components";
 import config from "theme-playground:config";
+import { integrations } from "theme-playground:context";
 import { Layout } from "theme-playground:layouts";
+
+if (integrations.has("@astrojs/sitemap")) {
+}
 ---
 
 <Layout>
@@ -12,6 +16,12 @@ import { Layout } from "theme-playground:layouts";
   <ul>
     <li><a href="/cats">Cats - Dynamic routing and images</a></li>
   </ul>
+	<h3>Integrations</h3>
+	<ul>
+		{Array.from(integrations).map(name => {
+			return <li>{name}</li>
+		})}
+	</ul>
 </Layout>
 
 <style>

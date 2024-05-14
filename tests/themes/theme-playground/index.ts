@@ -1,3 +1,4 @@
+import sitemap from "@astrojs/sitemap";
 import defineTheme from "astro-theme-provider";
 import { z } from "astro/zod";
 
@@ -6,10 +7,12 @@ export default defineTheme({
 	schema: z.object({
 		title: z.string(),
 		description: z.string().optional(),
+		sitemap: z.boolean().optional().default(true),
 	}),
 	imports: {
 		test: {
 			default: "./src/components/Heading.astro",
 		},
 	},
+	integrations: [({ config }) => config.sitemap && sitemap()],
 });

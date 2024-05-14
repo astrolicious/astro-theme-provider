@@ -26,6 +26,8 @@ import {
 } from "./utils/path.js";
 import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./utils/virtual.js";
 
+const INTEGRATION_INTERNAL = Symbol("astro-theme-provider/internal-integration");
+
 const thisFile = resolveFilepath("./", import.meta.url);
 
 export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
@@ -54,7 +56,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 			layouts: `layouts/${GLOB_ASTRO}`,
 			styles: `styles/${GLOB_STYLES}`,
 		},
-		integrations: [() => staticDir(authorOptions.publicDir)],
+		integrations: [() => Object.assign(staticDir(authorOptions.publicDir), { [INTEGRATION_INTERNAL]: true })],
 	};
 
 	if (typeof authorOptions.pageDir === "string") {
@@ -124,6 +126,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// Record of virtual imports and their content
 					const virtualImports: Record<string, string> = {
 						[`${themeName}:config`]: `export default ${JSON.stringify(userConfig)}`,
+						[`${themeName}:context`]: "",
 					};
 
 					// Module type buffers
@@ -132,6 +135,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
 							export default config;
 						`,
+						[`${themeName}:context`]: "",
 					};
 
 					// Interface type buffers
@@ -140,6 +144,8 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						ThemeExportsResolved: "",
 						ThemeRoutes: "",
 						ThemeRoutesResolved: "",
+						ThemeIntegrations: "",
+						ThemeIntegrationsResolved: "",
 					};
 
 					let themeTypesBuffer = `
@@ -150,19 +156,19 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 								export interface Themes {
 										"${themeName}": true;
 								}
-						
+
 								export interface ThemeConfigs {
 										"${themeName}": ThemeConfig;
 								};
-						
+
 								export interface ThemePages {
 										"${themeName}": ThemeRoutesResolved
 								}
-						
+
 								export interface ThemeOverrides {
 										"${themeName}": ThemeExportsResolved
 								}
-						
+
 								export interface ThemeOptions {
 										"${themeName}": {
 												pages?: { [Pattern in keyof ThemeRoutes]?: string | boolean }
@@ -173,7 +179,10 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 																				?	string[]
 																				: { [Export in keyof ThemeExports[Module]]?: string }
 																		: never
-												} & {};
+												} & {}
+												integrations?: keyof ThemeIntegrationsResolved extends never
+													? \`\$\{ThemeName\} is not injecting any integrations\`
+													: { [Name in keyof ThemeIntegrationsResolved]?: boolean }
 										};
 								}
 						}
@@ -187,18 +196,62 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// HMR for theme author's package
 					watchDirectory(params, themeRoot);
 
-					// Add integrations from author (like mdx or sitemap)
+					// Integrations inside the config (including the theme) and integrations injected by the theme
+					const integrationsExisting: Record<string, true> = Object.fromEntries(
+						config.integrations.map((i) => [i.name, true]),
+					);
+					// Integrations added by a theme but possibly do not exist because a user disabled it
+					const integrationsPossible: Record<string, true> = {};
+					// Integrations that are injected into a theme
+					const integrationsInjected: Record<string, true> = {};
+					// Integrations ignored/disabled by a user
+					const integrationsIgnored: Record<string, false> = {};
+
 					for (const option of authorOptions.integrations) {
 						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>;
+
+						// Handle integration options that might be a callback for conditonal injection
 						if (typeof option === "function") {
-							const names = config.integrations.map((i) => i.name);
-							integration = option({ config: userConfig, integrations: names });
+							integration = option({ config: userConfig, integrations: Object.keys(integrationsExisting) });
 						} else {
 							integration = option;
 						}
+
 						if (!integration) continue;
+
+						// Skip integrations marked as internal
+						if (INTEGRATION_INTERNAL in integration) {
+							addIntegration(params, { integration });
+							continue;
+						}
+
+						const { name } = integration;
+
+						integrationsPossible[name] = true;
+
+						// Allow users to ignore/disable an integration
+						if (userOptions.integrations && name in userOptions.integrations && !userOptions.integrations[name]) {
+							integrationsIgnored[name] = false;
+							continue;
+						}
+
+						integrationsInjected[name] = true;
+						integrationsExisting[name] = true;
+
+						// Add the integration
 						addIntegration(params, { integration });
 					}
+
+					// Virtual module for integration utilities
+					virtualImports[`${themeName}:context`] += `\nexport const integrations = new Set(${JSON.stringify(
+						Array.from(Object.keys(integrationsExisting)),
+					)})`;
+					moduleBuffers[`${themeName}:context`] += `\nexport const integrations: Set<string>`;
+
+					// Type interfaces for theme integrations, used to build other types like the user config
+					interfaceBuffers.ThemeIntegrations = `${JSON.stringify(integrationsPossible, null, 4).slice(1, -1)}` || "\n";
+					interfaceBuffers.ThemeIntegrationsResolved =
+						`${JSON.stringify({ ...integrationsInjected, ...integrationsIgnored }, null, 4).slice(1, -1)}` || "\n";
 
 					// Add middleware
 					if (middlewareDir) {
@@ -216,12 +269,15 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						}
 					}
 
+					// Reserved names for built-in virtual modules
+					const reservedNames = new Set(["config", "pages", "content", "db", "integrations"]);
+
 					// Dynamically create virtual modules using globs, imports, or exports
 					for (let [name, option] of Object.entries(authorOptions.imports)) {
 						if (!option) continue;
 
 						// Reserved module/import names
-						if (["config", "pages", "content", "db"].includes(name)) {
+						if (reservedNames.has(name)) {
 							logger.warn(`Module name '${name}' is reserved for the built in virtual import '${themeName}:${name}'`);
 							continue;
 						}
