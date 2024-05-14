@@ -340,7 +340,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// Initialize route injection
 					const { pages: pagesInjected, injectPages } = addPageDir(pageDirOption);
 					const pagesResolved: Record<string, string | false> = Object.fromEntries(
-						Object.keys(pagesInjected).map((p) => [p, p]),
+						Object.keys(pagesInjected).map((pattern) => [pattern, pattern]),
 					);
 
 					// Generate types for possibly injected routes
