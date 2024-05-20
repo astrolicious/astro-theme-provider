@@ -14,6 +14,6 @@
 		"@astrojs/check": "^0.6.0",
 		"@astrojs/starlight": "^0.22.2",
 		"astro": "^4.8.3",
-		"sharp": "^0.33.3"
+		"sharp": "^0.33.4"
 	}
 }
