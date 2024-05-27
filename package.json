@@ -22,7 +22,7 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "^1.7.3",
-		"@changesets/cli": "^2.27.1",
+		"@changesets/cli": "^2.27.3",
 		"@playwright/test": "^1.44.0",
 		"astro": "^4.8.3"
 	}
