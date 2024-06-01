@@ -60,7 +60,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		pageDir = { dir: pageDir };
 	}
 
-	pageDir = { ...pageDir, cwd: themeSrc, log: logLevel }
+	pageDir = { ...pageDir, cwd: themeSrc, log: logLevel };
 
 	if (publicDir || typeof publicDir === "string") {
 		if (typeof publicDir === "string") {
