@@ -9,16 +9,14 @@
 		"url": "https://github.com/UserName/theme-playground",
 		"directory": "package"
 	},
-	"keywords": [
-		"astro-integration"
-	],
+	"keywords": ["astro-integration"],
 	"scripts": {},
 	"devDependencies": {
-		"@types/node": "^20.12.12",
-		"astro": "^4.8.3"
+		"@types/node": "^20.13.0",
+		"astro": "^4.9.2"
 	},
 	"dependencies": {
-		"@astrojs/sitemap": "^3.1.4",
+		"@astrojs/sitemap": "^3.1.5",
 		"astro-theme-provider": "workspace:^"
 	}
 }

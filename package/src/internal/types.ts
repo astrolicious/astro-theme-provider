@@ -29,9 +29,9 @@ export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny>
 	name: ThemeName;
 	entrypoint?: string;
 	srcDir?: string;
-	pageDir?: string | PageDirOption;
-	publicDir?: string | StaticDirOption;
-	middlewareDir?: string | false;
+	pageDir?: PageDirOption | string;
+	publicDir?: StaticDirOption | string | false | null | undefined;
+	middlewareDir?: string | false | null | undefined;
 	log?: "verbose" | "minimal" | boolean;
 	schema?: Schema;
 	imports?: Record<string, string | ModuleImports | ModuleExports | ModuleObject>;
