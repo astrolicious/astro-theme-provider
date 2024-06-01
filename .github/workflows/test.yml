@@ -6,15 +6,9 @@ on:
 	pull_request:
 		branches:
       - "**"
-    paths:
-      - 'package/**'
-      - 'tests/**'
   pull_request_target:
 		branches:
       - "**"
-    paths:
-      - 'package/**'
-      - 'tests/**'
 jobs:
   test:
     timeout-minutes: 10
