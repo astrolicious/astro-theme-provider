@@ -3,11 +3,11 @@ on:
   push:
     branches:
       - main
+	pull_request:
+    paths:
+      - 'package/**'
+      - 'tests/**'
   pull_request_target:
-    types:
-      - opened
-    branches:
-      - main
     paths:
       - 'package/**'
       - 'tests/**'
