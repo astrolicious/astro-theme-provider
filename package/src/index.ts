@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { AstroIntegration } from "astro";
 import { addDts, addIntegration, addVirtualImports, watchDirectory } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
 import type { IntegrationOption as PageDirIntegrationOption } from "astro-pages";
@@ -22,14 +23,12 @@ import {
 	validatePattern,
 } from "./utils/path.js";
 import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./utils/virtual.js";
-import type { AstroIntegration } from "astro";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 
 export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	partialAuthorOptions: AuthorOptions<ThemeName, Schema>,
 ) {
-
 	let {
 		log: logLevel = true,
 		name: themeName,
@@ -43,10 +42,10 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		publicDir = "public",
 		middlewareDir = "./",
 		imports: themeImports = {},
-		integrations: themeIntegrations = []
-	} = partialAuthorOptions
+		integrations: themeIntegrations = [],
+	} = partialAuthorOptions;
 
-	themeEntrypoint = resolveFilepath("./", themeEntrypoint)
+	themeEntrypoint = resolveFilepath("./", themeEntrypoint);
 
 	const themeRoot = resolveDirectory("./", themeEntrypoint);
 
@@ -54,41 +53,37 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 	themeSrc = resolveDirectory(themeRoot, themeSrc);
 
-	middlewareDir = resolveDirectory(themeSrc, middlewareDir)
+	middlewareDir = resolveDirectory(themeSrc, middlewareDir);
 
 	if (typeof pageDir === "string") {
 		pageDir = { dir: pageDir };
 	}
 
-	Object.assign(pageDir, { cwd: themeSrc, log: logLevel })
+	Object.assign(pageDir, { cwd: themeSrc, log: logLevel });
 
 	if (typeof publicDir === "string") {
 		publicDir = { dir: publicDir };
 	}
 
-	Object.assign(publicDir, { cwd: themeRoot, log: logLevel })
+	Object.assign(publicDir, { cwd: themeRoot, log: logLevel });
 
 	themeImports = {
 		assets: `assets/${GLOB_IMAGES}`,
 		components: `components/${GLOB_COMPONENTS}`,
 		layouts: `layouts/${GLOB_ASTRO}`,
 		styles: `styles/${GLOB_STYLES}`,
-		...themeImports
-	}
+		...themeImports,
+	};
 
 	// Return theme integration
 	return (userOptions: UserOptions<ThemeName, Schema> = {}) => {
-		const {
-			config: userConfigPartial = {},
-			pages: userPages = {},
-			overrides: userOverrides = {}
-		} = userOptions;
+		const { config: userConfigPartial = {}, pages: userPages = {}, overrides: userOverrides = {} } = userOptions;
 
 		// Parse/validate config passed by user, throw formatted error if it is invalid
 		const {
 			data: userConfig,
 			success: parseSuccess,
-			error: parseError
+			error: parseError,
 		} = configSchema.safeParse(userConfigPartial, { errorMap });
 
 		if (!parseSuccess) {
@@ -112,7 +107,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 				"astro:config:setup": (params) => {
 					const { config, logger, injectRoute, addMiddleware } = params;
 
-					const projectRoot = resolveDirectory('./', config.root)
+					const projectRoot = resolveDirectory("./", config.root);
 
 					// Record of virtual imports and their content
 					const virtualImports: Record<string, string> = {
@@ -188,7 +183,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					watchDirectory(params, themeRoot);
 
 					// Sideload integration to handle the public directory
-					addIntegration(params, { integration: staticDir(publicDir) })
+					addIntegration(params, { integration: staticDir(publicDir) });
 
 					// Integrations inside the config (including the theme) and integrations injected by the theme
 					const integrationsExisting: Record<string, true> = Object.fromEntries(
