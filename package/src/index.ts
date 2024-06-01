@@ -1,6 +1,5 @@
 import { existsSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { AstroIntegration } from "astro";
 import { addDts, addIntegration, addVirtualImports, watchDirectory } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
