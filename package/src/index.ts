@@ -1,12 +1,10 @@
 import { existsSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { AstroDbIntegration } from "@astrojs/db/types";
 import { addDts, addIntegration, addVirtualImports, watchDirectory } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
-import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOption } from "astro-pages";
+import type { IntegrationOption as PageDirIntegrationOption } from "astro-pages";
 import staticDir from "astro-public";
-import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
 import { z } from "astro/zod";
 import callsites from "callsites";
@@ -14,7 +12,6 @@ import fg from "fast-glob";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_IGNORE, GLOB_IMAGES, GLOB_STYLES } from "./internal/consts.js";
 import { errorMap } from "./internal/error-map.js";
 import type { AuthorOptions, UserOptions } from "./internal/types.js";
-import { mergeOptions } from "./utils/options.js";
 import { PackageJSON, warnThemePackage } from "./utils/package.js";
 import {
 	addLeadingSlash,
@@ -25,93 +22,87 @@ import {
 	validatePattern,
 } from "./utils/path.js";
 import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./utils/virtual.js";
-
-const INTEGRATION_INTERNAL = Symbol("astro-theme-provider/internal-integration");
+import type { AstroIntegration } from "astro";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 
 export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	partialAuthorOptions: AuthorOptions<ThemeName, Schema>,
 ) {
-	// Theme package entrypoint (/package/index.ts)
-	const themeEntrypoint = callsites()
-		.reverse()
-		.map((callsite) => (callsite as NodeJS.CallSite).getScriptNameOrSourceURL())
-		// Assume the first path before `file://` path is the entrypoint
-		.find((path) => path && !path.startsWith("file://") && path !== thisFile)!;
 
-	// Default options
-	let authorOptions: Required<AuthorOptions<string, z.ZodRecord>> = {
-		name: "",
-		entrypoint: themeEntrypoint,
-		srcDir: "src",
-		pageDir: "pages",
-		publicDir: "public",
-		middlewareDir: "./",
-		log: true,
-		schema: z.record(z.any()),
-		imports: {
-			assets: `assets/${GLOB_IMAGES}`,
-			components: `components/${GLOB_COMPONENTS}`,
-			layouts: `layouts/${GLOB_ASTRO}`,
-			styles: `styles/${GLOB_STYLES}`,
-		},
-		integrations: [() => Object.assign(staticDir(authorOptions.publicDir), { [INTEGRATION_INTERNAL]: true })],
-	};
+	let {
+		log: logLevel = true,
+		name: themeName,
+		schema: configSchema = z.any(),
+		entrypoint: themeEntrypoint = callsites()
+			.reverse()
+			.map((callsite) => (callsite as NodeJS.CallSite).getScriptNameOrSourceURL())
+			.find((path) => path && !path.startsWith("file://") && path !== thisFile)!,
+		srcDir: themeSrc = "src",
+		pageDir = "pages",
+		publicDir = "public",
+		middlewareDir = "./",
+		imports: themeImports = {},
+		integrations: themeIntegrations = []
+	} = partialAuthorOptions
 
-	if (typeof authorOptions.pageDir === "string") {
-		authorOptions.pageDir = { dir: authorOptions.pageDir } as PageDirOption;
-	}
+	themeEntrypoint = resolveFilepath("./", themeEntrypoint)
 
-	if (typeof authorOptions.publicDir === "string") {
-		authorOptions.publicDir = { dir: authorOptions.publicDir } as PublicDirOption;
-	}
+	const themeRoot = resolveDirectory("./", themeEntrypoint);
 
-	// Merge author options with default options
-	authorOptions = mergeOptions(authorOptions, partialAuthorOptions) as typeof authorOptions;
-
-	// Theme package root (/package)
-	const themeRoot = resolveDirectory("./", authorOptions.entrypoint);
-
-	// Theme source dir (/package/src)
-	const themeSrc = resolveDirectory(themeRoot, authorOptions.srcDir);
-
-	// Root dir used to search for middleware files
-	const middlewareDir = authorOptions.middlewareDir ? resolveDirectory(themeSrc, authorOptions.middlewareDir) : false;
-
-	// Force options
-	authorOptions = mergeOptions(authorOptions, {
-		pageDir: { cwd: themeSrc, log: authorOptions.log },
-		publicDir: { cwd: themeRoot, log: authorOptions.log },
-		middlewareDir,
-	}) as typeof authorOptions;
-
-	// Theme `package.json`
 	const themePackage = new PackageJSON(themeRoot);
 
-	// Assign theme name
-	const themeName = authorOptions.name;
+	themeSrc = resolveDirectory(themeRoot, themeSrc);
+
+	middlewareDir = resolveDirectory(themeSrc, middlewareDir)
+
+	if (typeof pageDir === "string") {
+		pageDir = { dir: pageDir };
+	}
+
+	Object.assign(pageDir, { cwd: themeSrc, log: logLevel })
+
+	if (typeof publicDir === "string") {
+		publicDir = { dir: publicDir };
+	}
+
+	Object.assign(publicDir, { cwd: themeRoot, log: logLevel })
+
+	themeImports = {
+		assets: `assets/${GLOB_IMAGES}`,
+		components: `components/${GLOB_COMPONENTS}`,
+		layouts: `layouts/${GLOB_ASTRO}`,
+		styles: `styles/${GLOB_STYLES}`,
+		...themeImports
+	}
 
 	// Return theme integration
 	return (userOptions: UserOptions<ThemeName, Schema> = {}) => {
-		const { config: userConfigUnparsed = {}, pages: userPages = {}, overrides: userOverrides = {} } = userOptions;
+		const {
+			config: userConfigPartial = {},
+			pages: userPages = {},
+			overrides: userOverrides = {}
+		} = userOptions;
 
 		// Parse/validate config passed by user, throw formatted error if it is invalid
-		const parsed = authorOptions.schema.safeParse(userConfigUnparsed, { errorMap });
+		const {
+			data: userConfig,
+			success: parseSuccess,
+			error: parseError
+		} = configSchema.safeParse(userConfigPartial, { errorMap });
 
-		if (!parsed.success) {
+		if (!parseSuccess) {
 			throw new AstroError(
 				`Invalid configuration passed to '${themeName}' integration\n`,
-				parsed.error.issues.map((i) => i.message).join("\n"),
+				parseError.issues.map((issue) => issue.message).join("\n"),
 			);
 		}
 
-		const userConfig = parsed.data;
-
-		const themeIntegration: AstroDbIntegration = {
+		const themeIntegration: AstroIntegration = {
 			name: themeName,
 			hooks: {
-				// Support `@astrojs/db` (Astro Studio)
+				// How should this get typed? Return type should be "AstroIntegration" but this requires "AstroDbIntegration"
+				// @ts-expect-error
 				"astro:db:setup": ({ extendDb }) => {
 					const configEntrypoint = resolve(themeRoot, "db/cofig.ts");
 					const seedEntrypoint = resolve(themeRoot, "db/seed.ts");
@@ -121,7 +112,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 				"astro:config:setup": (params) => {
 					const { config, logger, injectRoute, addMiddleware } = params;
 
-					const projectRoot = normalizePath(fileURLToPath(config.root.toString()));
+					const projectRoot = resolveDirectory('./', config.root)
 
 					// Record of virtual imports and their content
 					const virtualImports: Record<string, string> = {
@@ -171,7 +162,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 								export interface ThemeOptions {
 										"${themeName}": {
-												pages?: { [Pattern in keyof ThemeRoutes]?: string | boolean }
+												pages?: { [Pattern in keyof ThemeRoutes]?: string | boolean } & {}
 												overrides?: {
 														[Module in keyof ThemeExports]?:
 																ThemeExports[Module] extends Record<string, any>
@@ -182,19 +173,22 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 												} & {}
 												integrations?: keyof ThemeIntegrationsResolved extends never
 													? \`\$\{ThemeName\} is not injecting any integrations\`
-													: { [Name in keyof ThemeIntegrationsResolved]?: boolean }
+													: { [Name in keyof ThemeIntegrationsResolved]?: boolean } & {}
 										};
 								}
 						}
 					`;
 
-					if (authorOptions.log) {
+					if (logLevel) {
 						// Warn about issues with theme's `package.json`
 						warnThemePackage(themePackage, logger);
 					}
 
 					// HMR for theme author's package
 					watchDirectory(params, themeRoot);
+
+					// Sideload integration to handle the public directory
+					addIntegration(params, { integration: staticDir(publicDir) })
 
 					// Integrations inside the config (including the theme) and integrations injected by the theme
 					const integrationsExisting: Record<string, true> = Object.fromEntries(
@@ -207,7 +201,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// Integrations ignored/disabled by a user
 					const integrationsIgnored: Record<string, false> = {};
 
-					for (const option of authorOptions.integrations) {
+					for (const option of themeIntegrations) {
 						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>;
 
 						// Handle integration options that might be a callback for conditonal injection
@@ -218,12 +212,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						}
 
 						if (!integration) continue;
-
-						// Skip integrations marked as internal
-						if (INTEGRATION_INTERNAL in integration) {
-							addIntegration(params, { integration });
-							continue;
-						}
 
 						const { name } = integration;
 
@@ -273,7 +261,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					const reservedNames = new Set(["config", "pages", "content", "db", "integrations"]);
 
 					// Dynamically create virtual modules using globs, imports, or exports
-					for (let [name, option] of Object.entries(authorOptions.imports)) {
+					for (let [name, option] of Object.entries(themeImports)) {
 						if (!option) continue;
 
 						// Reserved module/import names
@@ -331,11 +319,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						`;
 					}
 
-					const pageDirOption: PageDirIntegrationOption = {
-						...(authorOptions.pageDir as PageDirOption),
-						config,
-						logger,
-					};
+					const pageDirOption: PageDirIntegrationOption = { ...pageDir, config, logger };
 
 					// Initialize route injection
 					const { pages: pagesInjected, injectPages } = addPageDir(pageDirOption);
