@@ -1,14 +1,14 @@
 name: Tests
 on:
   push:
+  pull_request_target:
+    types:
+      - opened
     branches:
       - main
-	pull_request:
-		branches:
-      - "**"
-  pull_request_target:
-		branches:
-      - "**"
+    paths:
+      - 'package/**'
+      - 'tests/**'
 jobs:
   test:
     timeout-minutes: 10
