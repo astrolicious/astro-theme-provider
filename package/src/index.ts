@@ -52,19 +52,22 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 	themeSrc = resolveDirectory(themeRoot, themeSrc);
 
-	middlewareDir = resolveDirectory(themeSrc, middlewareDir);
+	if (middlewareDir) {
+		middlewareDir = resolveDirectory(themeSrc, middlewareDir);
+	}
 
 	if (typeof pageDir === "string") {
 		pageDir = { dir: pageDir };
 	}
 
-	Object.assign(pageDir, { cwd: themeSrc, log: logLevel });
+	pageDir = { ...pageDir, cwd: themeSrc, log: logLevel }
 
-	if (typeof publicDir === "string") {
-		publicDir = { dir: publicDir };
+	if (publicDir || typeof publicDir === "string") {
+		if (typeof publicDir === "string") {
+			publicDir = { dir: publicDir };
+		}
+		publicDir = { ...publicDir, cwd: themeRoot, log: logLevel };
 	}
-
-	Object.assign(publicDir, { cwd: themeRoot, log: logLevel });
 
 	themeImports = {
 		assets: `assets/${GLOB_IMAGES}`,
@@ -182,7 +185,9 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					watchDirectory(params, themeRoot);
 
 					// Sideload integration to handle the public directory
-					addIntegration(params, { integration: staticDir(publicDir) });
+					if (publicDir && existsSync(resolveDirectory(publicDir.cwd!, publicDir.dir))) {
+						addIntegration(params, { integration: staticDir(publicDir) });
+					}
 
 					// Integrations inside the config (including the theme) and integrations injected by the theme
 					const integrationsExisting: Record<string, true> = Object.fromEntries(
