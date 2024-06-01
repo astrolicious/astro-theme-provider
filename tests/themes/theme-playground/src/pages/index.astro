@@ -3,7 +3,6 @@ import { Heading } from "theme-playground:components";
 import config from "theme-playground:config";
 import { integrations, pages } from "theme-playground:context";
 import { Layout } from "theme-playground:layouts";
-import type { cat } from "theme-ssg/assets";
 ---
 
 <Layout>
@@ -15,13 +14,21 @@ import type { cat } from "theme-ssg/assets";
     <li><a href="/cats">Cats - Dynamic routing and images</a></li>
   </ul>
 	<h3>Pages</h3>
-	<table>
-		{Object.entries(Object.fromEntries(pages)).map(path => {
+	<table border="true">
+		<thead>
+			<tr>
+				<th>Injected</th>
+				<th>Resolved</th>
+			</tr>
+		</thead>
+		<tbody>
+		{ Object.entries(Object.fromEntries(pages)).map(path => {
 			return <tr>
 				<td>{path[0]}</td>
 				<td>{path[1] || 'false'}</td>
 			</tr>
 		})}
+		</tbody>
 	<table/>
 	<h3>Integrations</h3>
 	<ul>
