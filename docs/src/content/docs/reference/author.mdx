@@ -33,7 +33,7 @@ export default defineTheme({
 })
 ```
 
-## Reference
+## Options Reference
 
 ### `name`
 
@@ -152,7 +152,7 @@ imports: {
 
 Create virtual modules to access assets inside a theme and allow users to override them.
 
-**`false`**: 
+**`false`**:
 
 Toggle default virtual modules off
 
@@ -165,7 +165,7 @@ imports: {
 }
 ```
 
-**`string`**: 
+**`string`**:
 
 Glob files into a virtual module, glob patterns are relative to a theme's `srcDir`
 
@@ -188,7 +188,7 @@ imports: {
 import { Hero, Card, Button } from "my-theme:components"
 ```
 
-**`array`**: 
+**`array`**:
 
 Use an array to combine imports into a single virtual module
 
@@ -206,7 +206,7 @@ imports: {
 import "my-theme:styles"
 ```
 
-**`object`**: 
+**`object`**:
 
 Use an object to create more complex custom virtual modules
 
@@ -251,9 +251,23 @@ A path to the root directory, or file inside the root directory, of a theme
 For advanced use cases only, this will be infered automatically assuming that this called at the root of the theme (see [Default Structure](#default-structure))
 :::
 
-## Example
+## Virtual Module Reference
 
-Author a theme inside a package similar a normal project
+### `theme:config`
+
+### `theme:context`
+
+### `theme:styles`
+
+### `theme:assets`
+
+### `theme:components`
+
+### `theme:layouts`
+
+## Example Project
+
+Author a theme inside a package similar to a normal project
 
 <FileTree>
 - package/
@@ -275,7 +289,7 @@ Author a theme inside a package similar a normal project
   - README.md
 </FileTree>
 
-Export the theme as an integration
+Export the theme integration from the package entrypoint
 
 ```ts
 // package/index.ts
