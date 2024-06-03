@@ -68,11 +68,11 @@ export default defineConfig({
 					items: [
 						{
 							label: "Author API",
-							link: "/author/reference",
+							link: "/reference/author",
 						},
 						{
 							label: "User API",
-							link: "/user/reference",
+							link: "/reference/user",
 						},
 					]
 				},
