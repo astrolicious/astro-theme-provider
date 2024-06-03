@@ -1,11 +1,14 @@
 name: Tests
-
 on:
-	push:
-		paths-ignore:
-			- 'docs/**'
-			- 'playground/**'
-			
+  push:
+  pull_request_target:
+    types:
+      - opened
+    branches:
+      - main
+    paths:
+      - 'package/**'
+      - 'tests/**'
 jobs:
   test:
     timeout-minutes: 10
