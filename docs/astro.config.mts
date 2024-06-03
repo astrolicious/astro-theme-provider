@@ -6,12 +6,16 @@ import { packageVersion } from "./src/utils";
 export default defineConfig({
 	integrations: [
 		starlight({
-			customCss: ["./src/styles/global.css"],
 			title: "Astro Theme Provider",
+			lastUpdated: true,
 			social: {
 				discord: "https://chat.astrolicious.dev/",
 				github: "https://github.com/astrolicious/astro-theme-provider",
 			},
+			editLink: {
+				baseUrl: "https://github.com/astrolicious/astro-theme-provider/edit/main/docs"
+			},
+			customCss: ["./src/styles/global.css"],
 			sidebar: [
 				{
 					label: "Introduction",
@@ -39,7 +43,7 @@ export default defineConfig({
 						},
 						{
 							label: "Styling a Theme",
-							link: "#",
+							link: "/conventions/styles",
 						},
 						{
 							label: "Authoring Routes",
@@ -89,7 +93,7 @@ export default defineConfig({
 					},
 				},
 				{
-					label: "Need help? ↗",
+					label: "Need Help? ↗",
 					link: "https://discord.com/channels/1217527207467946087/1217544309226733779"
 				},
 			],
