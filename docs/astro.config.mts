@@ -94,7 +94,7 @@ export default defineConfig({
 				},
 				{
 					label: "Need Help? ↗",
-					link: "https://discord.com/channels/1217527207467946087/1217544309226733779"
+					link: "https://chat.astrolicious.dev/"
 				},
 			],
 		}),
