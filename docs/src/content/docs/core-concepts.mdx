@@ -11,7 +11,7 @@ If you need specific advice about how to author a theme check out the guides und
 
 ## Authoring a Theme
 
-Authoring a theme integration with Astro Theme Provider is simple, but there are a few core concpets that one must know before getting started.
+Authoring a theme integration with Astro Theme Provider is simple, but there are a few core concepts that one must know before getting started.
 
 ### Project Structure
 
@@ -47,7 +47,7 @@ The playground is responsible for generating types during development and previe
 ### Theme Config
 
 Themes have a built-in config that can be configured by a user.
-Theme authors can define a shape for this user configuration with a zod schema.
+Theme authors can define a shape for this user configuration with a Zod schema.
 
 ```ts
 // package/index.ts
@@ -108,7 +108,7 @@ This allows theme authors to create dynamic themes that adapt to a user's projec
 
 ### Virtual Modules
 
-Virtual modules are used by authors to access components and assets insde a theme
+Virtual modules are used by authors to access components and assets inside a theme
 
 <FileTree>
 - package/
@@ -137,7 +137,7 @@ import "my-theme:styles";
 </Layout>
 ```
 
-These components and assets can be overriden by a user allowing for complete customization of a theme.
+These components and assets can be overridden by a user allowing for complete customization of a theme.
 
 ## Using a Theme
 
