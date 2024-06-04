@@ -18,10 +18,10 @@ import "my-theme:styles";
 ---
 ```
 
-Virtual modules are important for the styling of themes, they allow users to append their own styles to the module for customization.
-When styling a theme, always use virtual imports so that users can append their own styles to the module:
+Using virtual modules to style themes is importnant because users can append their own styles to the module for customization.
+When styling a theme, always use virtual imports so that users can override the styles:
 
-```tsx
+```ts
 // package/src/pages/index.astro
 ---
 // DO NOT use relative imports
@@ -47,11 +47,11 @@ By default, all styles inside the `src/styles` directory will be combined into a
 ```tsx
 // package/src/pages/index.astro
 ---
-import "my-theme:styles";
+import 'my-theme:styles';
 ---
 ```
 
-The default style module can be overridden using the `imports` option.
+The default style module can be overridden using the [`imports` option](/reference/author#imports).
 This can be useful for cases like importing fonts or controlling the order of styles inside the module:
 
 ```ts
@@ -63,69 +63,129 @@ export default defineTheme({
 			'./src/styles/reset.css',
 			'./src/styles/global.css',
 			'./src/styles/utilities.css',
-		]
-	}
+		],
+	},
 })
 ```
 
 ### Custom style modules
 
-Custom style modules can be created using the `imports` option:
+Themes have access to a [default style module](#default-style-module), but authors can create as many style modules as they want using the [`imports` option](/reference/author#imports).
 
 ```ts
 export default defineTheme({
 	name: 'my-theme',
 	imports: {
 		// Use a string to glob files inside the 'src' folder
-		'styles/blog': 'styles/blog/**/*.{css,scss}'
+		'styles/blog': 'styles/blog/**/*.{css,scss}',
+
 		// Use an array to manually define imports and control order
 		'styles/gallery': [
 			'@fontsource-variable/inter',
 			'./src/styles/gallery/reset.css',
 			'./src/styles/gallery/global.css',
 			'./src/styles/gallery/utilities.css',
-		]
-	}
+		],
+	},
 })
 ```
 
 ```tsx
 // package/src/pages/index.astro
 ---
-import "my-theme:styles/blog";
-import "my-theme:styles/gallery";
+import 'my-theme:styles/blog';
+import 'my-theme:styles/gallery';
 ---
 ```
 
 
 ## Creating overridable styles
 
-All themes should be authored with style systems that are compatible with user projects and easy to customize.
+All themes should be authored with style systems that are easy to customize, compatible with user projects, and compatible with other theme integrations.
+
+### Importing styles
+
+Styles should always be imported using [virtual style modules](#virtual-style-modules):
+
+```ts
+// package/src/pages/index.astro
+---
+// DO NOT use relative imports
+import "../styles/global.css";
+// DO use virtual imports
+import "my-theme:styles";
+---
+```
+
+Styles will cascade in the order they are imported.
+Always place virtual style imports *below* all other imports to avoid issues with users overriding styles.
+
+
+```ts
+// package/src/pages/index.astro
+---
+import { Layout } from 'my-theme:layout'
+import { Component } from 'my-theme:components'
+// Place style import below all other imports
+import "my-theme:styles";
+---
+```
+
+
+### CSS Layers
+
+All styles inside a theme should be authored using [CSS layers](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer).
+
+```css "@layer my-theme"
+@layer my-theme {
+	:root {
+		--my-color-bg: #222222;
+	}
+
+	body {
+		background-color: var(--my-color-bg);
+	}
+}
+```
+
+CSS layers allows users to have *full control* over the order that styles cascade. For example:
+
+```css
+@layer blog-theme, my-theme, docs-theme, user-overrides;
+```
+
+Read more about CSS layers here:
+
+- [`@layer`- MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer)
+- [Cascade layers - MDN](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Cascade_layers#the_layer_statement_at-rule_for_named_layers)
+- [A Complete Guide to CSS Cascade Layers - Miriam Suzanne](https://css-tricks.com/css-cascade-layers/)
 
 
 ### CSS variables
 
-Use CSS variables when styling elements. CSS variables can be overwritten by the a user to customize the styles of a theme:
+Theme authors should create style systems that make use of CSS variables.
+CSS variables allow authors to create themes that are easily customizable and overridable:
 
-```css
+```css "--my-color-bg" "--my-color-fg"
 :root {
 	--my-color-fg: #fefefe;
 	--my-color-bg: #222222;
 }
 
+/* DO use css variables */
 body {
-	/* DO NOT hardcode common styles */
-	background-color: #222222;
-	color: #fefefe;
-
-	/* DO use css variables for common styles */
 	background-color: var(--my-color-bg);
 	color: var(--my-color-fg);
 }
+
+/* DO NOT hardcode values */
+body {
+	background-color: #222222;
+	color: #fefefe;
+}
 ```
 
-All CSS variables inside a theme should contain a prefix to avoid collisions with other styles and variables.
-
+CSS variables should always include a unique prefix to avoid collisions with existing styles.
 
 Read more about creating style systems with CSS variables here:
 {/* Results of quick google search, better suggestions are appreciated */}
@@ -135,32 +195,32 @@ Read more about creating style systems with CSS variables here:
 
 ### Class names
 
-Classes allow users to target elements inside a theme with style changes.
-Elements inside themes should always include a class, even if it is not being styled, so that users have an option to target the element for style changes.
-Themes should choose class names that include a prefix to prevent collision with existing styles:
+Theme authors should include classes on elements, even if the element is not being styled.
+Classes allow users to target elements inside a theme with style changes:
 
 ```html
-<!-- DO NOT use broad generic class names -->
-<article class="card">
-	<h1></h1>
-	<img/>
-	<p></p>
-</article>
-
 <!-- DO use unique descriptive class names -->
 <article class="my-card">
 	<h1 class="my-card__title"></h1>
 	<img class="my-card__image"/>
 	<p class="my-card__description"></p>
 </article>
+
+<!-- DO NOT use broad generic class names -->
+<article class="card">
+	<h1></h1>
+	<img/>
+	<p></p>
+</article>
 ```
+
+Class names should always include a unique prefix to prevent collisions with existing styles.
+
 
 Read more about choosing names for classes here:
 - [BEM by Example - Nathan Rambeck](https://sparkbox.com/foundry/bem_by_example)
 
 ## Style patterns to avoid
-
-There are many different patterns that theme authors should avoid when styling a theme.
 
 ### Style attributes
 
@@ -169,22 +229,4 @@ There are many different patterns that theme authors should avoid when styling a
 ```
 
 Style attributes have a [high specificity](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity#inline_styles) which makes them hard for users override.
-Avoid using style attributes so that users can override the styles with their own custom styles.
-
-### Style tags
-
-```css
-<style>
-	body {
-		color: red;
-	}
-</style>
-```
-
-All style tags, inline, global, and scoped should be avoided.
-Astro Theme Provider cannot guarantee the order of styles loaded from tags which can lead to issues when users try to override the styles.
-Instead, styles should be authored inside of separate files and consumed using [virtual style modules](#virtual-style-modules)
-
-{/* ### Fonts */}
-
-{/* ### Utility classes */}
+Avoid using style attributes so that it is easier for users to override the styles.

@@ -23,10 +23,18 @@ export default defineConfig({
 						{
 							label: "Why?",
 							link: "/why",
+							badge: {
+								text: "New",
+								variant: 'success',
+							}
 						},
 						{
 							label: "Core Concepts",
 							link: "/core-concepts",
+							badge: {
+								text: "New",
+								variant: 'success',
+							}
 						},
 						{
 							label: "Getting Started",
@@ -37,26 +45,44 @@ export default defineConfig({
 				{
 					label: "Conventions and Techniques",
 					items: [
-						{
-							label: "Theme Configurations",
-							link: "#",
-						},
+						// {
+						// 	label: "Theme Configurations",
+						// 	link: "#",
+						// },
 						{
 							label: "Styling a Theme",
 							link: "/conventions/styles",
+							badge: {
+								text: "New",
+								variant: 'success',
+							}
 						},
 						{
 							label: "Authoring Routes",
 							link: "#",
+							attrs: {
+								style: 'opacity:.5'
+							},
+							badge: {
+								text: "WIP",
+								variant: "caution",
+							}
 						},
 						{
 							label: "Authoring Components",
 							link: "#",
+							attrs: {
+								style: 'opacity:.5'
+							},
+							badge: {
+								text: "WIP",
+								variant: "caution",
+							}
 						},
-						{
-							label: "Client Scripts & Frameworks",
-							link: "#",
-						},
+						// {
+						// 	label: "Client Scripts & Frameworks",
+						// 	link: "#",
+						// },
 						// {
 						// 	label: "Integration Wrappers",
 						// 	link: "#",

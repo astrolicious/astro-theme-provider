@@ -9,9 +9,8 @@ All themes authored using Astro Theme Provider share a basic API for using the t
 
 ### `config`
 
-This type for this property depends on the theme, typically themes will use an object
-
-**Example**:
+The value/type for this property is defined by a [theme's `schema`](/reference/author#schema).
+This configuration can be used by a user to customize the theme.
 
 ```ts
 config: {
@@ -23,9 +22,8 @@ config: {
 
 ### `pages`
 
-An object used to configure the pages injected by a theme
-
-**Example**:
+An object that can be used to configure the pages that are injected by a theme
+Users can use this configuration to disable or rename pages.
 
 ```ts
 pages: {
@@ -37,9 +35,8 @@ pages: {
 
 ### `overrides`
 
-An object used to override the virtual modules created by a theme
-
-**Example**:
+An object that can be used to override the virtual modules that are created by a theme.
+Users can use this configuration to append custom styles or replace components and assets inside of a theme.
 
 ```ts
 overrides: {
@@ -56,7 +53,7 @@ overrides: {
 
 ### `integrations`
 
-An object used to disable/ignore integrations added by a theme
+An object that can be used to disable integrations that are injected by a theme.
 
 ```ts
 integrations: {
@@ -64,30 +61,30 @@ integrations: {
 },
 ```
 
-## Example
+## Examples
 
-Example for how a blog theme might be configured
+Examples for what a theme might look like inside of a user's Astro config.
 
-### Simple User Customization
+### Simple customization
 
 ```ts
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import blogTheme from 'blog-theme';
+import myTheme from 'my-theme';
 
 export default defineConfig({
   integrations: [
-    blogTheme({
+    myTheme({
       config: {
-        title: 'My Blog',
-        description: 'This is my theme',
+        title: 'My Theme',
+        description: 'This is my theme!',
       },
     }),
   ]
 });
 ```
 
-### Advanced User Customization
+### Advanced customization
 
 ```ts
 // astro.config.mjs

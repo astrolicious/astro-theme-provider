@@ -92,14 +92,13 @@ To account for this, all themes have a built-in utilities for information about 
 
 ```tsx
 ---
-import { pages, integrations } from 'my-theme:context'
-
-if (integrations.has('some-integration')) {
-	// Do something because an integration is installed
-}
+import { pages, integrations } from 'my-theme:context';
 ---
 
-{/* Check if route was injected and link to it */}
+{ integrations.has('@astrojs/rss') &&
+	<a href="/rss.xml"></a>
+}
+
 { pages.get('/blog') &&
 	<a href={pages.get('/blog')}></a>
 }
