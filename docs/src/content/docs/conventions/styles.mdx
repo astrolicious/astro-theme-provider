@@ -51,7 +51,7 @@ import "my-theme:styles";
 ---
 ```
 
-The default style module can be overriden using the `imports` option.
+The default style module can be overridden using the `imports` option.
 This can be useful for cases like importing fonts or controlling the order of styles inside the module:
 
 ```ts
@@ -136,8 +136,8 @@ Read more about creating style systems with CSS variables here:
 ### Class names
 
 Classes allow users to target elements inside a theme with style changes.
-Elements inside themes should always include a class, even if it isnt being styled, so that users have an option to target the element for style changes.
-Themes should choose class names that include a prefix to prevent collision with exisiting styles:
+Elements inside themes should always include a class, even if it is not being styled, so that users have an option to target the element for style changes.
+Themes should choose class names that include a prefix to prevent collision with existing styles:
 
 ```html
 <!-- DO NOT use broad generic class names -->
@@ -182,8 +182,8 @@ Avoid using style attributes so that users can override the styles with their ow
 ```
 
 All style tags, inline, global, and scoped should be avoided.
-Astro Theme Provider cannot guarentee the order of styles loaded from tags which can lead to issues when users try to override the styles.
-Instead, styles should be authored inside of seperate files and consumed using [virtual style modules](#virtual-style-modules)
+Astro Theme Provider cannot guarantee the order of styles loaded from tags which can lead to issues when users try to override the styles.
+Instead, styles should be authored inside of separate files and consumed using [virtual style modules](#virtual-style-modules)
 
 {/* ### Fonts */}
 
