@@ -7,6 +7,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: "Astro Theme Provider",
+			credits: true,
 			lastUpdated: true,
 			social: {
 				discord: "https://chat.astrolicious.dev/",
