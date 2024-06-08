@@ -21,7 +21,7 @@ import {
 	resolveFilepath,
 	validatePattern,
 } from "./utils/path.js";
-import { createVirtualModule, globToModuleObject, isEmptyModuleObject, mergeModuleObjects, resolveModuleObject, toModuleObject, type ResolvedModuleObject } from "./utils/virtual.js";
+import { createVirtualModule, globToModuleObject, isEmptyModuleObject, resolveModuleObject, toModuleObject } from "./utils/virtual.js";
 import { createVirtualResolver } from "./utils/resolver.ts";
 
 const thisFile = resolveFilepath("./", import.meta.url);
