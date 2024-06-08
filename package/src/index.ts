@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
 import type { AstroIntegration } from "astro";
-import { addDts, addIntegration, addVirtualImports, watchDirectory } from "astro-integration-kit";
+import { addDts, addIntegration, addVitePlugin, watchDirectory } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
 import type { IntegrationOption as PageDirIntegrationOption } from "astro-pages";
 import staticDir from "astro-public";
@@ -21,7 +21,8 @@ import {
 	resolveFilepath,
 	validatePattern,
 } from "./utils/path.js";
-import { createVirtualModule, globToModuleObject, isEmptyModuleObject, toModuleObject } from "./utils/virtual.js";
+import { createVirtualModule, globToModuleObject, isEmptyModuleObject, mergeModuleObjects, resolveModuleObject, toModuleObject, type ResolvedModuleObject } from "./utils/virtual.js";
+import { createVirtualResolver } from "./utils/resolver.ts";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 
@@ -112,7 +113,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					const projectRoot = resolveDirectory("./", config.root);
 
 					// Record of virtual imports and their content
-					const virtualImports: Record<string, string> = {
+					const virtualImports: Parameters<typeof createVirtualResolver>[0]['imports'] = {
 						[`${themeName}:config`]: `export default ${JSON.stringify(userConfig)}`,
 						[`${themeName}:context`]: "",
 					};
@@ -257,7 +258,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					}
 
 					// Reserved names for built-in virtual modules
-					const reservedNames = new Set(["config", "pages", "content", "db", "integrations"]);
+					const reservedNames = new Set(["config", "context", "content", "collections",  "db"]);
 
 					// Dynamically create virtual modules using globs, imports, or exports
 					for (let [name, option] of Object.entries(themeImports)) {
@@ -269,15 +270,20 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							continue;
 						}
 
-						const moduleName = normalizePath(join(themeName, name)).replace(/\//, ":");
-
 						// Turn a glob string into a module object
 						if (typeof option === "string") {
 							option = globToModuleObject(themeSrc, option);
 						}
 
-						// Create virtual module object
-						const virtualModule = createVirtualModule(moduleName, themeRoot, toModuleObject(option));
+						const moduleName = normalizePath(join(themeName, name)).replace(/\//, ":");
+
+						const moduleObject = toModuleObject(option)
+
+						const resolvedModuleObject = resolveModuleObject(themeRoot, moduleObject)
+
+						const virtualModule = createVirtualModule(moduleName, resolvedModuleObject);
+
+						const orignalContent = virtualModule.content()
 
 						let interfaceTypes = virtualModule.types.interface();
 
@@ -286,26 +292,27 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : JSON.stringify(virtualModule.imports)},
 						`;
 
-						const override = userOverrides[name];
+						const moduleOverride = name in userOverrides
+							? resolveModuleObject(projectRoot, toModuleObject(userOverrides[name]!))
+							: null
 
-						// Check if module exists and contains overrides
-						if (override) {
-							const altModuleName = moduleName.replace(/:/, "::");
-							const moduleOverride = createVirtualModule(altModuleName, projectRoot, toModuleObject(override));
-							if (!isEmptyModuleObject(moduleOverride)) {
-								// Add virtual module to import buffer
-								virtualImports[altModuleName] = virtualModule.content();
+						const isEmptyOverride = moduleOverride
+							? isEmptyModuleObject(moduleOverride)
+							: true
 
-								// Add generated types to module buffer
-								moduleBuffers[altModuleName] = moduleOverride.types.module();
+						const overrideContent = !isEmptyOverride
+							? createVirtualModule(moduleName, moduleOverride!).content()
+							: orignalContent
 
-								// Merge module override into virtual module
-								virtualModule.merge(moduleOverride);
+						virtualImports[moduleName] = ({ importer }) => {
+							if (
+								!isEmptyOverride &&
+								Object.values(moduleOverride!.exports).some(e => e === importer)
+							) {
+								return orignalContent
 							}
+							return overrideContent;
 						}
-
-						// Add virtual module to import buffer
-						virtualImports[moduleName] = virtualModule.content();
 
 						// Add generated types to module buffer
 						moduleBuffers[moduleName] = virtualModule.types.module();
@@ -379,10 +386,12 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					injectPages(injectRoute);
 
 					// Add virtual modules
-					addVirtualImports(params, {
-						name: themeName,
-						imports: virtualImports,
-					});
+					addVitePlugin(params, {
+						plugin: createVirtualResolver({
+							name: themeName,
+							imports: virtualImports,
+						})
+					})
 
 					// Add interfaces to global type buffer
 					for (const [name, buffer] of Object.entries(interfaceBuffers)) {
