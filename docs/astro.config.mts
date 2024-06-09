@@ -14,7 +14,7 @@ export default defineConfig({
 				github: "https://github.com/astrolicious/astro-theme-provider",
 			},
 			editLink: {
-				baseUrl: "https://github.com/astrolicious/astro-theme-provider/edit/main/docs"
+				baseUrl: "https://github.com/astrolicious/astro-theme-provider/edit/main/docs",
 			},
 			customCss: ["./src/styles/global.css"],
 			sidebar: [
@@ -26,22 +26,22 @@ export default defineConfig({
 							link: "/why",
 							badge: {
 								text: "New",
-								variant: 'success',
-							}
+								variant: "success",
+							},
 						},
 						{
 							label: "Core Concepts",
 							link: "/core-concepts",
 							badge: {
 								text: "New",
-								variant: 'success',
-							}
+								variant: "success",
+							},
 						},
 						{
 							label: "Getting Started",
 							link: "/getting-started",
 						},
-					]
+					],
 				},
 				{
 					label: "Conventions and Techniques",
@@ -55,30 +55,30 @@ export default defineConfig({
 							link: "/conventions/styles",
 							badge: {
 								text: "New",
-								variant: 'success',
-							}
+								variant: "success",
+							},
 						},
 						{
 							label: "Authoring Routes",
 							link: "#",
 							attrs: {
-								style: 'opacity:.5'
+								style: "opacity:.5",
 							},
 							badge: {
 								text: "WIP",
 								variant: "caution",
-							}
+							},
 						},
 						{
 							label: "Authoring Components",
 							link: "#",
 							attrs: {
-								style: 'opacity:.5'
+								style: "opacity:.5",
 							},
 							badge: {
 								text: "WIP",
 								variant: "caution",
-							}
+							},
 						},
 						// {
 						// 	label: "Client Scripts & Frameworks",
@@ -105,7 +105,7 @@ export default defineConfig({
 							label: "User API",
 							link: "/reference/user",
 						},
-					]
+					],
 				},
 				{
 					label: "Upgrade Guide",
@@ -113,15 +113,14 @@ export default defineConfig({
 				},
 				{
 					label: `v${packageVersion} Changelog ↗`,
-					link:
-						`https://github.com/astrolicious/astro-theme-provider/blob/main/package/CHANGELOG.md#${packageVersion.replaceAll(".", "")}`,
+					link: `https://github.com/astrolicious/astro-theme-provider/blob/main/package/CHANGELOG.md#${packageVersion.replaceAll(".", "")}`,
 					attrs: {
 						target: "_blank",
 					},
 				},
 				{
 					label: "Need Help? ↗",
-					link: "https://chat.astrolicious.dev/"
+					link: "https://chat.astrolicious.dev/",
 				},
 			],
 		}),
