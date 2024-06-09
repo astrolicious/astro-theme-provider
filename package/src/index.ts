@@ -131,26 +131,16 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					const interfaceBuffers = {
 						ThemeExports: "",
 						ThemeRoutes: "",
-						ThemeRoutesResolved: "",
 						ThemeIntegrations: "",
 						ThemeIntegrationsResolved: "",
 					};
 
 					let themeTypesBuffer = `
 						type ThemeName = "${themeName}";
-						type ThemeConfig = NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>
 
 						declare namespace AstroThemeProvider {
 								export interface Themes {
 										"${themeName}": true;
-								}
-
-								export interface ThemeConfigs {
-										"${themeName}": ThemeConfig;
-								};
-
-								export interface ThemePages {
-										"${themeName}": ThemeRoutesResolved
 								}
 
 								export interface ThemeOptions {
@@ -370,11 +360,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					moduleBuffers[`${themeName}:context`] += `\nexport const pages: Map<${Object.keys(pagesResolved)
 						.map((p) => `"${p}"`)
 						.join(" | ")}, string | false>`;
-
-					// Generate types for injected routes
-					interfaceBuffers.ThemeRoutesResolved += Object.entries(pagesInjected)
-						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
-						.join("");
 
 					// Inject routes/pages
 					injectPages(injectRoute);
