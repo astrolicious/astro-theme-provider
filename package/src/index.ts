@@ -313,13 +313,14 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					// Initialize route injection
 					const { pages: pagesInjected, injectPages } = addPageDir(pageDirOption);
+
 					const pagesResolved: Record<string, string | false> = Object.fromEntries(
 						Object.keys(pagesInjected).map((pattern) => [pattern, pattern]),
 					);
 
 					// Generate types for possibly injected routes
-					interfaceBuffers.ThemeRoutes += Object.entries(pagesInjected)
-						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
+					interfaceBuffers.ThemeRoutes += Object.keys(pagesInjected)
+						.map(pattern => `\n"${pattern}": true`)
 						.join("");
 
 					// Filter out routes the theme user toggled off
