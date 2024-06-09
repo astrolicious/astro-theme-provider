@@ -130,7 +130,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// Interface type buffers
 					const interfaceBuffers = {
 						ThemeExports: "",
-						ThemeExportsResolved: "",
 						ThemeRoutes: "",
 						ThemeRoutesResolved: "",
 						ThemeIntegrations: "",
@@ -152,10 +151,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 								export interface ThemePages {
 										"${themeName}": ThemeRoutesResolved
-								}
-
-								export interface ThemeOverrides {
-										"${themeName}": ThemeExportsResolved
 								}
 
 								export interface ThemeOptions {
@@ -283,17 +278,26 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 						const orignalContent = virtualModule.content()
 
-						const moduleOverride = name in userOverrides
+						virtualImports[moduleName] = orignalContent
+
+						const virtualModuleOverride = createVirtualModule(moduleName, resolvedModuleObject)
+
+						const resolvedModuleOverride = name in userOverrides
 							? resolveModuleObject(projectRoot, toModuleObject(userOverrides[name]!))
 							: null
 
-						const isEmptyOverride = moduleOverride
-							? isEmptyModuleObject(moduleOverride)
+						const isEmptyOverride = resolvedModuleOverride
+							? isEmptyModuleObject(resolvedModuleOverride)
 							: true
 
-						if (moduleOverride && !isEmptyOverride) {
-							const overrideExports = new Set(Object.values(moduleOverride.exports))
-							const overrideContent = createVirtualModule(moduleName, moduleOverride!).content()
+						if (!isEmptyOverride) {
+							virtualModuleOverride.merge(resolvedModuleOverride!)
+						}
+
+						const overrideContent = virtualModuleOverride.content()
+
+						if (!isEmptyOverride) {
+							const overrideExports = new Set(Object.values(virtualModuleOverride.exports))
 							if (overrideExports.size > 0) {
 								virtualImports[moduleName] = ({ importer }) => {
 									if (importer && overrideExports.has(importer)) {
@@ -304,22 +308,13 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							} else {
 								virtualImports[moduleName] = overrideContent
 							}
-						} else {
-							virtualImports[moduleName] = orignalContent
 						}
 
-						// Add generated types to module buffer
 						moduleBuffers[moduleName] = virtualModule.types.module();
 
-						const interfaceTypes = virtualModule.types.interface();
+						let interfaceTypes = virtualModule.types.interface();
 
-						// Add generated types to interface buffer
 						interfaceBuffers.ThemeExports += `
-							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : JSON.stringify(virtualModule.imports)},
-						`;
-
-						// Add generated types to interface buffer
-						interfaceBuffers.ThemeExportsResolved += `
 							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : JSON.stringify(virtualModule.imports)},
 						`;
 					}
