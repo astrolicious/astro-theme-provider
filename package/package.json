@@ -39,7 +39,8 @@
 		"@types/node": "^20.14.2",
 		"playwright": "^1.44.1",
 		"tsup": "^8.1.0",
-		"typescript": "^5.4.5"
+		"typescript": "^5.4.5",
+		"vite": "^5.2.13"
 	},
 	"dependencies": {
 		"astro-integration-kit": "^0.13.3",

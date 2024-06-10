@@ -144,16 +144,10 @@ export function globToModuleObject(root: string, glob: string | string[]): Resol
 	};
 }
 
-export function createVirtualModule(
-	name: string,
-	root: string,
-	module: ModuleObject | ResolvedModuleObject,
-): VirtualModule {
-	const resolved = resolveModuleObject(root, module);
-
+export function createVirtualModule(name: string, module: ResolvedModuleObject): VirtualModule {
 	const virtual: VirtualModule = {
 		name,
-		...resolved,
+		...module,
 		merge: (source) => mergeModuleObjects(virtual, source),
 		content: (content) => generateModuleContent(virtual, content),
 		types: {
@@ -161,7 +155,6 @@ export function createVirtualModule(
 			interface: () => generateInterfaceTypes(virtual),
 		},
 	};
-
 	return virtual;
 }
 
