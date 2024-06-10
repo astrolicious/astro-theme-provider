@@ -1,0 +1,121 @@
+---
+title: Getting Started
+description: How to get started using Astro Theme Provider
+sidebar:
+  order: 10
+---
+import { FileTree, Steps } from '@astrojs/starlight/components';
+
+## Quick Start
+
+This quickest way to get started with Astro Theme Provider is cloning the [theme template](https://github.com/astrolicious/astro-theme-provider-template):
+
+<Steps>
+
+1. Clone the [theme template](https://github.com/astrolicious/astro-theme-provider-template):
+
+	```sh
+	git clone https://github.com/astrolicious/astro-theme-provider-template.git my-theme
+	```
+
+1. Navigate to the created directory and install dependencies:
+
+	```sh
+	pnpm install
+	```
+
+1. Run the playground to generate types for theme development and preview any changes:
+
+	```sh
+	pnpm playground:dev
+	```
+
+1. Explore! Learn how Astro Theme provider works by navigating around the theme and reading the docs
+
+</Steps>
+
+## Setup Manually
+
+If you are creating a theme inside an existing repository, you will have to set it up manually:
+
+<Steps>
+
+1. Create a package with the following structure:
+
+	<FileTree>
+	- package/
+		- public/
+		- src/
+			- assets/
+			- components/
+			- layouts/
+			- pages/
+			- styles/
+		- index.ts
+		- README.md
+		- package.json
+	</FileTree>
+
+1. Create a playground to generate types and test changes:
+
+	```sh
+	pnpm create astro@latest playground --template minimal --no-git -y
+	```
+
+	<FileTree>
+	- playground/
+		- public/
+		- src/
+		- astro.config.mjs
+		- tsconfig.json
+		- package.json
+	</FileTree>
+
+1. Add the package and playground directories to the workspace
+
+	```yaml
+	// pnpm-workspace.yaml
+	packages:
+		- 'package'
+		- 'playground'
+	```
+
+1. Add the theme package to the playground's `package.json` and re-install dependencies:
+
+	```json
+	// playground/package.json
+	{
+		"dependencies": {
+			"astro": "^4.9.0",
+			"my-theme": "workspace:^"
+		}
+	}
+	```
+
+	```sh
+	pnpm install
+	```
+
+1. Add the theme to the `integrations` array inside the Astro config:
+
+	```ts
+	// playground/astro.config.mjs
+	import { defineConfig } from 'astro/config';
+	import mytheme from 'my-theme';
+
+	export default defineConfig({
+		integrations: [
+			mytheme({
+				// ...
+			}),
+		]
+	});
+	```
+
+1. Run the playground to generate types for theme development and preview any changes
+
+	```sh
+	pnpm dev
+	```
+
+</Steps>

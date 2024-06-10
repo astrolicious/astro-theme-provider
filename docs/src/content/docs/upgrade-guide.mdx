@@ -4,6 +4,23 @@ description: How to upgrade to the latest version of Astro Theme Provider
 ---
 import { FileTree } from '@astrojs/starlight/components';
 
+## `0.5.0`
+
+### Added: Virtual import for theme utilities
+
+The virtual import `<name>:context` is now reserved, authors can no longer create custom virtual modules with this name, example:
+
+```diff
+  defineTheme({
+    imports: {
+-     context: {
++     options: {
+        // ...
+      }
+    }
+  })
+```
+
 ## `0.4.0`
 
 ### Renamed: Virtual Imports

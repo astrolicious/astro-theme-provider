@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import { Heading } from "theme-playground:components";
 import config from "theme-playground:config";
+import { integrations, pages } from "theme-playground:context";
 import { Layout } from "theme-playground:layouts";
 
 const entries = await getCollection('blog')
@@ -15,6 +16,29 @@ const entries = await getCollection('blog')
   <ul>
     <li><a href="/cats">Cats - Dynamic routing and images</a></li>
   </ul>
+	<h3>Pages</h3>
+	<table border="true">
+		<thead>
+			<tr>
+				<th>Injected</th>
+				<th>Resolved</th>
+			</tr>
+		</thead>
+		<tbody>
+		{ Object.entries(Object.fromEntries(pages)).map(path => {
+			return <tr>
+				<td>{path[0]}</td>
+				<td>{path[1] || 'false'}</td>
+			</tr>
+		})}
+		</tbody>
+	<table/>
+	<h3>Integrations</h3>
+	<ul>
+		{Array.from(integrations).map(name => {
+			return <li>{name}</li>
+		})}
+	</ul>
 </Layout>
 
 <style>

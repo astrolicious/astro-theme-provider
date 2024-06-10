@@ -12,13 +12,13 @@
 		"test": "playwright test"
 	},
 	"dependencies": {
-		"@astrojs/check": "^0.5.10",
-		"astro": "^4.7.1",
+		"@astrojs/check": "^0.7.0",
+		"astro": "^4.10.1",
 		"theme-ssg": "workspace:^",
 		"typescript": "^5.4.5"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.44.0",
-		"@types/node": "^20.12.10"
+		"@playwright/test": "^1.44.1",
+		"@types/node": "^20.14.2"
 	}
 }

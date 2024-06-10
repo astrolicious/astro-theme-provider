@@ -1,0 +1,43 @@
+---
+title: Why?
+description: Why?
+---
+
+## What is Astro Theme Provider?
+
+Astro Theme provider is a tool for authoring theme integrations.
+Themes can be authored inside a package similar to a normal Astro project and published as an integration for others to use.
+
+## Why use Astro Theme Provider?
+
+###  Problems with current themes
+
+In Astro, typically a theme is authored as a complete project and published as a template that users can clone and customize.
+Theme templates are a very common pattern, but this pattern has many downsides that theme authors may not be aware of:
+
+- **Not beginner friendly**: The largest demographic for theme users are people who are new to Astro and web development in general. Project templates can be hard to setup and understand for new developers.
+- **Cannot be updated easily**: Merging improvements from a template can be difficult if not impossible after customizing your local copy of the template.
+- **Cannot be used in existing projects**: Templates are authored as complete Astro projects, you cannot use templates inside existing projects.
+
+### A better way to create themes
+
+A better way to create themes is shifting away from project templates and towards Astro integrations.
+Integrations have many different advantages over a traditional template, but the largest one is that integrations can be consumed from an NPM package.
+This allows users to:
+
+- Install themes with a single command: `astro add my-theme`
+- Update themes with a single command: `pnpm upgrade my-theme`
+- Use a theme inside of an existing project
+- Use multiple themes together inside a single project
+- Manage and configure themes from the Astro config
+
+Although theme integrations may be more user-friendly, they are much harder to author and require a deeper level of knowledge about Astro and Vite to create.
+Astro Theme Provider solves this by allowing theme authors to create theme integrations without having to write any integration code.
+Themes can be authored inside packages similar to a normal Astro project and exported as an integration for others to use.
+
+### Real-world Example
+
+The best example of a theme integration, and pioneer of the pattern, is [Starlight](https://starlight.astro.build/getting-started/).
+Starlight allows you to build an entire documentation website with a object for configuration and some markdown.
+It has become one of the most popular themes for Astro because it is easy to setup and use.
+Starlight's success proves that theme integrations are a powerful pattern that have been under utilized in the Astro ecosystem and Astro Theme Provider wants to change that!

@@ -29,21 +29,26 @@ export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny>
 	name: ThemeName;
 	entrypoint?: string;
 	srcDir?: string;
-	pageDir?: string | PageDirOption;
-	publicDir?: string | StaticDirOption;
-	contentDir?: string | false;
-	middlewareDir?: string | false;
+	pageDir?: PageDirOption | string;
+	publicDir?: StaticDirOption | string | false | null | undefined;
+	contentDir?: string | false | null | undefined;
+	middlewareDir?: string | false | null | undefined;
 	log?: "verbose" | "minimal" | boolean;
 	schema?: Schema;
 	imports?: Record<string, string | ModuleImports | ModuleExports | ModuleObject>;
 	integrations?: Array<
 		| AstroIntegration
-		| ((options: { config: z.infer<Schema>; integrations: string[] }) => AstroIntegration | false | null | undefined)
+		| ((options: { config: z.infer<Schema>; integrations: string[] }) =>
+				| AstroIntegration
+				| false
+				| null
+				| undefined
+				| void)
 	>;
 }>;
 
 export type UserOptions<ThemeName extends string, Schema extends z.ZodTypeAny = z.ZodTypeAny> = {
-	config?: z.infer<Schema>;
+	config?: z.input<Schema>;
 } & AstroThemeProvider.ThemeOptions[ThemeName];
 
 declare global {
@@ -54,6 +59,7 @@ declare global {
 				{
 					pages?: Record<string, string | boolean>;
 					overrides?: Record<string, string[] | Record<string, string>>;
+					integrations?: Record<string, boolean>;
 				}
 			> {}
 	}

@@ -1,0 +1,47 @@
+---
+title: Configurations
+description: Configurations
+---
+
+### Overriding Default Modules
+
+Authors can override the default virtual modules using the [`imports`](/reference/author/#imports) option
+
+```ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+	name: 'my-theme',
+	imports: {
+		// Define style files manually to control order
+		styles: [
+			'./src/styles/reset.css',
+			'./src/styles/base.css',
+		],
+		// Remap globs to deeply nested folders
+		assets: 'assets/nested/**/*.png',
+		layouts: 'layouts/nested/**/*.astro',
+		components: 'components/nested/**/*.astro'
+	}
+})
+```
+
+### Disabling Default Modules
+
+Authors can disable the default virtual modules using the [`imports`](/reference/author/#imports) option and setting the modules to `false`
+
+```ts
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+	name: 'my-theme',
+	imports: {
+		styles: false,
+		assets: false,
+		layouts: false,
+		components: false
+	}
+})
+```
+
+### Custom Virtual Modules

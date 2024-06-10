@@ -1,12 +1,10 @@
 import { existsSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import type { AstroDbIntegration } from "@astrojs/db/types";
+import type { AstroIntegration } from "astro";
 import { addDts, addIntegration, addVirtualImports, watchDirectory } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
-import type { IntegrationOption as PageDirIntegrationOption, Option as PageDirOption } from "astro-pages";
+import type { IntegrationOption as PageDirIntegrationOption } from "astro-pages";
 import staticDir from "astro-public";
-import type { Option as PublicDirOption } from "astro-public/types";
 import { AstroError } from "astro/errors";
 import { z } from "astro/zod";
 import callsites from "callsites";
@@ -14,7 +12,6 @@ import fg from "fast-glob";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_IGNORE, GLOB_IMAGES, GLOB_STYLES } from "./internal/consts.js";
 import { errorMap } from "./internal/error-map.js";
 import type { AuthorOptions, UserOptions } from "./internal/types.js";
-import { mergeOptions } from "./utils/options.js";
 import { PackageJSON, warnThemePackage } from "./utils/package.js";
 import {
 	addLeadingSlash,
@@ -32,89 +29,79 @@ const thisFile = resolveFilepath("./", import.meta.url);
 export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	partialAuthorOptions: AuthorOptions<ThemeName, Schema>,
 ) {
-	// Theme package entrypoint (/package/index.ts)
-	const themeEntrypoint = callsites()
-		.reverse()
-		.map((callsite) => (callsite as NodeJS.CallSite).getScriptNameOrSourceURL())
-		// Assume the first path before `file://` path is the entrypoint
-		.find((path) => path && !path.startsWith("file://") && path !== thisFile)!;
+	let {
+		log: logLevel = true,
+		name: themeName,
+		schema: configSchema = z.any(),
+		entrypoint: themeEntrypoint = callsites()
+			.reverse()
+			.map((callsite) => (callsite as NodeJS.CallSite).getScriptNameOrSourceURL())
+			.find((path) => path && !path.startsWith("file://") && path !== thisFile)!,
+		srcDir: themeSrc = "src",
+		pageDir = "pages",
+		publicDir = "public",
+		contentDir = "content",
+		middlewareDir = "./",
+		imports: themeImports = {},
+		integrations: themeIntegrations = [],
+	} = partialAuthorOptions;
 
-	// Default options
-	let authorOptions: Required<AuthorOptions<string, z.ZodRecord>> = {
-		name: "",
-		entrypoint: themeEntrypoint,
-		srcDir: "src",
-		pageDir: "pages",
-		publicDir: "public",
-		contentDir: "content",
-		middlewareDir: "./",
-		log: true,
-		schema: z.record(z.any()),
-		imports: {
-			assets: `assets/${GLOB_IMAGES}`,
-			components: `components/${GLOB_COMPONENTS}`,
-			layouts: `layouts/${GLOB_ASTRO}`,
-			styles: `styles/${GLOB_STYLES}`,
-		},
-		integrations: [() => staticDir(authorOptions.publicDir)],
-	};
+	themeEntrypoint = resolveFilepath("./", themeEntrypoint);
 
-	if (typeof authorOptions.pageDir === "string") {
-		authorOptions.pageDir = { dir: authorOptions.pageDir } as PageDirOption;
-	}
+	const themeRoot = resolveDirectory("./", themeEntrypoint);
 
-	if (typeof authorOptions.publicDir === "string") {
-		authorOptions.publicDir = { dir: authorOptions.publicDir } as PublicDirOption;
-	}
-
-	// Merge author options with default options
-	authorOptions = mergeOptions(authorOptions, partialAuthorOptions) as typeof authorOptions;
-
-	// Theme package root (/package)
-	const themeRoot = resolveDirectory("./", authorOptions.entrypoint);
-
-	// Theme source dir (/package/src)
-	const themeSrc = resolveDirectory(themeRoot, authorOptions.srcDir);
-
-	// Root dir used to search for middleware files
-	const middlewareDir = authorOptions.middlewareDir ? resolveDirectory(themeSrc, authorOptions.middlewareDir) : false;
-
-	const contentDir = authorOptions.contentDir ? resolveDirectory(themeSrc, authorOptions.contentDir) : false
-
-	// Force options
-	authorOptions = mergeOptions(authorOptions, {
-		pageDir: { cwd: themeSrc, log: authorOptions.log },
-		publicDir: { cwd: themeRoot, log: authorOptions.log },
-		contentDir,
-		middlewareDir,
-	}) as typeof authorOptions;
-
-	// Theme `package.json`
 	const themePackage = new PackageJSON(themeRoot);
 
-	// Assign theme name
-	const themeName = authorOptions.name;
+	themeSrc = resolveDirectory(themeRoot, themeSrc);
+
+	if (middlewareDir) {
+		middlewareDir = resolveDirectory(themeSrc, middlewareDir);
+	}
+
+	if (typeof pageDir === "string") {
+		pageDir = { dir: pageDir };
+	}
+
+	pageDir = { ...pageDir, cwd: themeSrc, log: logLevel };
+
+	if (publicDir || typeof publicDir === "string") {
+		if (typeof publicDir === "string") {
+			publicDir = { dir: publicDir };
+		}
+		publicDir = { ...publicDir, cwd: themeRoot, log: logLevel };
+	}
+
+	themeImports = {
+		assets: `assets/${GLOB_IMAGES}`,
+		components: `components/${GLOB_COMPONENTS}`,
+		layouts: `layouts/${GLOB_ASTRO}`,
+		styles: `styles/${GLOB_STYLES}`,
+		...themeImports,
+	};
 
 	// Return theme integration
 	return (userOptions: UserOptions<ThemeName, Schema> = {}) => {
-		const { config: userConfigUnparsed = {}, pages: userPages = {}, overrides: userOverrides = {} } = userOptions;
+		const { config: userConfigPartial = {}, pages: userPages = {}, overrides: userOverrides = {} } = userOptions;
 
 		// Parse/validate config passed by user, throw formatted error if it is invalid
-		const parsed = authorOptions.schema.safeParse(userConfigUnparsed, { errorMap });
+		const {
+			data: userConfig,
+			success: parseSuccess,
+			error: parseError,
+		} = configSchema.safeParse(userConfigPartial, { errorMap });
 
-		if (!parsed.success) {
+		if (!parseSuccess) {
 			throw new AstroError(
 				`Invalid configuration passed to '${themeName}' integration\n`,
-				parsed.error.issues.map((i) => i.message).join("\n"),
+				parseError.issues.map((issue) => issue.message).join("\n"),
 			);
 		}
 
-		const userConfig = parsed.data;
-
-		const themeIntegration: AstroDbIntegration = {
+		const themeIntegration: AstroIntegration = {
 			name: themeName,
 			hooks: {
-				// Support `@astrojs/db` (Astro Studio)
+				// How should this get typed? Return type should be "AstroIntegration" but this requires "AstroDbIntegration"
+				// @ts-expect-error
 				"astro:db:setup": ({ extendDb }) => {
 					const configEntrypoint = resolve(themeRoot, "db/cofig.ts");
 					const seedEntrypoint = resolve(themeRoot, "db/seed.ts");
@@ -124,7 +111,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 				"astro:config:setup": (params) => {
 					const { config, logger, injectRoute, addMiddleware } = params;
 
-					const projectRoot = normalizePath(fileURLToPath(config.root.toString()));
+					const projectRoot = resolveDirectory("./", config.root);
 
 					const contentConfig = ['config.mjs', 'config.js', 'config.mts', 'config.ts']
 						.map((configPath) => resolve(contentDir || './', configPath))
@@ -132,6 +119,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					// Record of virtual imports and their content
 					const virtualImports: Record<string, string> = {
+						[`${themeName}:context`]: "",
 						[`${themeName}:config`]: `export default ${JSON.stringify(userConfig)}`,
 						[`${themeName}:content`]: `export * from "@it-astro:content"`,
 						[`${themeName}:collections`]: `export * from ${JSON.stringify(contentConfig)}`,
@@ -160,6 +148,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
 							export default config;
 						`,
+						[`${themeName}:context`]: "",
 					};
 
 					// Interface type buffers
@@ -168,6 +157,8 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						ThemeExportsResolved: "",
 						ThemeRoutes: "",
 						ThemeRoutesResolved: "",
+						ThemeIntegrations: "",
+						ThemeIntegrationsResolved: "",
 					};
 
 					let themeTypesBuffer = `
@@ -193,7 +184,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 								export interface ThemeOptions {
 										"${themeName}": {
-												pages?: { [Pattern in keyof ThemeRoutes]?: string | boolean }
+												pages?: { [Pattern in keyof ThemeRoutes]?: string | boolean } & {}
 												overrides?: {
 														[Module in keyof ThemeExports]?:
 																ThemeExports[Module] extends Record<string, any>
@@ -201,13 +192,16 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 																				?	string[]
 																				: { [Export in keyof ThemeExports[Module]]?: string }
 																		: never
-												} & {};
+												} & {}
+												integrations?: keyof ThemeIntegrationsResolved extends never
+													? \`\$\{ThemeName\} is not injecting any integrations\`
+													: { [Name in keyof ThemeIntegrationsResolved]?: boolean } & {}
 										};
 								}
 						}
 					`;
 
-					if (authorOptions.log) {
+					if (logLevel) {
 						// Warn about issues with theme's `package.json`
 						warnThemePackage(themePackage, logger);
 					}
@@ -215,18 +209,61 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// HMR for theme author's package
 					watchDirectory(params, themeRoot);
 
-					// Add integrations from author (like mdx or sitemap)
-					for (const option of authorOptions.integrations) {
+					// Sideload integration to handle the public directory
+					if (publicDir && existsSync(resolveDirectory(publicDir.cwd!, publicDir.dir))) {
+						addIntegration(params, { integration: staticDir(publicDir) });
+					}
+
+					// Integrations inside the config (including the theme) and integrations injected by the theme
+					const integrationsExisting: Record<string, true> = Object.fromEntries(
+						config.integrations.map((i) => [i.name, true]),
+					);
+					// Integrations added by a theme but possibly do not exist because a user disabled it
+					const integrationsPossible: Record<string, true> = {};
+					// Integrations that are injected into a theme
+					const integrationsInjected: Record<string, true> = {};
+					// Integrations ignored/disabled by a user
+					const integrationsIgnored: Record<string, false> = {};
+
+					for (const option of themeIntegrations) {
 						let integration: ReturnType<Extract<typeof option, (...args: any[]) => any>>;
+
+						// Handle integration options that might be a callback for conditonal injection
 						if (typeof option === "function") {
-							const names = config.integrations.map((i) => i.name);
-							integration = option({ config: userConfig, integrations: names });
+							integration = option({ config: userConfig, integrations: Object.keys(integrationsExisting) });
 						} else {
 							integration = option;
 						}
+
 						if (!integration) continue;
+
+						const { name } = integration;
+
+						integrationsPossible[name] = true;
+
+						// Allow users to ignore/disable an integration
+						if (userOptions.integrations && name in userOptions.integrations && !userOptions.integrations[name]) {
+							integrationsIgnored[name] = false;
+							continue;
+						}
+
+						integrationsInjected[name] = true;
+						integrationsExisting[name] = true;
+
+						// Add the integration
 						addIntegration(params, { integration });
 					}
+
+					// Virtual module for integration utilities
+					virtualImports[`${themeName}:context`] += `\nexport const integrations = new Set(${JSON.stringify(
+						Array.from(Object.keys(integrationsExisting)),
+					)})`;
+					moduleBuffers[`${themeName}:context`] += `\nexport const integrations: Set<string>`;
+
+					// Type interfaces for theme integrations, used to build other types like the user config
+					interfaceBuffers.ThemeIntegrations = `${JSON.stringify(integrationsPossible, null, 4).slice(1, -1)}` || "\n";
+					interfaceBuffers.ThemeIntegrationsResolved =
+						`${JSON.stringify({ ...integrationsInjected, ...integrationsIgnored }, null, 4).slice(1, -1)}` || "\n";
 
 					// Add middleware
 					if (middlewareDir) {
@@ -262,12 +299,15 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						}
 					}
 
+					// Reserved names for built-in virtual modules
+					const reservedNames = new Set(["config", "pages", "content", "db", "integrations"]);
+
 					// Dynamically create virtual modules using globs, imports, or exports
-					for (let [name, option] of Object.entries(authorOptions.imports)) {
+					for (let [name, option] of Object.entries(themeImports)) {
 						if (!option) continue;
 
 						// Reserved module/import names
-						if (["config", "pages", "content", "db"].includes(name)) {
+						if (reservedNames.has(name)) {
 							logger.warn(`Module name '${name}' is reserved for the built in virtual import '${themeName}:${name}'`);
 							continue;
 						}
@@ -321,30 +361,30 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						`;
 					}
 
-					const pageDirOption: PageDirIntegrationOption = {
-						...(authorOptions.pageDir as PageDirOption),
-						config,
-						logger,
-					};
+					const pageDirOption: PageDirIntegrationOption = { ...pageDir, config, logger };
 
 					// Initialize route injection
-					const { pages, injectPages } = addPageDir(pageDirOption);
+					const { pages: pagesInjected, injectPages } = addPageDir(pageDirOption);
+					const pagesResolved: Record<string, string | false> = Object.fromEntries(
+						Object.keys(pagesInjected).map((pattern) => [pattern, pattern]),
+					);
 
 					// Generate types for possibly injected routes
-					interfaceBuffers.ThemeRoutes += Object.entries(pages)
+					interfaceBuffers.ThemeRoutes += Object.entries(pagesInjected)
 						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
 						.join("");
 
 					// Filter out routes the theme user toggled off
 					for (const oldPattern of Object.keys(userPages)) {
 						// Skip pages that are not defined by author
-						if (!pages?.[oldPattern!]) continue;
+						if (!pagesInjected?.[oldPattern!]) continue;
 
 						let newPattern = userPages[oldPattern as keyof typeof userPages];
 
 						// If user passes falsy value remove the route
 						if (!newPattern) {
-							delete pages[oldPattern];
+							pagesResolved[oldPattern] = false;
+							delete pagesInjected[oldPattern];
 							continue;
 						}
 
@@ -358,14 +398,23 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 								);
 							}
 							// Add new pattern
-							pages[newPattern] = pages[oldPattern]!;
+							pagesInjected[newPattern] = pagesInjected[oldPattern]!;
+							pagesResolved[oldPattern] = newPattern;
 							// Remove old pattern
-							delete pages[oldPattern];
+							delete pagesInjected[oldPattern];
 						}
 					}
 
+					// Virtual module for integration utilities
+					virtualImports[`${themeName}:context`] += `\nexport const pages = new Map(Object.entries(${JSON.stringify(
+						pagesResolved,
+					)}))`;
+					moduleBuffers[`${themeName}:context`] += `\nexport const pages: Map<${Object.keys(pagesResolved)
+						.map((p) => `"${p}"`)
+						.join(" | ")}, string | false>`;
+
 					// Generate types for injected routes
-					interfaceBuffers.ThemeRoutesResolved += Object.entries(pages)
+					interfaceBuffers.ThemeRoutesResolved += Object.entries(pagesInjected)
 						.map(([pattern, entrypoint]) => `\n"${pattern}": typeof import("${entrypoint}").default`)
 						.join("");
 

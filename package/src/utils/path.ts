@@ -51,8 +51,8 @@ export function validatePattern(newPattern: string, oldPattern: string) {
 	return normalizePattern(newPattern) === normalizePattern(oldPattern);
 }
 
-export function resolveDirectory(base: string, path: string, safe = true): string {
-	if (path.startsWith("file:/")) {
+export function resolveDirectory(base: string, path: string | URL, message: boolean | string = true): string {
+	if (path instanceof URL || path.startsWith("file:/")) {
 		path = fileURLToPath(path);
 	}
 
@@ -64,15 +64,18 @@ export function resolveDirectory(base: string, path: string, safe = true): strin
 		path = dirname(path);
 	}
 
-	if (safe && !existsSync(path)) {
-		throw new AstroError("Directory does not exist!", `"${path}"`);
+	path = normalizePath(path);
+
+	if (message && !existsSync(path)) {
+		if (message === true) message = "Resolved directory does not exist";
+		throw new AstroError(message, path);
 	}
 
 	return path;
 }
 
-export function resolveFilepath(base: string, path: string, safe = true): string {
-	if (path.startsWith("file:/")) {
+export function resolveFilepath(base: string, path: string | URL, message: string | boolean = true): string {
+	if (path instanceof URL || path.startsWith("file:/")) {
 		path = fileURLToPath(path);
 	}
 
@@ -80,14 +83,15 @@ export function resolveFilepath(base: string, path: string, safe = true): string
 		path = resolve(resolveDirectory("./", base), path);
 	}
 
-	if (safe) {
-		if (!extname(path)) {
-			throw new AstroError("Filepath is a directory!", `"${path}"`);
-		}
+	if (!extname(path)) {
+		throw new AstroError("Expected a filepath but recieved a directory", `"${path}"`);
+	}
 
-		if (!existsSync(path)) {
-			throw new AstroError("File does not exist!", `"${path}"`);
-		}
+	path = normalizePath(path);
+
+	if (message && !existsSync(path)) {
+		if (message === true) message = "Resolved filepath does not exist";
+		throw new AstroError(message, path);
 	}
 
 	return path;
