@@ -2,7 +2,7 @@ import type { AstroIntegration } from "astro";
 import type { Option as PageDirOption } from "astro-pages";
 import type { Option as StaticDirOption } from "astro-public/types";
 import type { z } from "astro/zod";
-import type { ModuleExports, ModuleImports, ModuleObject } from "../utils/virtual.js";
+import type { ModuleExports, ModuleImports, ModuleObject } from "../utils/modules.ts";
 
 export type ValueOrArray<T> = T | ValueOrArray<T>[];
 

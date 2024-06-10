@@ -1,7 +1,7 @@
 import * as assert from "node:assert/strict";
 import { isAbsolute } from "node:path";
 import { describe, it } from "node:test";
-import { resolveModuleObject, toModuleObject } from "../dist/utils/virtual.js";
+import { resolveModuleObject, toModuleObject } from "../dist/utils/modules.js";
 
 describe("toModuleObject()", () => {
 	const imports = ["./global.css"];

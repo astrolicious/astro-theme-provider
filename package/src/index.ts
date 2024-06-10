@@ -28,7 +28,7 @@ import {
 	isEmptyModuleObject,
 	resolveModuleObject,
 	toModuleObject,
-} from "./utils/virtual.js";
+} from "./utils/modules.ts";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 
