@@ -12,6 +12,13 @@ import fg from "fast-glob";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_IGNORE, GLOB_IMAGES, GLOB_STYLES } from "./internal/consts.js";
 import { errorMap } from "./internal/error-map.js";
 import type { AuthorOptions, UserOptions } from "./internal/types.js";
+import {
+	createVirtualModule,
+	globToModuleObject,
+	isEmptyModuleObject,
+	resolveModuleObject,
+	toModuleObject,
+} from "./utils/modules.ts";
 import { PackageJSON, warnThemePackage } from "./utils/package.js";
 import {
 	addLeadingSlash,
@@ -22,13 +29,6 @@ import {
 	validatePattern,
 } from "./utils/path.js";
 import { createVirtualResolver } from "./utils/resolver.ts";
-import {
-	createVirtualModule,
-	globToModuleObject,
-	isEmptyModuleObject,
-	resolveModuleObject,
-	toModuleObject,
-} from "./utils/modules.ts";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 
