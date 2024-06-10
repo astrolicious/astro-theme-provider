@@ -33,7 +33,7 @@ export default defineTheme({
 })
 ```
 
-## Reference
+## Options Reference
 
 ### `name`
 
@@ -152,7 +152,7 @@ imports: {
 
 Create virtual modules to access assets inside a theme and allow users to override them.
 
-**`false`**: 
+**`false`**:
 
 Toggle default virtual modules off
 
@@ -165,7 +165,7 @@ imports: {
 }
 ```
 
-**`string`**: 
+**`string`**:
 
 Glob files into a virtual module, glob patterns are relative to a theme's `srcDir`
 
@@ -188,7 +188,7 @@ imports: {
 import { Hero, Card, Button } from "my-theme:components"
 ```
 
-**`array`**: 
+**`array`**:
 
 Use an array to combine imports into a single virtual module
 
@@ -206,7 +206,7 @@ imports: {
 import "my-theme:styles"
 ```
 
-**`object`**: 
+**`object`**:
 
 Use an object to create more complex custom virtual modules
 
@@ -247,13 +247,160 @@ Toggle logging for the theme
 
 A path to the root directory, or file inside the root directory, of a theme
 
-:::note
-For advanced use cases only, this will be infered automatically assuming that this called at the root of the theme (see [Default Structure](#default-structure))
+:::caution
+For advanced use cases only, this should be infered automatically
 :::
 
-## Example
+## Virtual Module Reference
 
-Author a theme inside a package similar a normal project
+### `theme:config`
+
+A virtual module used to expose the [user configuration](/reference/user#config).
+The shape for this module can be define using the [`schema` option](#schema):
+
+```ts
+import { z } from 'astro/zod'
+import defineTheme from 'astro-theme-provider';
+
+export default defineTheme({
+  name: "my-theme",
+  schema: z.object({
+    title: z.string(),
+    description: z.sting().optional()
+  })
+})
+```
+
+After a [`schema`](#schema) is defined, authors can use this virtual module to create configurable pages and components:
+
+```tsx
+---
+import config from "my-theme:config"
+---
+
+<h1>{config.title}</h1>
+<p>{config.description}</p>
+```
+
+### `theme:context`
+
+A virtual module that contains utilities and information related to the context or enviroment a theme is running in.
+
+```ts
+declare module "theme:context" {
+	export const pages: Map<string, string>;
+	export const integrations: Set<string>;
+}
+```
+
+#### `pages`
+
+A `Map` that contains the final pattern that page is injected with
+
+```tsx
+---
+import { pages } from "my-theme:context"
+---
+
+{ pages.get('/blog') &&
+	<a href={pages.get('/blog')}>Blog</a>
+}
+```
+
+#### `integrations`
+
+A `Set` that contains the name of every integration inside the user's project.
+
+```tsx
+---
+import { integrations } from "my-theme:context"
+---
+
+{ integrations.get('@astrojs/rss') &&
+	<a href='/rss.xml'>RSS</a>
+}
+```
+
+### `theme:layouts`
+
+By default, all Astro files inside a theme's `src/layouts` folder are available as named exports inside the `:layouts` module
+
+<FileTree>
+- package/
+  - src/
+    - **layouts/**
+			- Layout.astro
+</FileTree>
+
+```ts
+import { Layout } from "my-theme:layouts";
+```
+
+This virtual module can be configured using the [`imports` option](#imports)
+
+### `theme:components`
+
+By default, all Astro files inside a theme's `src/components` folder are available as named exports inside the `:components` module
+
+<FileTree>
+- package/
+  - src/
+    - **components/**
+			- Hero.astro
+			- Card.astro
+			- Button.astro
+</FileTree>
+
+```ts
+import { Hero, Card, Button } from "my-theme:components";
+```
+
+This virtual module can be configured using the [`imports` option](#imports)
+
+### `theme:assets`
+
+By default, all images inside a theme's `src/assets` folder are available as named exports inside the `:assets` module
+
+<FileTree>
+- package/
+  - src/
+    - **assets/**
+			- logo.png
+			- background.png
+</FileTree>
+
+```ts
+import { logo, background } from "my-theme:assets";
+```
+
+This virtual module can be configured using the [`imports` option](#imports)
+
+### `theme:styles`
+
+By default, all styles inside a theme's `src/styles` folder are available inside the `:styles` module
+
+<FileTree>
+- package/
+  - src/
+    - **styles/**
+			- reset.css
+			- styles.css
+			- utilities.css
+</FileTree>
+
+```ts
+import "my-theme:styles";
+```
+
+This virtual module can be configured using the [`imports` option](#imports)
+
+Read more:
+	- [Styling a Theme](/conventions/styles)
+	- [Virtual style modules](/conventions/styles#virtual-style-modules)
+
+## Example Project
+
+Author a theme inside a package similar to a normal project
 
 <FileTree>
 - package/
@@ -275,7 +422,7 @@ Author a theme inside a package similar a normal project
   - README.md
 </FileTree>
 
-Export the theme as an integration
+Export the theme integration from the package entrypoint
 
 ```ts
 // package/index.ts

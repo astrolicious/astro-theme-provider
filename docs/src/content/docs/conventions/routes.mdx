@@ -1,0 +1,53 @@
+---
+title: Conventions and Techniques
+description: Conventions and techniques for authoring themes using Astro Theme Provider
+---
+
+## Theme Context
+
+### Check Installed Integrations
+
+The context module contains a list of all integrations running inside the user's project.
+This list can be used to support [conditionally injected integrations](#conditionally-inject-integrations) or integrations that may be used alongside a theme.
+For example:
+
+```ts
+// package/src/pages/index.astro
+---
+import { integrations } from 'my-theme:context'
+---
+
+/*
+	The integration "@inox-tools/sitemap-ext" has
+	a special API for per-route configurations
+
+	Themes can opt-in to this alternative sitemap integration
+	by checking for the existence of the integration and providing a value
+*/
+if (integrations.has('@inox-tools/sitemap-ext')) {
+		import('sitemap-ext:config')
+			.then(({ default: sitemap }) => sitemap(true))
+}
+```
+
+### Get Final Pattern of Injected Routes
+
+Routes injected by the Theme Provider can be overwritten and disabled. The context module contains a map of all possibly injected routes and their final pattern.
+
+```tsx
+// package/src/pages/blog/[...slug].astro
+---
+import { pages } from 'my-theme:context'
+---
+
+if (pages.get('/blog')) {
+	<a href={pages.get('/blog')}></a>
+}
+```
+
+
+## Injecting Routes
+
+## Injecting Middleware
+
+### Ordering Middleware
