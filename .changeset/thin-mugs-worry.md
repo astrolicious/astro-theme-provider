@@ -1,11 +1,12 @@
 ---
-"astro-theme-provider": minor
+"astro-theme-provider": patch
 ---
 
-Allow theme authors to toggle public directory off
+Added an option for theme authors to toggle the public directory off:
 
 ```ts
 defineTheme({
+	name: 'my-theme',
 	publicDir: false
 })
 ```
