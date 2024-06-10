@@ -144,10 +144,7 @@ export function globToModuleObject(root: string, glob: string | string[]): Resol
 	};
 }
 
-export function createVirtualModule(
-	name: string,
-	module: ResolvedModuleObject,
-): VirtualModule {
+export function createVirtualModule(name: string, module: ResolvedModuleObject): VirtualModule {
 	const virtual: VirtualModule = {
 		name,
 		...module,

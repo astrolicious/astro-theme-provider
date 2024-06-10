@@ -21,8 +21,14 @@ import {
 	resolveFilepath,
 	validatePattern,
 } from "./utils/path.js";
-import { createVirtualModule, globToModuleObject, isEmptyModuleObject, resolveModuleObject, toModuleObject } from "./utils/virtual.js";
 import { createVirtualResolver } from "./utils/resolver.ts";
+import {
+	createVirtualModule,
+	globToModuleObject,
+	isEmptyModuleObject,
+	resolveModuleObject,
+	toModuleObject,
+} from "./utils/virtual.js";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 
@@ -113,7 +119,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					const projectRoot = resolveDirectory("./", config.root);
 
 					// Record of virtual imports and their content
-					const virtualImports: Parameters<typeof createVirtualResolver>[0]['imports'] = {
+					const virtualImports: Parameters<typeof createVirtualResolver>[0]["imports"] = {
 						[`${themeName}:config`]: `export default ${JSON.stringify(userConfig)}`,
 						[`${themeName}:context`]: "",
 					};
@@ -243,7 +249,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					}
 
 					// Reserved names for built-in virtual modules
-					const reservedNames = new Set(["config", "context", "content", "collections",  "db"]);
+					const reservedNames = new Set(["config", "context", "content", "collections", "db"]);
 
 					// Dynamically create virtual modules using globs, imports, or exports
 					for (let [name, option] of Object.entries(themeImports)) {
@@ -262,47 +268,44 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 						const moduleName = normalizePath(join(themeName, name)).replace(/\//, ":");
 
-						const resolvedModuleObject = resolveModuleObject(themeRoot, toModuleObject(option))
+						const resolvedModuleObject = resolveModuleObject(themeRoot, toModuleObject(option));
 
 						const virtualModule = createVirtualModule(moduleName, resolvedModuleObject);
 
-						const orignalContent = virtualModule.content()
+						const orignalContent = virtualModule.content();
 
-						virtualImports[moduleName] = orignalContent
+						virtualImports[moduleName] = orignalContent;
 
-						const virtualModuleOverride = createVirtualModule(moduleName, resolvedModuleObject)
+						const virtualModuleOverride = createVirtualModule(moduleName, resolvedModuleObject);
 
-						const resolvedModuleOverride = name in userOverrides
-							? resolveModuleObject(projectRoot, toModuleObject(userOverrides[name]!))
-							: null
+						const resolvedModuleOverride =
+							name in userOverrides ? resolveModuleObject(projectRoot, toModuleObject(userOverrides[name]!)) : null;
 
-						const isEmptyOverride = resolvedModuleOverride
-							? isEmptyModuleObject(resolvedModuleOverride)
-							: true
+						const isEmptyOverride = resolvedModuleOverride ? isEmptyModuleObject(resolvedModuleOverride) : true;
 
 						if (!isEmptyOverride) {
-							virtualModuleOverride.merge(resolvedModuleOverride!)
+							virtualModuleOverride.merge(resolvedModuleOverride!);
 						}
 
-						const overrideContent = virtualModuleOverride.content()
+						const overrideContent = virtualModuleOverride.content();
 
 						if (!isEmptyOverride) {
-							const overrideExports = new Set(Object.values(virtualModuleOverride.exports))
+							const overrideExports = new Set(Object.values(virtualModuleOverride.exports));
 							if (overrideExports.size > 0) {
 								virtualImports[moduleName] = ({ importer }) => {
 									if (importer && overrideExports.has(importer)) {
-										return orignalContent
+										return orignalContent;
 									}
 									return overrideContent;
-								}
+								};
 							} else {
-								virtualImports[moduleName] = overrideContent
+								virtualImports[moduleName] = overrideContent;
 							}
 						}
 
 						moduleBuffers[moduleName] = virtualModule.types.module();
 
-						let interfaceTypes = virtualModule.types.interface();
+						const interfaceTypes = virtualModule.types.interface();
 
 						interfaceBuffers.ThemeExports += `
 							"${name}": ${interfaceTypes ? `{\n${interfaceTypes}\n}` : JSON.stringify(virtualModule.imports)},
@@ -320,7 +323,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 					// Generate types for possibly injected routes
 					interfaceBuffers.ThemeRoutes += Object.keys(pagesInjected)
-						.map(pattern => `\n"${pattern}": true`)
+						.map((pattern) => `\n"${pattern}": true`)
 						.join("");
 
 					// Filter out routes the theme user toggled off
@@ -370,8 +373,8 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						plugin: createVirtualResolver({
 							name: themeName,
 							imports: virtualImports,
-						})
-					})
+						}),
+					});
 
 					// Add interfaces to global type buffer
 					for (const [name, buffer] of Object.entries(interfaceBuffers)) {
