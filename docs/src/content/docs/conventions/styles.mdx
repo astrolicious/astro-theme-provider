@@ -7,9 +7,9 @@ import { FileTree } from '@astrojs/starlight/components';
 
 Theme integrations can be styled just like any other Astro project, but there are a few conventions that theme authors should follow to create themes that are customizable and compatible with each other.
 
-## Virtual style modules
+## Virtual modules
 
-Astro Theme Provider uses virtual modules for styling:
+Astro Theme Provider uses virtual modules for styling, enabling complete customization for theme users through overrides:
 
 ```tsx
 // package/src/pages/index.astro
@@ -18,16 +18,15 @@ import "my-theme:styles";
 ---
 ```
 
-Using virtual modules to style themes is importnant because users can append their own styles to the module for customization.
-When styling a theme, always use virtual imports so that users can override the styles:
+When styling a theme, always use virtual imports so that theme users can override the styles:
 
 ```ts
 // package/src/pages/index.astro
 ---
-// DO NOT use relative imports
-import "../styles/global.css";
 // DO use virtual imports
 import "my-theme:styles";
+// DO NOT use relative imports
+import "../styles/global.css";
 ---
 ```
 
@@ -52,7 +51,7 @@ import 'my-theme:styles';
 ```
 
 The default style module can be overridden using the [`imports` option](/reference/author#imports).
-This can be useful for cases like importing fonts or controlling the order of styles inside the module:
+This may be useful for cases like importing fonts or controlling the order of styles inside the module. For example:
 
 ```ts
 export default defineTheme({
@@ -98,28 +97,26 @@ import 'my-theme:styles/gallery';
 ---
 ```
 
-
 ## Creating overridable styles
 
 All themes should be authored with style systems that are easy to customize, compatible with user projects, and compatible with other theme integrations.
 
 ### Importing styles
 
-Styles should always be imported using [virtual style modules](#virtual-style-modules):
+Styles should always be imported using [virtual modules](#virtual-modules):
 
 ```ts
 // package/src/pages/index.astro
 ---
-// DO NOT use relative imports
-import "../styles/global.css";
 // DO use virtual imports
 import "my-theme:styles";
+// DO NOT use relative imports
+import "../styles/global.css";
 ---
 ```
 
-Styles will cascade in the order they are imported.
-Always place virtual style imports *below* all other imports to avoid issues with users overriding styles.
-
+Styles will apply as a cascade, in the order they are imported.
+Always place virtual style imports _below_ all other imports to avoid issues with theme users overriding styles.
 
 ```ts
 // package/src/pages/index.astro
@@ -130,7 +127,6 @@ import { Component } from 'my-theme:components'
 import "my-theme:styles";
 ---
 ```
-
 
 ### CSS Layers
 
@@ -148,7 +144,7 @@ All styles inside a theme should be authored using [CSS layers](https://develope
 }
 ```
 
-CSS layers allows users to have *full control* over the order that styles cascade. For example:
+CSS layers allows users to have _full control_ over the order that styles cascade. For example:
 
 ```css
 @layer blog-theme, my-theme, docs-theme, user-overrides;
@@ -163,8 +159,7 @@ Read more about CSS layers here:
 
 ### CSS variables
 
-Theme authors should create style systems that make use of CSS variables.
-CSS variables allow authors to create themes that are easily customizable and overridable:
+Theme authors should make use of CSS variables to enable style themes that are easy to customize and override. For example:
 
 ```css "--my-color-bg" "--my-color-fg"
 :root {
@@ -196,7 +191,7 @@ Read more about creating style systems with CSS variables here:
 ### Class names
 
 Theme authors should include classes on elements, even if the element is not being styled.
-Classes allow users to target elements inside a theme with style changes:
+Classes allow users to target elements inside a theme with style changes. For example:
 
 ```html
 <!-- DO use unique descriptive class names -->
@@ -216,7 +211,6 @@ Classes allow users to target elements inside a theme with style changes:
 
 Class names should always include a unique prefix to prevent collisions with existing styles.
 
-
 Read more about choosing names for classes here:
 - [BEM by Example - Nathan Rambeck](https://sparkbox.com/foundry/bem_by_example)
 
@@ -224,9 +218,9 @@ Read more about choosing names for classes here:
 
 ### Style attributes
 
+Avoid using style attributes as they have a [high specificity](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity#inline_styles), making them hard for users override.
+
 ```html
 <img src="" alt="" style="height:auto;width:100%;" />
 ```
 
-Style attributes have a [high specificity](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity#inline_styles) which makes them hard for users override.
-Avoid using style attributes so that it is easier for users to override the styles.

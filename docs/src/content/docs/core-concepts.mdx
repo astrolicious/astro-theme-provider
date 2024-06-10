@@ -1,21 +1,36 @@
 ---
 title: Core Concepts
-description: Core concepts for Astro Theme Provider
+description: Core concepts of Astro Theme Provider
 ---
 
 import { FileTree } from '@astrojs/starlight/components';
 
-This page aims to explain to theme authors how Astro Theme Provider works on a fundamental level.
+This page aims to explain how Astro Theme Provider works at a fundamental level for _theme authors_.
 If you are interested in learning about what Astro Theme Provider is and why you want to use it, you can read more here: [Why?](/why)
-If you need specific advice about how to author a theme check out the guides under "Conventions and Techniques" in the left sidebar.
+If you need specific advice about how to author a theme, check out the guides under "Conventions and Techniques" in the left sidebar.
+If you are a _theme user_ please refer to [User API](/reference/user) and your theme's documentation.
 
 ## Authoring a Theme
 
-Authoring a theme integration with Astro Theme Provider is simple, but there are a few core concepts that one must know before getting started.
+Using Astro Theme Provider to author a theme integration is simple, but there are a few core concepts that one should know before getting started.
 
 ### Project Structure
 
-Themes are authored inside of monorepositories. A theme lives inside a package with a structure similar to a normal Astro project:
+Themes are developed inside a [pnpm](https://pnpm.io/) monorepository.
+
+<FileTree>
+- /
+	- package/
+		- ...
+	- playground/
+		- ...
+	- package.json
+	- pnpm-lock.yaml
+	- pnpm-workspace.yaml
+	- tsconfig.json
+</FileTree>
+
+The theme integration itself lives inside a package with a structure similar to a normal Astro project:
 
 <FileTree>
 - package/
@@ -27,27 +42,27 @@ Themes are authored inside of monorepositories. A theme lives inside a package w
 		- pages/
 		- styles/
 	- index.ts
-	- README.md
 	- package.json
+	- README.md
 </FileTree>
 
-Themes must be authored alongside a playground.
-The playground is responsible for generating types during development and previewing changes to the theme.
+Theme integrations must be authored alongside a playground.
+The playground is responsible for generating types during development and enables previewing changes made to the theme.
 
 <FileTree>
 - playground/
 	- public/
 	- src/
 	- astro.config.mjs
-	- tsconfig.json
 	- package.json
+	- tsconfig.json
 </FileTree>
 
 
-### Theme Config
+### Theme Configuration
 
-Themes have a built-in config that can be configured by a user.
-Theme authors can define a shape for this user configuration with a Zod schema.
+Theme integrations can be modified by a theme user from inside the Astro config.
+Theme authors define the shape for this user configuration using a [Zod](https://zod.dev/) schema.
 
 ```ts
 // package/index.ts
@@ -63,7 +78,7 @@ export default defineTheme({
 })
 ```
 
-The user configuration is used to customize pages and components inside the theme:
+The user configuration can customize pages and components inside the theme:
 
 ```tsx
 // package/src/pages/index.astro
@@ -82,13 +97,13 @@ import config from 'my-theme:config'
 </html>
 ```
 
-The theme config has to be JSON serializable. Values like functions and classes do not work inside of theme configurations.
+The theme config must be JSON serializable. Values like functions and classes do not work inside theme configurations.
 
 
 ### Theme Context
 
-Themes are *dynamic*, they can be used inside a variety of projects with different combinations of user configurations and enviroments.
-To account for this, all themes have a built-in utilities for information about the context the theme is running in. For example:
+Theme integrations are _dynamic_, they may be used inside a variety of projects with different combinations of user configurations and enviroments.
+To account for this, themes have built-in utilities to access information about the context the theme is running in. For example:
 
 ```tsx
 ---
@@ -104,11 +119,11 @@ import { pages, integrations } from 'my-theme:context';
 }
 ```
 
-This allows theme authors to create dynamic themes that adapt to a user's project and configuration
+This allows theme authors to create dynamic themes that adapt to a user's project and configuration.
 
 ### Virtual Modules
 
-Virtual modules are used by authors to access components and assets inside a theme
+Theme authors should load components and assets as virtual modules. This enables complete customization for a theme user via overrides.
 
 <FileTree>
 - package/
@@ -126,7 +141,7 @@ Virtual modules are used by authors to access components and assets inside a the
 ```tsx
 // package/src/pages/index.astro
 ---
-import { Layout } from 'my-theme:lauouts';
+import { Layout } from 'my-theme:layouts';
 import { Hero } from 'my-theme:components';
 import { logo } from 'my-theme:assets';
 import "my-theme:styles";
@@ -137,11 +152,9 @@ import "my-theme:styles";
 </Layout>
 ```
 
-These components and assets can be overridden by a user allowing for complete customization of a theme.
-
 ## Using a Theme
 
-Once a theme has been authored and published to NPM, a user can add it to their project with a single command:
+Once a theme integration has been authored and published to NPM, a user can add it to their project with a single command:
 
 ```sh
 pnpm astro add my-theme
@@ -162,9 +175,9 @@ export default defineConfig({
 });
 ```
 
-### Configuring
+### Configuring a theme
 
-User's can configure a theme using the `config` option defined by the author:
+Users can configure a theme using the `config` options that were defined by the theme author:
 
 ```ts
 myTheme({
@@ -174,9 +187,9 @@ myTheme({
 })
 ```
 
-### Overriding
+### Overriding part of a theme
 
-Themes can be overriden for complete cusomtization by the user, for example:
+For complete customization, various parts of a theme can be overriden by a theme user. For example:
 
 **Overriding routes**:
 
@@ -196,7 +209,7 @@ myTheme({
 ```ts
 myTheme({
 	overrides: {
-		// Append styles to style module
+		// Appending new styles
 		styles: [
 			'./src/styles/override.css'
 		]
@@ -204,12 +217,12 @@ myTheme({
 })
 ```
 
-**Overriding an image inside the theme**:
+**Overriding assets**:
 
 ```ts
 myTheme({
 	overrides: {
-		// Override components/assets inside the theme
+		// Changing an image
 		assets: {
 			logo: './src/assets/custom-logo.png'
 		}
@@ -222,7 +235,7 @@ myTheme({
 ```ts
 myTheme({
 	integrations: {
-		// Disable an integration from being injected
+		// Remove injected integration
 		"@astrojs/sitemap": false
 	}
 })

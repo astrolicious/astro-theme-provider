@@ -1,6 +1,6 @@
 ---
 title: Author API
-description: Occaecat culpa culpa labore nulla ut et voluptate est occaecat aliqua aliquip esse do anim.
+description: Author API reference for Astro Theme Provider
 ---
 import { FileTree } from '@astrojs/starlight/components';
 
@@ -41,7 +41,7 @@ export default defineTheme({
 
 **Required**
 
-The name of a theme, must be unique. If you are authoring your theme as a package, it is recomended to use the package name as the name of your theme
+The name of a theme, must be unique. If you are authoring your theme as a package, it is recomended to use the package name as the name of your theme.
 
 ### `schema`
 
@@ -74,7 +74,7 @@ console.log(config.title, config.description)
 
 **Default**: `"src"`
 
-Directory that contains a theme's assets (pages, components, images, css, etc). Assets inside the src directory can be accessed using virtual modules (see `imports`)
+Directory that contains a theme's assets (pages, components, images, css, etc). Assets inside the src directory can be accessed using virtual modules (see `imports`).
 
 ### `pageDir`
 
@@ -82,7 +82,7 @@ Directory that contains a theme's assets (pages, components, images, css, etc). 
 
 **Default**: `"pages"`
 
-Directory that contains all of the pages for a theme
+Directory that contains all of the pages for a theme.
 
 ### `publicDir`
 
@@ -98,13 +98,13 @@ Directory that contains a theme's static assets (`favicon.svg`, etc). By default
 
 **Default**: `srcDir`
 
-Directory that contains a theme's middleware. Relative paths are resolved relative to the theme's `srcDir`, use `false` to disable middleware injection
+Directory that contains a theme's middleware. Relative paths are resolved relative to the theme's `srcDir`, use `false` to disable middleware injection.
 
 ### `integrations`
 
 **Type**: `Array<AstroIntegration | (options: { config: z.infer<Schema>, integrations: string[] }) => AstroIntegration | false | null | undefined>`
 
-An array of integrations that will be included with the theme
+An array of integrations that will be included with the theme:
 
 ```ts
 integrations: [
@@ -144,7 +144,7 @@ integrations: [
 ```js
 imports: {
   assets: "assets**.{jpeg,jpg,png,tiff,webp,gif,svg,avif}",
-  components: "components/**.{astro,tsx,jsx,svelte,vue}"
+  components: "components/**.{astro,tsx,jsx,svelte,vue}",
   layouts: "layouts/**.astro",
   styles: "styles/**.{css,scss,sass,styl,less}",
 }
@@ -167,7 +167,7 @@ imports: {
 
 **`string`**:
 
-Glob files into a virtual module, glob patterns are relative to a theme's `srcDir`
+Glob files into a virtual module, glob patterns are relative to a theme's `srcDir`.
 
 <FileTree>
 - package/
@@ -190,7 +190,7 @@ import { Hero, Card, Button } from "my-theme:components"
 
 **`array`**:
 
-Use an array to combine imports into a single virtual module
+Use an array to combine imports into a single virtual module.
 
 ```ts
 imports: {
@@ -208,7 +208,7 @@ import "my-theme:styles"
 
 **`object`**:
 
-Use an object to create more complex custom virtual modules
+Use an object to create more complex custom virtual modules.
 
 ```ts
 imports: {
@@ -231,7 +231,7 @@ import Layout, { Head, Button } from "my-theme:components"
 
 **Default**: `true`
 
-Toggle logging for the theme
+Toggle logging for the theme.
 
 | Level | Description |
 | --- | --- |
@@ -245,7 +245,7 @@ Toggle logging for the theme
 
 **Default**: directory of the file the theme is exported from
 
-A path to the root directory, or file inside the root directory, of a theme
+A path to the root directory, or file inside the root directory, of a theme.
 
 :::caution
 For advanced use cases only, this should be infered automatically
@@ -295,7 +295,7 @@ declare module "theme:context" {
 
 #### `pages`
 
-A `Map` that contains the final pattern that page is injected with
+A `Map` that contains the final pattern that page is injected with:
 
 ```tsx
 ---
@@ -323,7 +323,7 @@ import { integrations } from "my-theme:context"
 
 ### `theme:layouts`
 
-By default, all Astro files inside a theme's `src/layouts` folder are available as named exports inside the `:layouts` module
+By default, all Astro files inside a theme's `src/layouts` folder are available as named exports inside the `:layouts` module.
 
 <FileTree>
 - package/
@@ -336,11 +336,11 @@ By default, all Astro files inside a theme's `src/layouts` folder are available 
 import { Layout } from "my-theme:layouts";
 ```
 
-This virtual module can be configured using the [`imports` option](#imports)
+This virtual module can be configured using the [`imports` option](#imports).
 
 ### `theme:components`
 
-By default, all Astro files inside a theme's `src/components` folder are available as named exports inside the `:components` module
+By default, all Astro files inside a theme's `src/components` folder are available as named exports inside the `:components` module.
 
 <FileTree>
 - package/
@@ -355,11 +355,11 @@ By default, all Astro files inside a theme's `src/components` folder are availab
 import { Hero, Card, Button } from "my-theme:components";
 ```
 
-This virtual module can be configured using the [`imports` option](#imports)
+This virtual module can be configured using the [`imports` option](#imports).
 
 ### `theme:assets`
 
-By default, all images inside a theme's `src/assets` folder are available as named exports inside the `:assets` module
+By default, all images inside a theme's `src/assets` folder are available as named exports inside the `:assets` module.
 
 <FileTree>
 - package/
@@ -373,11 +373,11 @@ By default, all images inside a theme's `src/assets` folder are available as nam
 import { logo, background } from "my-theme:assets";
 ```
 
-This virtual module can be configured using the [`imports` option](#imports)
+This virtual module can be configured using the [`imports` option](#imports).
 
 ### `theme:styles`
 
-By default, all styles inside a theme's `src/styles` folder are available inside the `:styles` module
+By default, all styles inside a theme's `src/styles` folder are available inside the `:styles` module.
 
 <FileTree>
 - package/
@@ -392,7 +392,7 @@ By default, all styles inside a theme's `src/styles` folder are available inside
 import "my-theme:styles";
 ```
 
-This virtual module can be configured using the [`imports` option](#imports)
+This virtual module can be configured using the [`imports` option](#imports).
 
 Read more:
 	- [Styling a Theme](/conventions/styles)
@@ -400,7 +400,7 @@ Read more:
 
 ## Example Project
 
-Author a theme inside a package similar to a normal project
+Author a theme inside a package similar to a normal project:
 
 <FileTree>
 - package/
@@ -422,7 +422,7 @@ Author a theme inside a package similar to a normal project
   - README.md
 </FileTree>
 
-Export the theme integration from the package entrypoint
+Export the theme integration from the package entrypoint:
 
 ```ts
 // package/index.ts
@@ -438,15 +438,15 @@ export default defineTheme({
 })
 ```
 
-Use the generated virtual modules to author the theme
+Use the generated virtual modules to author the theme:
 
 ```tsx
 // package/src/pages/index.astro
 ---
 import { Layout } from 'my-theme:layouts';
 import { Card } from 'my-theme:components';
-import { logo } from 'my-theme:assets'
-import config from 'my-theme:config'
+import { logo } from 'my-theme:assets';
+import config from 'my-theme:config';
 import 'my-theme:styles';
 
 const {

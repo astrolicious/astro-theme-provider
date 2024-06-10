@@ -8,7 +8,7 @@ import { FileTree, Steps } from '@astrojs/starlight/components';
 
 ## Quick Start
 
-This quickest way to get started with Astro Theme Provider is cloning the [theme template](https://github.com/astrolicious/astro-theme-provider-template):
+This quickest way to get started with Astro Theme Provider is to clone the [theme template](https://github.com/astrolicious/astro-theme-provider-template):
 
 <Steps>
 
@@ -21,6 +21,7 @@ This quickest way to get started with Astro Theme Provider is cloning the [theme
 1. Navigate to the created directory and install dependencies:
 
 	```sh
+	cd my-theme/
 	pnpm install
 	```
 
@@ -30,17 +31,17 @@ This quickest way to get started with Astro Theme Provider is cloning the [theme
 	pnpm playground:dev
 	```
 
-1. Explore! Learn how Astro Theme provider works by navigating around the theme and reading the docs
+1. Explore! Learn how Astro Theme Provider works by navigating the theme and reading the docs.
 
 </Steps>
 
 ## Setup Manually
 
-If you are creating a theme inside an existing repository, you will have to set it up manually:
+If you are creating a theme inside an existing repository, you will have to set things up manually:
 
 <Steps>
 
-1. Create a package with the following structure:
+1. Create a package directory with the following structure:
 
 	<FileTree>
 	- package/
@@ -52,11 +53,11 @@ If you are creating a theme inside an existing repository, you will have to set 
 			- pages/
 			- styles/
 		- index.ts
-		- README.md
 		- package.json
+		- README.md
 	</FileTree>
 
-1. Create a playground to generate types and test changes:
+1. Create a playground directory to generate types and test changes:
 
 	```sh
 	pnpm create astro@latest playground --template minimal --no-git -y
@@ -67,11 +68,11 @@ If you are creating a theme inside an existing repository, you will have to set 
 		- public/
 		- src/
 		- astro.config.mjs
-		- tsconfig.json
 		- package.json
+		- tsconfig.json
 	</FileTree>
 
-1. Add the package and playground directories to the workspace
+1. Add the package and playground directories to the workspace:
 
 	```yaml
 	// pnpm-workspace.yaml
@@ -96,16 +97,16 @@ If you are creating a theme inside an existing repository, you will have to set 
 	pnpm install
 	```
 
-1. Add the theme to the `integrations` array inside the Astro config:
+1. Add the theme package to the `integrations` array inside the playground's Astro configuration:
 
 	```ts
 	// playground/astro.config.mjs
 	import { defineConfig } from 'astro/config';
-	import mytheme from 'my-theme';
+	import myTheme from 'my-theme';
 
 	export default defineConfig({
 		integrations: [
-			mytheme({
+			myTheme({
 				// ...
 			}),
 		]
@@ -115,7 +116,7 @@ If you are creating a theme inside an existing repository, you will have to set 
 1. Run the playground to generate types for theme development and preview any changes
 
 	```sh
-	pnpm dev
+	pnpm --filter playground dev
 	```
 
 </Steps>
