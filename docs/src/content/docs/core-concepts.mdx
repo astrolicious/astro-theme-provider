@@ -61,8 +61,7 @@ The playground is responsible for generating types during development and enable
 
 ### Theme Configuration
 
-Theme integrations can be modified by a theme user from inside the Astro config.
-Theme authors define the shape for this user configuration using a [Zod](https://zod.dev/) schema.
+Theme authors define the shape for the theme user configuration using a [Zod](https://zod.dev/) schema.
 
 ```ts
 // package/index.ts
@@ -78,7 +77,9 @@ export default defineTheme({
 })
 ```
 
-The user configuration can customize pages and components inside the theme:
+> **Important**: The theme config object must be JSON serializable. Values like functions and classes do not work inside theme configurations.
+
+Pages and components can then be designed so that theme users can easily customize them without touching core parts of the theme.
 
 ```tsx
 // package/src/pages/index.astro
@@ -96,9 +97,6 @@ import config from 'my-theme:config'
 	</body>
 </html>
 ```
-
-The theme config must be JSON serializable. Values like functions and classes do not work inside theme configurations.
-
 
 ### Theme Context
 
@@ -163,6 +161,7 @@ pnpm astro add my-theme
 This will install the theme package and add it to the `integrations` array inside the Astro config:
 
 ```ts
+// astro.config.mjs
 import { defineConfig } from 'astro/config';
 import myTheme from 'my-theme';
 
@@ -182,7 +181,8 @@ Users can configure a theme using the `config` options that were defined by the 
 ```ts
 myTheme({
 	config: {
-		title: 'My Theme!'
+		title: 'My Site!',
+		description: 'My Astro Theme Provider Site!'
 	}
 })
 ```

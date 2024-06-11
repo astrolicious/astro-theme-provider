@@ -1,6 +1,6 @@
 ## What is `astro-theme-provider`?
 
-Astro Theme Provider is a tool that allows you to author themes for Astro like a normal project and export your work as an integration for others to use.
+Astro Theme Provider is a tool that allows you to author themes for [Astro](https://astro.build/) like a normal project and export your work as an integration for others to use.
 
 ### Core Goals
 
@@ -17,15 +17,15 @@ Astro Theme Provider is a tool that allows you to author themes for Astro like a
 
 There are many ways to contribute and many of them do not involve code, giving feedback and asking questions helps a lot. We encourage contributions of any kind! Some ways you can help contribute are:
 
-- Help improve the documentation
+- Help improve the [documentation](https://astro-theme-provider.netlify.app/)
 - Use `astro-theme-provider`, give feedback about your experience and open issues for any bugs you find
-- Participate in discussions in the [Discord Channel](https://chat.astrolicious.dev), [Issues Tab](https://github.com/astrolicious/astro-theme-provider/issues), [Discussions Tab](https://github.com/astrolicious/astro-theme-provider/discussions), etc and give suggestions for improvments or enhancments 
+- Participate in discussions in the [Discord Channel](https://chat.astrolicious.dev), [Issues Tab](https://github.com/astrolicious/astro-theme-provider/issues), [Discussions Tab](https://github.com/astrolicious/astro-theme-provider/discussions), etc and give suggestions for improvments or enhancments
 - Take ownership of an issue (typically tagged as `help wanted`), this can be anything from a simple bug fix to a large enhancement for the project
 - Review PRs, it is important that code is reviewed and approved by someone that did not author the PR
 
 ### Setting up local repo
 
-> **Note**: This repo uses ***pnpm***, you must use ***pnpm*** as your package manager
+> **Note**: This repo uses ***[pNPM](https://pnpm.io/)***, you must use ***pNPM*** as your package manager
 
 1. Clone the repo locally
 
@@ -36,7 +36,7 @@ git clone https://github.com/astrolicious/astro-theme-provider.git
 2. Install dependencies
 
 ```
-pnpm i
+pnpm install
 ```
 
 3. Install browsers for e2e testing
@@ -56,7 +56,7 @@ Now that the repo has been setup and the package has been built, you can use `pn
 ### PRs
 
 - Use the command `pnpm lint:fix` to lint your PR (last commit)
-- Use the command `pnpm changeset` to add a changeset to your PR 
+- Use the command `pnpm changeset` to add a changeset to your PR
 
 #### Merging
 
