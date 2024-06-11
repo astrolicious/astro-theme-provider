@@ -25,7 +25,8 @@ The virtual import `<name>:context` is now reserved, authors can no longer creat
 
 ### Renamed: Virtual Imports
 
-Virtual imports have been updated to follow [conventions for virtual modules](https://vitejs.dev/guide/api-plugin.html#virtual-modules-convention). This fix now allows theme packages use an `export` property inside the `package.json` without breaking.
+Virtual imports have been updated to follow [conventions for virtual modules](https://vitejs.dev/guide/api-plugin.html#virtual-modules-convention).
+This fix now allows theme packages use an `export` property inside the `package.json` without breaking.
 
 ```diff
 - import { Component } from 'my-theme/components'
@@ -36,14 +37,14 @@ Virtual imports have been updated to follow [conventions for virtual modules](ht
 
 ### Renamed: Default module for styling
 
-The default module for styling `css` has been renamed to `styles`
+The default module for styling `css` has been renamed to `styles`:
 
 ```diff
 - import 'my-theme/css'
 + import 'my-theme:styles'
 ```
 
-Make sure to also update the name of the folder inside of your theme
+Make sure to also update the name of the folder inside of your theme:
 
 <FileTree>
 - package/
@@ -51,5 +52,3 @@ Make sure to also update the name of the folder inside of your theme
 		- **styles/** \<- Renamed from "css"
 			- ...
 </FileTree>
-
-
