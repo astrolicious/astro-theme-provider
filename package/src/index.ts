@@ -51,12 +51,17 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 	const themeRoot = resolveDirectory("./", themeEntrypoint);
 
+	themeSrc = resolveDirectory(themeRoot, themeSrc);
+
 	const themePackage = new PackageJSON(themeRoot);
 
-	themeSrc = resolveDirectory(themeRoot, themeSrc);
+	let contentConfig: string | null = null
 
 	if (contentDir) {
 		contentDir = resolveDirectory(themeSrc, contentDir)
+		contentConfig = ['config.mjs', 'config.js', 'config.mts', 'config.ts']
+			.map((configPath) => resolve(contentDir || './', configPath))
+			.find((configPath) => existsSync(configPath)) || null
 	}
 
 	if (middlewareDir) {
@@ -116,54 +121,33 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 				"astro:config:setup": (params) => {
 					const { config, logger, injectRoute, addMiddleware } = params;
 
+					// Root of a user's project (directory that contains the Astrto config)
 					const projectRoot = resolveDirectory("./", config.root);
 
-					const contentConfig = ['config.mjs', 'config.js', 'config.mts', 'config.ts']
-						.map((configPath) => resolve(contentDir || './', configPath))
-						.find((configPath) => existsSync(configPath));
-
-					// Record of virtual imports and their content
+					// Record of virtual modules
 					const virtualImports: Parameters<typeof createVirtualResolver>[0]["imports"] = {
 						[`${themeName}:context`]: "",
 						[`${themeName}:config`]: `export default ${JSON.stringify(userConfig)}`,
-						[`${themeName}:content`]: `export * from "@it-astro:content"`,
-						[`${themeName}:collections`]: `export * from ${JSON.stringify(contentConfig)}`,
 					};
 
-					// Module type buffers
-					const moduleBuffers: Record<string, string> = {
-						// ['@it-astro:content/injector']: `
-						// 	import type { defineCollection } from 'astro:content';
-						// 	import type { FancyCollection } from '@inox-tools/content-utils/runtime/fancyContent';
-						// 	export type CollectionConfig = ReturnType<typeof defineCollection>;
-						// 	export const injectedCollections: Record<string, CollectionConfig | FancyCollection>;
-						// `,
-						// ['@it-astro:content']: `
-						// 	export { z, reference } from "astro:content";
-						// 	export type { SchemaContext, CollectionEntry, ContentCollectionKey, CollectionKey } from "astro:content";
-						// 	export { defineCollection } from "@inox-tools/content-utils/runtime/fancyContent";
-						// `,
-						[`${themeName}:content`]: `
-							export * from "@it-astro:content"
-						`,
-						[`${themeName}:collections`]: `
-							export const collections: typeof import(${JSON.stringify(contentConfig)}).collections;
-						`,
-						[`${themeName}:config`]: `
-							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
-							export default config;
-						`,
-						[`${themeName}:context`]: "",
-					};
-
-					// Interface type buffers
-					const interfaceBuffers = {
+					// Type buffers for declaring interfaces: `declare interface ThemeExports { ... }`
+					const interfaceBuffers: Record<string, string> = {
 						ThemeExports: "",
 						ThemeRoutes: "",
 						ThemeIntegrations: "",
 						ThemeIntegrationsResolved: "",
 					};
 
+					// Type buffers for declaring modules: `declare module "my-theme:config" { ... }`
+					const moduleBuffers: Record<string, string> = {
+						[`${themeName}:context`]: "",
+						[`${themeName}:config`]: `
+							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
+							export default config;
+						`,
+					};
+
+					// Template/stub for type generation
 					let themeTypesBuffer = `
 						type ThemeName = "${themeName}";
 
@@ -272,21 +256,18 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					}
 
 					// Inject collections
-					if (contentDir) {
-						const possibleConfigs = ['config.mjs', 'config.js', 'config.mts', 'config.ts'];
-
-						const contentConfig = possibleConfigs
-							.map((configPath) => resolve(contentDir, configPath))
-							.find((configPath) => existsSync(configPath));
-
-						if (contentConfig) {
-							injectCollections(params, {
-								entrypoint: `${themeName}:collections`,
-								seedTemplateDirectory: contentDir
-							})
-						} else {
-							logger.warn(`Could not find a config file inside the content directory `)
-						}
+					if (contentConfig) {
+						// Create virtual import used by author to define collections
+						virtualImports[`${themeName}:content`] = `export * from "@it-astro:content"`,
+						moduleBuffers[`${themeName}:content`] = `export * from "@it-astro:content"`
+						// Create virtual import used to inject and override collections
+						virtualImports[`${themeName}:collections`] =`export * from ${JSON.stringify(contentConfig)}`
+						moduleBuffers[`${themeName}:collections`] = `export const collections: typeof import(${JSON.stringify(contentConfig)}).collections;`
+						// Inject the content collections
+						injectCollections(params, {
+							entrypoint: `${themeName}:collections`,
+							seedTemplateDirectory: contentDir as string
+						})
 					}
 
 					// Reserved names for built-in virtual modules

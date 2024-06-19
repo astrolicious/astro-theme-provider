@@ -9,11 +9,13 @@
 		"url": "https://github.com/UserName/theme-ssg",
 		"directory": "package"
 	},
-	"keywords": ["astro-integration"],
+	"keywords": [
+		"astro-integration"
+	],
 	"scripts": {},
 	"devDependencies": {
-		"@types/node": "^20.14.2",
-		"astro": "^4.10.1"
+		"@types/node": "^20.14.6",
+		"astro": "^4.10.3"
 	},
 	"dependencies": {
 		"astro-theme-provider": "workspace:^"
