@@ -1,11 +1,13 @@
 ---
 import { Heading } from "theme-ssg:components";
 import { Layout } from "theme-ssg:layouts";
-import config from "theme-ssg:config";
+import { getEntry } from "astro:content";
+
+const entry = await getEntry('blog', 'success')
 ---
 
 <Layout>
   <Heading>
-    Theme SSG
+    { entry.data.title }
   </Heading>
 </Layout>
