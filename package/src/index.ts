@@ -58,10 +58,12 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 	let contentConfig: string | null = null
 
 	if (contentDir) {
-		contentDir = resolveDirectory(themeSrc, contentDir)
-		contentConfig = ['config.mjs', 'config.js', 'config.mts', 'config.ts']
+		contentDir = resolveDirectory(themeSrc, contentDir, false)
+		if (contentDir) {
+			contentConfig = ['config.mjs', 'config.js', 'config.mts', 'config.ts']
 			.map((configPath) => resolve(contentDir || './', configPath))
 			.find((configPath) => existsSync(configPath)) || null
+		}
 	}
 
 	if (middlewareDir) {
