@@ -1,8 +1,4 @@
 {
 	"extends": "astro/tsconfigs/strictest",
-	"exclude": [
-		"../docs/**/*",
-		"../tests/**/*",
-		"../package/**/*"
-	]
+	"exclude": ["../docs/**/*", "../tests/**/*", "../package/**/*"]
 }

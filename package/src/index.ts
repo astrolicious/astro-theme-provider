@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
+import { injectCollections } from "@inox-tools/content-utils";
 import type { AstroIntegration } from "astro";
 import { addDts, addIntegration, addVitePlugin, watchDirectory } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
@@ -12,6 +13,13 @@ import fg from "fast-glob";
 import { GLOB_ASTRO, GLOB_COMPONENTS, GLOB_IGNORE, GLOB_IMAGES, GLOB_STYLES } from "./internal/consts.js";
 import { errorMap } from "./internal/error-map.js";
 import type { AuthorOptions, UserOptions } from "./internal/types.js";
+import {
+	createVirtualModule,
+	globToModuleObject,
+	isEmptyModuleObject,
+	resolveModuleObject,
+	toModuleObject,
+} from "./utils/modules.ts";
 import { PackageJSON, warnThemePackage } from "./utils/package.js";
 import {
 	addLeadingSlash,
@@ -21,8 +29,6 @@ import {
 	resolveFilepath,
 	validatePattern,
 } from "./utils/path.js";
-import { createVirtualModule, globToModuleObject, isEmptyModuleObject, resolveModuleObject, toModuleObject } from "./utils/modules.ts";
-import { injectCollections } from "@inox-tools/content-utils";
 import { createVirtualResolver } from "./utils/resolver.ts";
 
 const thisFile = resolveFilepath("./", import.meta.url);
@@ -55,14 +61,15 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 	const themePackage = new PackageJSON(themeRoot);
 
-	let contentConfig: string | null = null
+	let contentConfig: string | null = null;
 
 	if (contentDir) {
-		contentDir = resolveDirectory(themeSrc, contentDir, false)
+		contentDir = resolveDirectory(themeSrc, contentDir, false);
 		if (contentDir) {
-			contentConfig = ['config.mjs', 'config.js', 'config.mts', 'config.ts']
-			.map((configPath) => resolve(contentDir || './', configPath))
-			.find((configPath) => existsSync(configPath)) || null
+			contentConfig =
+				["config.mjs", "config.js", "config.mts", "config.ts"]
+					.map((configPath) => resolve(contentDir || "./", configPath))
+					.find((configPath) => existsSync(configPath)) || null;
 		}
 	}
 
@@ -260,16 +267,17 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// Inject collections
 					if (contentConfig) {
 						// Create virtual import used by author to define collections
-						virtualImports[`${themeName}:content`] = `export * from "@it-astro:content"`,
-						moduleBuffers[`${themeName}:content`] = `export * from "@it-astro:content"`
+						(virtualImports[`${themeName}:content`] = `export * from "@it-astro:content"`),
+							(moduleBuffers[`${themeName}:content`] = `export * from "@it-astro:content"`);
 						// Create virtual import used to inject and override collections
-						virtualImports[`${themeName}:collections`] =`export * from ${JSON.stringify(contentConfig)}`
-						moduleBuffers[`${themeName}:collections`] = `export const collections: typeof import(${JSON.stringify(contentConfig)}).collections;`
+						virtualImports[`${themeName}:collections`] = `export * from ${JSON.stringify(contentConfig)}`;
+						moduleBuffers[`${themeName}:collections`] =
+							`export const collections: typeof import(${JSON.stringify(contentConfig)}).collections;`;
 						// Inject the content collections
 						injectCollections(params, {
 							entrypoint: `${themeName}:collections`,
-							seedTemplateDirectory: contentDir as string
-						})
+							seedTemplateDirectory: contentDir as string,
+						});
 					}
 
 					// Reserved names for built-in virtual modules

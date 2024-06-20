@@ -17,11 +17,11 @@ test("injected content collection", async ({ page }) => {
 
 	await expect(await page.innerText("h1")).toBe("Success!");
 
-  page.on('response', async (response) => {
-		if (response.url().endsWith('blog/fail')) {
-			await expect(response.status()).toBe(500)
+	page.on("response", async (response) => {
+		if (response.url().endsWith("blog/fail")) {
+			await expect(response.status()).toBe(500);
 		}
-  });
+	});
 
 	await page.goto("/blog/fail");
 });

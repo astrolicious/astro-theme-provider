@@ -1,9 +1,9 @@
 ---
+import { getEntry } from "astro:content";
 import { Heading } from "theme-ssg:components";
 import { Layout } from "theme-ssg:layouts";
-import { getEntry } from "astro:content";
 
-const entry = await getEntry('blog', 'success')
+const entry = await getEntry("blog", "success");
 ---
 
 <Layout>
