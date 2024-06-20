@@ -2,7 +2,7 @@
 "astro-theme-provider": minor
 ---
 
-Added the ability for themes to seed content collections and inject schemas into a user's project using [`@inox-tools/content-utils`](https://www.npmjs.com/package/@inox-tools/content-utils), thanks @Fryuni!
+Added the ability for themes to seed content collections and inject schemas into a user's project using [`@inox-tools/content-utils`](https://www.npmjs.com/package/@inox-tools/content-utils), thanks [@Fryuni](https://github.com/Fryuni)!
 
 ```
 package/
@@ -29,4 +29,4 @@ export const collections = {
 
 All collection schemas defined inside `package/src/content/config.ts` are injected into a user's project.
 
-All collection directories inside `package/src/content/` will be seeded (copied) to a user's project if the collection directory does not exist
+All collection directories inside `package/src/content/` will be copied to a user's project if the collection directory does not exist
