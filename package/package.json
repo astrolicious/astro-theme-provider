@@ -27,6 +27,7 @@
 	"files": ["dist"],
 	"peerDependencies": {
 		"@astrojs/db": ">=0.8.0",
+		"@inox-tools/content-utils": ">=0.2.1",
 		"astro": ">=3"
 	},
 	"peerDependenciesMeta": {
@@ -35,12 +36,13 @@
 		}
 	},
 	"devDependencies": {
-		"@astrojs/db": "^0.11.4",
-		"@types/node": "^20.14.2",
+		"@astrojs/db": "^0.11.6",
+		"@inox-tools/content-utils": "^0.4.0",
+		"@types/node": "^20.14.6",
 		"playwright": "^1.44.1",
 		"tsup": "^8.1.0",
 		"typescript": "^5.4.5",
-		"vite": "^5.2.13"
+		"vite": "^5.3.1"
 	},
 	"dependencies": {
 		"astro-integration-kit": "^0.13.3",

@@ -12,6 +12,20 @@ test("injected pages", async ({ page }) => {
 	await expect(page).toHaveTitle("Theme SSG");
 });
 
+test("injected content collection", async ({ page }) => {
+	await page.goto("/blog/success");
+
+	await expect(await page.innerText("h1")).toBe("Success!");
+
+	page.on("response", async (response) => {
+		if (response.url().endsWith("blog/fail")) {
+			await expect(response.status()).toBe(500);
+		}
+	});
+
+	await page.goto("/blog/fail");
+});
+
 test("injected public", async ({ request }) => {
 	const response = await request.get("/favicon.svg");
 	expect(response.status()).toBe(200);

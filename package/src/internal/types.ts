@@ -31,6 +31,7 @@ export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny>
 	srcDir?: string;
 	pageDir?: PageDirOption | string;
 	publicDir?: StaticDirOption | string | false | null | undefined;
+	contentDir?: string | false | null | undefined;
 	middlewareDir?: string | false | null | undefined;
 	log?: "verbose" | "minimal" | boolean;
 	schema?: Schema;

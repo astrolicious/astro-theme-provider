@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
+import { injectCollections } from "@inox-tools/content-utils";
 import type { AstroIntegration } from "astro";
 import { addDts, addIntegration, addVitePlugin, watchDirectory } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
@@ -46,6 +47,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		srcDir: themeSrc = "src",
 		pageDir = "pages",
 		publicDir = "public",
+		contentDir = "content",
 		middlewareDir = "./",
 		imports: themeImports = {},
 		integrations: themeIntegrations = [],
@@ -55,9 +57,21 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 
 	const themeRoot = resolveDirectory("./", themeEntrypoint);
 
+	themeSrc = resolveDirectory(themeRoot, themeSrc);
+
 	const themePackage = new PackageJSON(themeRoot);
 
-	themeSrc = resolveDirectory(themeRoot, themeSrc);
+	let contentConfig: string | null = null;
+
+	if (contentDir) {
+		contentDir = resolveDirectory(themeSrc, contentDir, false);
+		if (contentDir) {
+			contentConfig =
+				["config.mjs", "config.js", "config.mts", "config.ts"]
+					.map((configPath) => resolve(contentDir || "./", configPath))
+					.find((configPath) => existsSync(configPath)) || null;
+		}
+	}
 
 	if (middlewareDir) {
 		middlewareDir = resolveDirectory(themeSrc, middlewareDir);
@@ -116,31 +130,33 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 				"astro:config:setup": (params) => {
 					const { config, logger, injectRoute, addMiddleware } = params;
 
+					// Root of a user's project (directory that contains the Astrto config)
 					const projectRoot = resolveDirectory("./", config.root);
 
-					// Record of virtual imports and their content
+					// Record of virtual modules
 					const virtualImports: Parameters<typeof createVirtualResolver>[0]["imports"] = {
+						[`${themeName}:context`]: "",
 						[`${themeName}:config`]: `export default ${JSON.stringify(userConfig)}`,
-						[`${themeName}:context`]: "",
 					};
 
-					// Module type buffers
-					const moduleBuffers: Record<string, string> = {
-						[`${themeName}:config`]: `
-							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
-							export default config;
-						`,
-						[`${themeName}:context`]: "",
-					};
-
-					// Interface type buffers
-					const interfaceBuffers = {
+					// Type buffers for declaring interfaces: `declare interface ThemeExports { ... }`
+					const interfaceBuffers: Record<string, string> = {
 						ThemeExports: "",
 						ThemeRoutes: "",
 						ThemeIntegrations: "",
 						ThemeIntegrationsResolved: "",
 					};
 
+					// Type buffers for declaring modules: `declare module "my-theme:config" { ... }`
+					const moduleBuffers: Record<string, string> = {
+						[`${themeName}:context`]: "",
+						[`${themeName}:config`]: `
+							const config: NonNullable<NonNullable<Parameters<typeof import("${themeEntrypoint}").default>[0]>["config"]>;
+							export default config;
+						`,
+					};
+
+					// Template/stub for type generation
 					let themeTypesBuffer = `
 						type ThemeName = "${themeName}";
 
@@ -246,6 +262,28 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 								addMiddleware({ entrypoint, order: "post" });
 							}
 						}
+					}
+
+					// Inject collections
+					if (contentConfig) {
+						// Create virtual import used by author to define collections
+						virtualImports[`${themeName}:content`] = `
+							export * from "astro:content";
+							export { defineCollection } from "@it-astro:content";
+						`;
+						moduleBuffers[`${themeName}:content`] = `
+							export * from "astro:content";
+							export { defineCollection } from "@it-astro:content";
+						`;
+						// Create virtual import used to inject and override collections
+						virtualImports[`${themeName}:collections`] = `export * from ${JSON.stringify(contentConfig)}`;
+						moduleBuffers[`${themeName}:collections`] =
+							`export const collections: typeof import(${JSON.stringify(contentConfig)}).collections;`;
+						// Inject the content collections
+						injectCollections(params, {
+							entrypoint: `${themeName}:collections`,
+							seedTemplateDirectory: contentDir as string,
+						});
 					}
 
 					// Reserved names for built-in virtual modules

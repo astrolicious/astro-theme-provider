@@ -1,0 +1,23 @@
+---
+import { getCollection } from "theme-playground:content";
+import { Layout } from "theme-playground:layouts";
+
+const posts = await getCollection("blog");
+---
+
+<Layout>
+	<h1>Blog posts</h1>
+	<ul>
+		{ posts.map((post: any) => {
+			return (
+				<li>
+					<a href={`/blog/${post.slug}`}>
+						<h3>
+							{post.data.title}
+						</h3>
+					</a>
+				</li>
+			)
+		})}
+	</ul>
+</Layout>
