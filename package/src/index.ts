@@ -267,8 +267,14 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					// Inject collections
 					if (contentConfig) {
 						// Create virtual import used by author to define collections
-						(virtualImports[`${themeName}:content`] = `export * from "@it-astro:content"`),
-							(moduleBuffers[`${themeName}:content`] = `export * from "@it-astro:content"`);
+						virtualImports[`${themeName}:content`] = `
+							export * from "astro:content";
+							export { defineCollection } from "@it-astro:content";
+						`;
+						moduleBuffers[`${themeName}:content`] = `
+							export * from "astro:content";
+							export { defineCollection } from "@it-astro:content";
+						`;
 						// Create virtual import used to inject and override collections
 						virtualImports[`${themeName}:collections`] = `export * from ${JSON.stringify(contentConfig)}`;
 						moduleBuffers[`${themeName}:collections`] =

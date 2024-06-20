@@ -1,4 +1,4 @@
-import { defineCollection, z } from "@it-astro:content";
+import { defineCollection, z } from "theme-playground:content";
 
 export const collections = {
 	blog: defineCollection({
