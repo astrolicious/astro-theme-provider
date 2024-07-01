@@ -13,7 +13,7 @@
 	"scripts": {},
 	"devDependencies": {
 		"@types/node": "^20.14.2",
-		"astro": "^4.10.1"
+		"astro": "^4.11.3"
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.1.5",
