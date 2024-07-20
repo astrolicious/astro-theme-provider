@@ -1,5 +1,5 @@
 ---
-"astro-theme-provider": patch
+"astro-theme-provider": minor
 ---
 
 Fixed circular import case when overriding components, for example:
