@@ -1,5 +1,50 @@
 # astro-theme-provider
 
+## 0.6.0
+
+### Minor Changes
+
+- 0d49101: Fixed circular import case when overriding components, for example:
+
+  ```tsx
+  // src/CustomButton.astro
+  ---
+  import { Button } from 'my-theme:components';
+  ---
+
+  <Button>
+    I am custon text
+  </Button>
+  ```
+
+  ```tsx
+  import { defineConfig } from "astro/config";
+  import myTheme from "my-theme";
+
+  export default defineConfig({
+    integrations: [
+      myTheme({
+        overrides: {
+          components: {
+            Button: "./src/CustomButton.astro",
+          },
+        },
+      }),
+    ],
+  });
+  ```
+
+- 0d49101: Simplified generated types and removed extra types that are not being used internally.
+- 8ecb96d: Change type for theme integrations from `AstroDbIntegration` to `AstroIntegration`
+- f604446: Added the ability for theme authors to toggle the public directory off:
+
+  ```ts
+  defineTheme({
+    name: "my-theme",
+    publicDir: false,
+  });
+  ```
+
 ## 0.5.0
 
 ### Minor Changes
