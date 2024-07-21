@@ -177,7 +177,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					watchDirectory(params, themeRoot);
 
 					// Sideload integration to handle the public directory
-					if (publicDir && existsSync(resolveDirectory(publicDir.cwd!, publicDir.dir))) {
+					if (publicDir && existsSync(resolveDirectory(publicDir.cwd!, publicDir.dir, false))) {
 						addIntegration(params, { integration: staticDir(publicDir) });
 					}
 
