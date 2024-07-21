@@ -1,5 +1,11 @@
 # astro-theme-provider
 
+## 0.6.1
+
+### Patch Changes
+
+- cb2bbd3: Fix error for theme's that do not have a `public` directory
+
 ## 0.6.0
 
 ### Minor Changes
