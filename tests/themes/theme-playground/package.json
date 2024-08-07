@@ -14,8 +14,8 @@
 	],
 	"scripts": {},
 	"devDependencies": {
-		"@types/node": "^20.14.11",
-		"astro": "^4.12.2"
+		"@types/node": "^22.1.0",
+		"astro": "^4.13.1"
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.1.6",
