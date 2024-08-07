@@ -42,14 +42,14 @@
 	},
 	"devDependencies": {
 		"@astrojs/db": "^0.12.0",
-		"@types/node": "^20.14.11",
-		"playwright": "^1.45.2",
-		"tsup": "^8.2.0",
-		"typescript": "^5.5.3",
-		"vite": "^5.3.4"
+		"@types/node": "^22.1.0",
+		"playwright": "^1.46.0",
+		"tsup": "^8.2.4",
+		"typescript": "^5.5.4",
+		"vite": "^5.4.0"
 	},
 	"dependencies": {
-		"astro-integration-kit": "^0.14.0",
+		"astro-integration-kit": "^0.16.0",
 		"astro-pages": "^0.3.0",
 		"astro-public": "^0.1.0",
 		"callsites": "^4.2.0",
