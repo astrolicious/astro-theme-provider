@@ -12,7 +12,7 @@
 		"test": "playwright test"
 	},
 	"dependencies": {
-		"@astrojs/check": "^0.8.2",
+		"@astrojs/check": "^0.9.3",
 		"astro": "^4.12.2",
 		"theme-ssg": "workspace:^",
 		"typescript": "^5.5.3"
