@@ -1,5 +1,13 @@
 # astro-theme-provider
 
+## 0.6.2
+
+### Patch Changes
+
+- 52e2a61: Upgrade to Astro 5.0
+
+  - Fix automatic resolution of theme entrypoint
+
 ## 0.6.1
 
 ### Patch Changes
