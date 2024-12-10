@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
 import type { AstroIntegration } from "astro";
-import { addDts, addIntegration, addVitePlugin, watchDirectory } from "astro-integration-kit";
+import { addIntegration, addVitePlugin, watchDirectory } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
 import type { IntegrationOption as PageDirIntegrationOption } from "astro-pages";
 import staticDir from "astro-public";
@@ -101,6 +101,33 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 			);
 		}
 
+		let themeTypesBuffer = `
+			type ThemeName = "${themeName}";
+
+			declare namespace AstroThemeProvider {
+					export interface Themes {
+							"${themeName}": true;
+					}
+
+					export interface ThemeOptions {
+							"${themeName}": {
+									pages?: { [Pattern in keyof ThemeRoutes]?: string | boolean } & {}
+									overrides?: {
+											[Module in keyof ThemeExports]?:
+													ThemeExports[Module] extends Record<string, any>
+															? ThemeExports[Module] extends string[]
+																	?	string[]
+																	: { [Export in keyof ThemeExports[Module]]?: string }
+															: never
+									} & {}
+									integrations?: keyof ThemeIntegrationsResolved extends never
+										? \`\$\{ThemeName\} is not injecting any integrations\`
+										: { [Name in keyof ThemeIntegrationsResolved]?: boolean } & {}
+							};
+					}
+			}
+		`;
+
 		const themeIntegration: AstroIntegration = {
 			name: themeName,
 			hooks: {
@@ -140,32 +167,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						ThemeIntegrationsResolved: "",
 					};
 
-					let themeTypesBuffer = `
-						type ThemeName = "${themeName}";
-
-						declare namespace AstroThemeProvider {
-								export interface Themes {
-										"${themeName}": true;
-								}
-
-								export interface ThemeOptions {
-										"${themeName}": {
-												pages?: { [Pattern in keyof ThemeRoutes]?: string | boolean } & {}
-												overrides?: {
-														[Module in keyof ThemeExports]?:
-																ThemeExports[Module] extends Record<string, any>
-																		? ThemeExports[Module] extends string[]
-																				?	string[]
-																				: { [Export in keyof ThemeExports[Module]]?: string }
-																		: never
-												} & {}
-												integrations?: keyof ThemeIntegrationsResolved extends never
-													? \`\$\{ThemeName\} is not injecting any integrations\`
-													: { [Name in keyof ThemeIntegrationsResolved]?: boolean } & {}
-										};
-								}
-						}
-					`;
 
 					if (logLevel) {
 						// Warn about issues with theme's `package.json`
@@ -394,13 +395,13 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 							}
 						`;
 					}
-
-					// Write compiled types to .d.ts file
-					addDts(params, {
-						name: themeName,
+				},
+				"astro:config:done": ({ injectTypes }) => {
+					injectTypes({
+						filename: 'theme.d.ts',
 						content: themeTypesBuffer,
 					});
-				},
+				}
 			},
 		};
 
