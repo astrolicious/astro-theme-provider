@@ -6,6 +6,7 @@
 		"node": ">=18.19.0"
 	},
 	"scripts": {
+		"update:all": "pnpm recursive update --include-workspace-root",
 		"test": "node --test && pnpm --filter \"./tests/e2e/**\" test",
 		"test:e2e": "pnpm --filter \"./tests/e2e/**\" test",
 		"test:unit": "node --test",
@@ -21,9 +22,9 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"@biomejs/biome": "^1.8.3",
-		"@changesets/cli": "^2.27.7",
-		"@playwright/test": "^1.46.0",
-		"astro": "^4.13.1"
+		"@biomejs/biome": "^1.9.4",
+		"@changesets/cli": "^2.27.10",
+		"@playwright/test": "^1.49.0",
+		"astro": "^5.0.4"
 	}
 }

@@ -40,7 +40,6 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		name: themeName,
 		schema: configSchema = z.any(),
 		entrypoint: themeEntrypoint = callsites()
-			.reverse()
 			.map((callsite) => (callsite as NodeJS.CallSite).getScriptNameOrSourceURL())
 			.find((path) => path && !path.startsWith("file://") && path !== thisFile)!,
 		srcDir: themeSrc = "src",
