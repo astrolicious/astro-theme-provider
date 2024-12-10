@@ -1,5 +1,11 @@
 # astro-theme-provider
 
+## 0.7.0
+
+### Minor Changes
+
+- e169ab8: Re-release 0.6.2 as a minor due to compatibility issues with Astro 4.0
+
 ## 0.6.2
 
 ### Patch Changes
