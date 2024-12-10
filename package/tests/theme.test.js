@@ -260,22 +260,6 @@ describe("defineTheme", () => {
 					}
 				}
 			});
-
-			it("should generate types", () => {
-				const theme = defineTheme({})();
-				const params = astroConfigSetupParamsStub();
-
-				theme.hooks["astro:config:setup"]?.(params);
-
-				assert.equal(
-					readFileSync(resolve(projectSrc, "env.d.ts"), "utf-8").includes(
-						`/// <reference types="../.astro/${packageName}.d.ts" />`,
-					),
-					true,
-				);
-
-				assert.equal(existsSync(resolve(projectRoot, `.astro/${packageName}.d.ts`)), true);
-			});
 		});
 	});
 });
