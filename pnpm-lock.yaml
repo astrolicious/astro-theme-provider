@@ -45,11 +45,11 @@ importers:
         specifier: ^0.17.0
         version: 0.17.0(astro@5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1))
       astro-pages:
-        specifier: ^0.3.0
-        version: 0.3.0(astro@5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1))
+        specifier: ^0.3.1
+        version: 0.3.1(astro@5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1))
       astro-public:
-        specifier: ^0.1.0
-        version: 0.1.0(astro@5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1))
+        specifier: ^0.1.1
+        version: 0.1.1(astro@5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1))
       callsites:
         specifier: ^4.2.0
         version: 4.2.0
@@ -1270,15 +1270,15 @@ packages:
     peerDependencies:
       astro: ^4.12.0 || ^5.0.0-beta
 
-  astro-pages@0.3.0:
-    resolution: {integrity: sha512-fHSXYA1qeTmNi7HA7d8VXn6nXI2r/cw9+ft3kbuizshk+bqXlTEepV/zqI7boWVJsp2uFG1ih/YeHF2mDYaoVQ==}
+  astro-pages@0.3.1:
+    resolution: {integrity: sha512-gDp2+JRhTzbNDjeTAP3rgG4i85eLO2z2fuhXJcFxdlkd6A5bpoLDNv1OPZP6K+Sd8sZvGK9wF8hL2icWTZdGqQ==}
     peerDependencies:
       astro: '>=3'
 
-  astro-public@0.1.0:
-    resolution: {integrity: sha512-e+vIfUohHYIOwUmlKyYOOMvlClHKuTT9AMzZcPCFAJeVEL8EQWyXVc+WCtS3IH16gN56UjnymQ2V2hjuQwPrOg==}
+  astro-public@0.1.1:
+    resolution: {integrity: sha512-uYJSqzd+zgfjxxUFhtU/erEWeeUuMxJ6NvKJvGCEKiT/AqbIkbBsuVrqX545/mOz+7uOFVSfZQ6jBuEvhssrCQ==}
     peerDependencies:
-      astro: ^4.4.0
+      astro: ^4.4.0||^5
 
   astro@4.16.17:
     resolution: {integrity: sha512-OuD+BP7U6OqQLKtZ/FJkU2S+TOlifxS/OKUbZOb5p6y+LLBa1J3zHRJrIl7DUSq6eXY+9wSWwbJpD9JS+lqhxA==}
@@ -2068,6 +2068,7 @@ packages:
 
   libsql@0.4.7:
     resolution: {integrity: sha512-T9eIRCs6b0J1SHKYIvD8+KCJMcWZ900iZyxdnSCdqxN12Z1ijzT+jY5nrk72Jw4B0HGzms2NgpryArlJqvc3Lw==}
+    cpu: [x64, arm64, wasm32]
     os: [darwin, linux, win32]
 
   lilconfig@3.1.3:
@@ -4391,7 +4392,7 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 22.10.1
+      '@types/node': 17.0.45
 
   '@types/unist@2.0.11': {}
 
@@ -4515,12 +4516,12 @@ snapshots:
       pathe: 1.1.2
       recast: 0.23.9
 
-  astro-pages@0.3.0(astro@5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1)):
+  astro-pages@0.3.1(astro@5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1)):
     dependencies:
       astro: 5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1)
       fast-glob: 3.3.2
 
-  astro-public@0.1.0(astro@5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1)):
+  astro-public@0.1.1(astro@5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1)):
     dependencies:
       astro: 5.0.4(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1)
 
