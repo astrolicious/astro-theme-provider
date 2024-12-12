@@ -140,7 +140,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
 				"astro:config:setup": (params) => {
-					const { config, logger, injectRoute, addMiddleware } = params;
+					const { config, logger, isRestart, injectRoute, addMiddleware } = params;
 
 					const projectRoot = resolveDirectory("./", config.root);
 
@@ -167,8 +167,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 						ThemeIntegrationsResolved: "",
 					};
 
-
-					if (logLevel) {
+					if (logLevel && !isRestart) {
 						// Warn about issues with theme's `package.json`
 						warnThemePackage(themePackage, logger);
 					}
@@ -398,10 +397,10 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 				},
 				"astro:config:done": ({ injectTypes }) => {
 					injectTypes({
-						filename: 'theme.d.ts',
+						filename: "theme.d.ts",
 						content: themeTypesBuffer,
 					});
-				}
+				},
 			},
 		};
 
