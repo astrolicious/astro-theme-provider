@@ -11,7 +11,8 @@ export default defineConfig({
 			config: {
 				title: "Hey!",
 				description: "This is a theme created using",
-				// sitemap: false
+				// sitemap: false,
+				// toc: false,
 			},
 			pages: {
 				// '/cats': '/dogs',

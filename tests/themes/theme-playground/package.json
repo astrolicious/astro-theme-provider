@@ -19,6 +19,7 @@
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.2.1",
-		"astro-theme-provider": "workspace:^"
+		"astro-theme-provider": "workspace:^",
+		"remark-toc": "^9.0.0"
 	}
 }

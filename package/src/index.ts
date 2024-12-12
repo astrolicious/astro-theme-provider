@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
-import type { AstroIntegration } from "astro";
+import type { AstroConfig, AstroIntegration } from "astro";
 import { addIntegration, addVitePlugin, watchDirectory } from "astro-integration-kit";
 import { addPageDir } from "astro-pages";
 import type { IntegrationOption as PageDirIntegrationOption } from "astro-pages";
@@ -29,6 +29,7 @@ import {
 	validatePattern,
 } from "./utils/path.js";
 import { createVirtualResolver } from "./utils/resolver.ts";
+import type { DeepPartial } from "./utils/type-utils.ts";
 
 const thisFile = resolveFilepath("./", import.meta.url);
 
@@ -48,6 +49,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 		middlewareDir = "./",
 		imports: themeImports = {},
 		integrations: themeIntegrations = [],
+		markdown: markdownOptions = {},
 	} = partialAuthorOptions;
 
 	themeEntrypoint = resolveFilepath("./", themeEntrypoint);
@@ -140,7 +142,7 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					if (existsSync(seedEntrypoint)) extendDb({ seedEntrypoint });
 				},
 				"astro:config:setup": (params) => {
-					const { config, logger, injectRoute, addMiddleware } = params;
+					const { config, logger, injectRoute, addMiddleware, updateConfig } = params;
 
 					const projectRoot = resolveDirectory("./", config.root);
 
@@ -231,6 +233,73 @@ export default function <ThemeName extends string, Schema extends z.ZodTypeAny>(
 					interfaceBuffers.ThemeIntegrations = `${JSON.stringify(integrationsPossible, null, 4).slice(1, -1)}` || "\n";
 					interfaceBuffers.ThemeIntegrationsResolved =
 						`${JSON.stringify({ ...integrationsInjected, ...integrationsIgnored }, null, 4).slice(1, -1)}` || "\n";
+
+							// Add markdown options
+					if (markdownOptions) {
+						let markdown:
+							| ReturnType<Extract<typeof markdownOptions, (...args: any[]) => any>>
+							| typeof markdownOptions
+							| false
+							| null
+							| undefined;
+						const results: DeepPartial<AstroConfig["markdown"]> = {};
+						if (typeof markdownOptions === "function")
+							markdown = markdownOptions({ config: userConfig, astroConfig: config });
+						else markdown = markdownOptions;
+
+						if (markdown) {
+							const { syntaxHighlight, shikiConfig, rehypePlugins, remarkPlugins, remarkRehype, gfm, smartypants } =
+								markdown;
+							if (syntaxHighlight && userConfig.markdown?.syntaxHighlight !== false) {
+								if (typeof syntaxHighlight === "function") {
+									const r = syntaxHighlight({ config: userConfig, astroConfig: config });
+									if (r) results.syntaxHighlight = r;
+								} else results.syntaxHighlight = syntaxHighlight;
+							}
+							if (shikiConfig && userConfig.markdown?.shikiConfig !== false) {
+								if (typeof shikiConfig === "function") {
+									const r = shikiConfig({ config: userConfig, astroConfig: config });
+									if (r) results.shikiConfig = r;
+								} else results.shikiConfig = shikiConfig;
+							}
+							function rmInvalid<T extends T[number][]>(r: T): Array<Exclude<NonNullable<T[number]>, false>> {
+								return r.filter((i) => i != null && i !== false) as Array<Exclude<NonNullable<T[number]>, false>>;
+							}
+							if (rehypePlugins && userConfig.markdown?.rehypePlugins !== false) {
+								if (typeof rehypePlugins === "function") {
+									const r = rehypePlugins({ config: userConfig, astroConfig: config });
+									if (r) results.rehypePlugins = rmInvalid(r);
+								} else results.rehypePlugins = rmInvalid(rehypePlugins);
+							}
+							if (remarkPlugins && userConfig.markdown?.remarkPlugins !== false) {
+								if (typeof remarkPlugins === "function") {
+									const r = remarkPlugins({ config: userConfig, astroConfig: config });
+									if (r) results.remarkPlugins = rmInvalid(r);
+								} else results.remarkPlugins = rmInvalid(remarkPlugins);
+							}
+							if (remarkRehype && userConfig.markdown?.remarkRehype !== false) {
+								if (typeof remarkRehype === "function") {
+									const r = remarkRehype({ config: userConfig, astroConfig: config });
+									if (r) results.remarkRehype = r;
+								} else results.remarkRehype = remarkRehype;
+							}
+							if (typeof gfm === "function" && userConfig.markdown?.gfm !== false) {
+								const r = gfm({ config: userConfig, astroConfig: config });
+								if (typeof r === "boolean") results.gfm = r;
+							} else if (typeof gfm === "boolean") {
+								results.gfm = gfm;
+							}
+							if (typeof smartypants === "function" && userConfig.markdown?.smartypants !== false) {
+								const r = smartypants({ config: userConfig, astroConfig: config });
+								if (typeof r === "boolean") results.smartypants = r;
+							} else if (typeof smartypants === "boolean") {
+								results.smartypants = smartypants;
+							}
+
+							updateConfig({ markdown: results });
+						}
+					}
+
 
 					// Add middleware
 					if (middlewareDir) {

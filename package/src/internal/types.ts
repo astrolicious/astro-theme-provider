@@ -1,8 +1,9 @@
-import type { AstroIntegration } from "astro";
+import type { AstroConfig, AstroIntegration } from "astro";
 import type { Option as PageDirOption } from "astro-pages";
 import type { Option as StaticDirOption } from "astro-public/types";
 import type { z } from "astro/zod";
 import type { ModuleExports, ModuleImports, ModuleObject } from "../utils/modules.ts";
+import type { DeepPartial } from "../utils/type-utils.ts";
 
 export type ValueOrArray<T> = T | ValueOrArray<T>[];
 
@@ -44,6 +45,56 @@ export type AuthorOptions<ThemeName extends string, Schema extends z.ZodTypeAny>
 				| undefined
 				| void)
 	>;
+	markdown?:
+	| DeepPartial<AstroConfig["markdown"]>
+	| ((options: { config: z.infer<Schema>; astroConfig: AstroConfig }) =>
+			| DeepPartial<AstroConfig["markdown"]>
+			| false
+			| null
+			| undefined)
+	| {
+			syntaxHighlight?:
+				| DeepPartial<AstroConfig["markdown"]["syntaxHighlight"]>
+				| ((options: { config: z.infer<Schema>; astroConfig: AstroConfig }) =>
+						| DeepPartial<AstroConfig["markdown"]["syntaxHighlight"]>
+						| false
+						| null
+						| undefined);
+			shikiConfig?:
+				| DeepPartial<AstroConfig["markdown"]["shikiConfig"]>
+				| ((options: { config: z.infer<Schema>; astroConfig: AstroConfig }) =>
+						| DeepPartial<AstroConfig["markdown"]["shikiConfig"]>
+						| false
+						| null
+						| undefined);
+			remarkPlugins?:
+				| (false | undefined | null | AstroConfig["markdown"]["remarkPlugins"][number])[]
+				| ((options: { config: z.infer<Schema>; astroConfig: AstroConfig }) =>
+						| (false | undefined | null | AstroConfig["markdown"]["remarkPlugins"][number])[]
+						| false
+						| null
+						| undefined);
+			rehypePlugins?:
+				| (false | undefined | null | AstroConfig["markdown"]["rehypePlugins"][number])[]
+				| ((options: { config: z.infer<Schema>; astroConfig: AstroConfig }) =>
+						| (false | undefined | null | AstroConfig["markdown"]["rehypePlugins"][number])[]
+						| false
+						| null
+						| undefined);
+			remarkRehype?:
+				| DeepPartial<AstroConfig["markdown"]["remarkRehype"]>
+				| ((options: { config: z.infer<Schema>; astroConfig: AstroConfig }) =>
+						| DeepPartial<AstroConfig["markdown"]["remarkRehype"]>
+						| false
+						| null
+						| undefined);
+			gfm?:
+				| boolean
+				| ((options: { config: z.infer<Schema>; astroConfig: AstroConfig }) => boolean | null | undefined);
+			smartypants?:
+				| boolean
+				| ((options: { config: z.infer<Schema>; astroConfig: AstroConfig }) => boolean | null | undefined);
+	  };
 }>;
 
 export type UserOptions<ThemeName extends string, Schema extends z.ZodTypeAny = z.ZodTypeAny> = {
