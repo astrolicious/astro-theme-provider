@@ -2,4 +2,4 @@
 "astro-theme-provider": patch
 ---
 
-Only warnThemePackage on not restart
+Only emit package warnings on the first start of the dev server
