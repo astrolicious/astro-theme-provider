@@ -1,6 +1,6 @@
 {
 	"name": "astro-theme-provider",
-	"version": "0.7.0",
+	"version": "0.7.1",
 	"description": "Easily create theme integrations for Astro",
 	"keywords": [
 		"astro",
