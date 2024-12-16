@@ -14,7 +14,7 @@
 	],
 	"scripts": {},
 	"devDependencies": {
-		"@types/node": "^22.10.1",
+		"@types/node": "^22.10.2",
 		"astro": "^5.0.4"
 	},
 	"dependencies": {
