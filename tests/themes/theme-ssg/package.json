@@ -15,7 +15,7 @@
 	"scripts": {},
 	"devDependencies": {
 		"@types/node": "^22.10.1",
-		"astro": "^5.0.4"
+		"astro": "^5.0.5"
 	},
 	"dependencies": {
 		"astro-theme-provider": "workspace:^"
