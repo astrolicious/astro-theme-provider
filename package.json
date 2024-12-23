@@ -25,6 +25,6 @@
 		"@biomejs/biome": "^1.9.4",
 		"@changesets/cli": "^2.27.10",
 		"@playwright/test": "^1.49.0",
-		"astro": "^5.0.4"
+		"astro": "^5.1.1"
 	}
 }
