@@ -1,5 +1,13 @@
 # astro-theme-provider
 
+## 0.7.1
+
+### Patch Changes
+
+- 3b70666: Upgrade dependencies
+- df50737: Migrate away from the AIK utility `addDts` to the native utility `injectTypes`
+- aa826a7: Only emit package warnings on the first start
+
 ## 0.7.0
 
 ### Minor Changes
