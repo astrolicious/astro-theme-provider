@@ -13,12 +13,12 @@
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.4",
-		"astro": "^5.0.4",
+		"astro": "^5.1.6",
 		"theme-ssg": "workspace:^",
-		"typescript": "^5.7.2"
+		"typescript": "^5.7.3"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.49.0",
-		"@types/node": "^22.10.1"
+		"@playwright/test": "^1.49.1",
+		"@types/node": "^22.10.6"
 	}
 }
