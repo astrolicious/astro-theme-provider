@@ -23,8 +23,8 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
-		"@changesets/cli": "^2.27.11",
-		"@playwright/test": "^1.49.1",
-		"astro": "^5.1.6"
+		"@changesets/cli": "^2.27.12",
+		"@playwright/test": "^1.50.1",
+		"astro": "^5.2.5"
 	}
 }
