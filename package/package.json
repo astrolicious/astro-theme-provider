@@ -42,7 +42,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/db": "^0.14.6",
-		"@types/node": "^22.13.1",
+		"@types/node": "^22.13.10",
 		"playwright": "^1.50.1",
 		"tsup": "^8.3.6",
 		"typescript": "^5.7.3",
