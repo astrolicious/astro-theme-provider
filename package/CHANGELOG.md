@@ -1,5 +1,11 @@
 # astro-theme-provider
 
+## 0.7.2
+
+### Patch Changes
+
+- 26f9369: Upgrade dependencies to latest versions
+
 ## 0.7.1
 
 ### Patch Changes
